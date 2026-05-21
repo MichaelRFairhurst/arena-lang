@@ -1,0 +1,26 @@
+# Build directories
+build/
+cmake-build-*/
+
+# vcpkg
+vcpkg_installed/
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Compiled binaries
+*.out
+llvm_example
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
