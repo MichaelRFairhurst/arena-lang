@@ -8,16 +8,18 @@ namespace arena::ast {
 class Node {
     public:
     Node() = default;
-    Node(Token begin, Token end) : beginToken(begin), endToken(end) {}
+    Node(Token *begin, Token *end) : beginToken(begin), endToken(end) {}
 
     virtual ~Node() = default;
 
-    const Token &begin() const { return beginToken; }
-    const Token &end() const { return endToken; }
+    Token *begin() { return beginToken; }
+    const Token *begin() const { return beginToken; }
+    Token *end() { return endToken; }
+    const Token *end() const { return endToken; }
 
     private:
-    Token beginToken;
-    Token endToken;
+    Token *beginToken;
+    Token *endToken;
 };
 
 } // namespace arena::ast

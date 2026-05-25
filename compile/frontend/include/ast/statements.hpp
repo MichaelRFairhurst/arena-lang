@@ -9,7 +9,7 @@ namespace arena::ast {
 
     class Statement : public Node {
     public:
-        Statement(Token begin, Token end) : Node(begin, end) {}
+        Statement(Token *begin, Token *end) : Node(begin, end) {}
 
         virtual std::string to_string() const = 0;
 
@@ -18,7 +18,7 @@ namespace arena::ast {
 
     class IfStatement : public Statement {
     public:
-        IfStatement(Token ifToken, Expression *condition, Statement *thenBranch, Statement *elseBranch)
+        IfStatement(Token *ifToken, Expression *condition, Statement *thenBranch, Statement *elseBranch)
             : Statement(ifToken, elseBranch ? elseBranch->end() : thenBranch->end()), condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {}
 
         virtual ~IfStatement() = default;
@@ -39,13 +39,13 @@ namespace arena::ast {
 
     class LetStatement : public Statement {
     public:
-        LetStatement(Token let, Token name, Type *type)
+        LetStatement(Token *let, Token *name, Type *type)
             : Statement(let, type == nullptr ? name : type->end()), name(name), type(type) {}
 
         virtual ~LetStatement() = default;
 
         std::string to_string() const override {
-            std::string result = "let " + std::string(name.text);
+            std::string result = "let " + std::string(name->text);
             if (type) {
                 result += ": " + type->to_string();
             }
@@ -54,13 +54,13 @@ namespace arena::ast {
         }
 
     private:
-        Token name;
+        Token *name;
         Type *type;
     };
 
     class ReturnStatement : public Statement {
     public:
-        ReturnStatement(Token returnToken, Expression *value)
+        ReturnStatement(Token *returnToken, Expression *value)
             : Statement(returnToken, value->end()), value(value) {}
 
         virtual ~ReturnStatement() = default;
@@ -75,7 +75,7 @@ namespace arena::ast {
 
     class ExpressionStatement : public Statement {
     public:
-        ExpressionStatement(Token begin, Expression *expression, Token semicolon)
+        ExpressionStatement(Token *begin, Expression *expression, Token *semicolon)
             : Statement(begin, semicolon), expression(expression) {}
 
         std::string to_string() const override {
@@ -90,7 +90,7 @@ namespace arena::ast {
 
     class BlockStatement : public Statement {
     public:
-        BlockStatement(Token openBrace, std::vector<Statement *> statements, Token closeBrace)
+        BlockStatement(Token *openBrace, std::vector<Statement *> statements, Token *closeBrace)
             : Statement(openBrace, closeBrace), statements(statements) {}
 
         std::string to_string() const override {

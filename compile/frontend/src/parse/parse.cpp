@@ -9,35 +9,65 @@
 #include "ast/token.hpp"
 #include "parse/parse.hpp"
 
+extern "C" {
+#include "arena.h"
+rena_arena ast_arena;
+}
+
+namespace {
+    template <typename T, typename... Args>
+    T *ast_arena_new(Args &&...args) {
+        void *ptr;
+        if (rena_arena_alloc(&ast_arena, sizeof(T), alignof(T), &ptr) != RENA_ARENA_SUCCESS) {
+            return nullptr;
+        }
+        return new (ptr) T(std::forward<Args>(args)...);
+    }
+} // namespace
+
 namespace arena::parse {
     using namespace arena::ast;
 
     class TokenIterator {
         std::string_view state;
-        Token head;
+        Token* prev = nullptr;
+        Token* head = nullptr;
+
+        Token* set_head(TokenType type, std::string_view text) {
+            prev = head;
+            head = ast_arena_new<Token>(Token{type, text, nullptr});
+
+            if (prev != nullptr) {
+                prev->next = head;
+            }
+
+            return head;
+        }
 
     public:
         TokenIterator(std::string_view input) : state(input) {}
 
-        Token peek() {
-            if (head.type == TokenType::UNINITIALIZED_TOKEN) {
-                head = next();
+        Token* peek() {
+            if (head == nullptr) {
+                next();
             }
             return head;
         }
 
-        Token take() {
-            Token current = peek();
-            head = {TokenType::UNINITIALIZED_TOKEN, {}};
-            return current;
+        Token* take() {
+            if (head == nullptr) {
+                next();
+            }
+            next();
+            return prev;
         }
 
-        Token next() {
+        Token* next() {
             auto begin = std::find_if_not(state.begin(), state.end(), isspace);
 
             state = std::string_view(begin, state.end() - begin);
             if (state.empty()) {
-                return {TokenType::END_OF_INPUT, state};
+                return set_head(TokenType::END_OF_INPUT, state);
             }
 
             std::optional<TokenType> matchType;
@@ -63,7 +93,7 @@ namespace arena::parse {
 
                 if (matchType.has_value()) {
                     state.remove_prefix(2);
-                    return {matchType.value(), twoCharToken};
+                    return set_head(matchType.value(), twoCharToken);
                 }
             }
 
@@ -134,7 +164,7 @@ namespace arena::parse {
 
             if (matchType.has_value()) {
                 state.remove_prefix(1);
-                return {matchType.value(), tokenText};
+                return set_head(matchType.value(), tokenText);
             }
 
             // TODO: handle integer literals, string literals, comments, etc.
@@ -149,32 +179,32 @@ namespace arena::parse {
             std::cout << state << std::endl;
 
             if (tokenText == "as") {
-                return {TokenType::AS, tokenText};
+                return set_head(TokenType::AS, tokenText);
             } else if (tokenText == "fun") {
-                return {TokenType::FUN, tokenText};
+                return set_head(TokenType::FUN, tokenText);
             } else if (tokenText == "true") {
-                return {TokenType::TRUE, tokenText};
+                return set_head(TokenType::TRUE, tokenText);
             } else if (tokenText == "false") {
-                return {TokenType::FALSE, tokenText};
+                return set_head(TokenType::FALSE, tokenText);
             } else if (tokenText == "if") {
-                return {TokenType::IF, tokenText};
+                return set_head(TokenType::IF, tokenText);
             } else if (tokenText == "else") {
-                return {TokenType::ELSE, tokenText};
+                return set_head(TokenType::ELSE, tokenText);
             } else if (tokenText == "for") {
-                return {TokenType::FOR, tokenText};
+                return set_head(TokenType::FOR, tokenText);
             } else if (tokenText == "while") {
-                return {TokenType::WHILE, tokenText};
+                return set_head(TokenType::WHILE, tokenText);
             } else if (tokenText == "let") {
-                return {TokenType::LET, tokenText};
+                return set_head(TokenType::LET, tokenText);
             } else if (tokenText == "ret") {
-                return {TokenType::RET, tokenText};
+                return set_head(TokenType::RET, tokenText);
             } else if (tokenText == "import") {
-                return {TokenType::IMPORT, tokenText};
+                return set_head(TokenType::IMPORT, tokenText);
             } else if (tokenText == "struct") {
-                return {TokenType::STRUCT, tokenText};
+                return set_head(TokenType::STRUCT, tokenText);
             }
 
-            return {TokenType::IDENTIFIER, tokenText};
+            return set_head(TokenType::IDENTIFIER, tokenText);
         }
     };
 
@@ -184,31 +214,31 @@ namespace arena::parse {
     Type *parse_type(TokenIterator &tokens);
 
     std::vector<TypeArgument *> parse_generic_args(TokenIterator &tokens) {
-        assert(tokens.peek().type == TokenType::LESS);
+        assert(tokens.peek()->type == TokenType::LESS);
         tokens.take();
         std::vector<TypeArgument *> generic_args;
         while (true) {
-            if (tokens.peek().type == TokenType::STAR) {
-                Token asterisk = tokens.take(); // consume '*'
-                Token lifetime = tokens.take(); // consume lifetime identifier
-                if (lifetime.type != TokenType::IDENTIFIER) {
+            if (tokens.peek()->type == TokenType::STAR) {
+                Token *asterisk = tokens.take(); // consume '*'
+                Token *lifetime = tokens.take(); // consume lifetime identifier
+                if (lifetime->type != TokenType::IDENTIFIER) {
                     throw std::runtime_error("Expected lifetime identifier but got: " +
-                                             std::string(lifetime.text));
+                                             std::string(lifetime->text));
                 }
-                generic_args.push_back(new TypeArgumentLifetime(asterisk, lifetime));
+                generic_args.push_back(ast_arena_new<TypeArgumentLifetime>(asterisk, lifetime));
             } else {
                 Type *given_type = parse_type(tokens);
-                generic_args.push_back(new TypeArgumentType(given_type->begin(), given_type));
+                generic_args.push_back(ast_arena_new<TypeArgumentType>(given_type->begin(), given_type));
             }
 
-            if (tokens.peek().type == TokenType::COMMA) {
+            if (tokens.peek()->type == TokenType::COMMA) {
                 tokens.take(); // consume ','
-            } else if (tokens.peek().type == TokenType::GREATER) {
+            } else if (tokens.peek()->type == TokenType::GREATER) {
                 tokens.take(); // consume '>'
                 break;
             } else {
                 throw std::runtime_error("Expected ',' or '>' in generic argument list but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
         }
 
@@ -218,38 +248,39 @@ namespace arena::parse {
     Type *parse_type(TokenIterator &tokens) {
         // TODO: const types
         Type *type;
-        if (tokens.peek().type != TokenType::IDENTIFIER) {
+        if (tokens.peek()->type != TokenType::IDENTIFIER) {
             throw std::runtime_error("Expected type name but got: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
 
-        Token name = tokens.take();
-        if (tokens.peek().type == TokenType::LESS) {
+        Token *name = tokens.take();
+        if (tokens.peek()->type == TokenType::LESS) {
             std::vector<TypeArgument *> generic_args = parse_generic_args(tokens);
-            type = new NamedType(name, generic_args);
+            type = ast_arena_new<NamedType>(name, generic_args);
         } else {
-            type = new NamedType(name, {});
+            type = ast_arena_new<NamedType>(name, std::vector<TypeArgument *>{});
         }
 
         do {
-            if (tokens.peek().type == TokenType::STAR) {
-                Token asterisk = tokens.take();
-                if (tokens.peek().type == TokenType::IDENTIFIER) {
-                    Token lifetime = tokens.take();
-                    type = new PointerType(asterisk, type, new Token(lifetime));
-                    std::cout << "Parsed pointer type with lifetime: " << lifetime.text << std::endl;
+            if (tokens.peek()->type == TokenType::STAR) {
+                Token *asterisk = tokens.take();
+                if (tokens.peek()->type == TokenType::IDENTIFIER) {
+                    Token *lifetime = tokens.take();
+                    type = ast_arena_new<PointerType>(asterisk, type, lifetime);
+                    std::cout << "Parsed pointer type with lifetime: " << lifetime->text
+                              << std::endl;
                 } else {
-                    type = new PointerType(asterisk, type, nullptr);
+                    type = ast_arena_new<PointerType>(asterisk, type, nullptr);
                 }
-            } else if (tokens.peek().type == TokenType::OPEN_BRACKET) {
-                Token openBracket = tokens.take();
+            } else if (tokens.peek()->type == TokenType::OPEN_BRACKET) {
+                Token *openBracket = tokens.take();
                 Literal *size = parse_literal(tokens);
-                if (tokens.peek().type != TokenType::CLOSE_BRACKET) {
+                if (tokens.peek()->type != TokenType::CLOSE_BRACKET) {
                     throw std::runtime_error("Expected ']' but got: " +
-                                             std::string(tokens.peek().text));
+                                             std::string(tokens.peek()->text));
                 }
-                Token closeBracket = tokens.take();
-                type = new ArrayType(type, openBracket, size, closeBracket);
+                Token *closeBracket = tokens.take();
+                type = ast_arena_new<ArrayType>(type, openBracket, size, closeBracket);
             } else {
                 break;
             }
@@ -260,63 +291,63 @@ namespace arena::parse {
 
     Literal *parse_literal(TokenIterator &tokens) {
         // TODO: actually parse different literals
-        if (tokens.peek().type != TokenType::IDENTIFIER) {
+        if (tokens.peek()->type != TokenType::IDENTIFIER) {
             throw std::runtime_error("Expected literal but got: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
 
-        return new Literal(tokens.take());
+        return ast_arena_new<Literal>(tokens.take());
     }
 
     Expression *parse_primary_expression(TokenIterator &tokens,
                                          std::vector<TokenType> stopTokens = {}) {
-        if (tokens.peek().type == TokenType::IDENTIFIER) {
-            return new IdExpression(tokens.take());
-        } else if (tokens.peek().type == TokenType::OPEN_PAREN) {
-            Token openParen = tokens.take();
+        if (tokens.peek()->type == TokenType::IDENTIFIER) {
+            return ast_arena_new<IdExpression>(tokens.take());
+        } else if (tokens.peek()->type == TokenType::OPEN_PAREN) {
+            Token *openParen = tokens.take();
             Expression *expr = parse_expression(tokens);
-            if (tokens.peek().type != TokenType::CLOSE_PAREN) {
+            if (tokens.peek()->type != TokenType::CLOSE_PAREN) {
                 throw std::runtime_error("Expected ')' but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
             tokens.take(); // consume close paren
             return expr;
         } else {
             throw std::runtime_error("Expected identifier, but got " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
     }
 
     Expression *parse_dot_expression(TokenIterator &tokens) {
         Expression *expr = parse_primary_expression(tokens);
 
-        while (tokens.peek().type == TokenType::DOT) {
-            Token dot = tokens.take();
-            if (tokens.peek().type == TokenType::IDENTIFIER) {
-                Token member = tokens.take();
-                expr = new MemberAccessExpression(expr, dot, member);
-            } else if (tokens.peek().type == TokenType::STAR ||
-                       tokens.peek().type == TokenType::AMP) {
-                Token op = tokens.take();
-                expr = new DotOperatorExpression(expr, dot, op);
-            } else if (tokens.peek().type == TokenType::AS) {
-                Token asToken = tokens.take();
-                Token openParen = tokens.peek();
-                if (openParen.type != TokenType::OPEN_PAREN) {
+        while (tokens.peek()->type == TokenType::DOT) {
+            Token *dot = tokens.take();
+            if (tokens.peek()->type == TokenType::IDENTIFIER) {
+                Token *member = tokens.take();
+                expr = ast_arena_new<MemberAccessExpression>(expr, dot, member);
+            } else if (tokens.peek()->type == TokenType::STAR ||
+                       tokens.peek()->type == TokenType::AMP) {
+                Token *op = tokens.take();
+                expr = ast_arena_new<DotOperatorExpression>(expr, dot, op);
+            } else if (tokens.peek()->type == TokenType::AS) {
+                Token *asToken = tokens.take();
+                Token *openParen = tokens.peek();
+                if (openParen->type != TokenType::OPEN_PAREN) {
                     throw std::runtime_error("Expected '(' after 'as' but got: " +
-                                             std::string(tokens.peek().text));
+                                             std::string(tokens.peek()->text));
                 }
                 tokens.take();
                 Type *targetType = parse_type(tokens);
-                if (tokens.peek().type != TokenType::CLOSE_PAREN) {
+                if (tokens.peek()->type != TokenType::CLOSE_PAREN) {
                     throw std::runtime_error("Expected ')' after type but got: " +
-                                             std::string(tokens.peek().text));
+                                             std::string(tokens.peek()->text));
                 }
                 tokens.take(); // consume close paren
-                expr = new CastExpression(expr, dot, asToken, openParen, targetType, tokens.take());
+                expr = ast_arena_new<CastExpression>(expr, dot, asToken, openParen, targetType, tokens.take());
             } else {
                 throw std::runtime_error("Expected identifier or operator after '.' but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
         }
 
@@ -324,10 +355,10 @@ namespace arena::parse {
     }
 
     Expression *parse_unary_expression(TokenIterator &tokens) {
-        if (tokens.peek().type == TokenType::NOT) {
-            Token op = tokens.take();
+        if (tokens.peek()->type == TokenType::NOT) {
+            Token *op = tokens.take();
             Expression *operand = parse_unary_expression(tokens);
-            return new UnaryPrefixExpression(op, operand);
+            return ast_arena_new<UnaryPrefixExpression>(op, operand);
         } else {
             return parse_dot_expression(tokens);
         }
@@ -371,19 +402,19 @@ namespace arena::parse {
         Expression *left = parse_bin_expression(tokens, precedence - 1, stopTokens);
 
         while (true) {
-            Token op = tokens.peek();
-            if (std::find(stopTokens.begin(), stopTokens.end(), op.type) != stopTokens.end()) {
+            Token *op = tokens.peek();
+            if (std::find(stopTokens.begin(), stopTokens.end(), op->type) != stopTokens.end()) {
                 break;
             }
 
-            if (get_binary_precedence(op.type) > precedence) {
+            if (get_binary_precedence(op->type) > precedence) {
                 break;
             }
 
             // valid binary operator
             tokens.take();
             Expression *right = parse_bin_expression(tokens, precedence - 1, stopTokens);
-            left = new BinaryExpression(left, op, right);
+            left = ast_arena_new<BinaryExpression>(left, op, right);
         }
 
         return left;
@@ -392,194 +423,201 @@ namespace arena::parse {
     Expression *parse_expression(TokenIterator &tokens) { return parse_bin_expression(tokens); }
 
     Statement *parse_if_statement(TokenIterator &tokens) {
-        assert(tokens.peek().type == TokenType::IF);
-        Token ifToken = tokens.take(); // consume 'if'
-        if (tokens.peek().type != TokenType::OPEN_PAREN) {
+        assert(tokens.peek()->type == TokenType::IF);
+        Token *ifToken = tokens.take(); // consume 'if'
+        if (tokens.peek()->type != TokenType::OPEN_PAREN) {
             throw std::runtime_error("Expected '(' after 'if' but got: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
         tokens.take(); // consume '('
         Expression *condition = parse_expression(tokens);
-        if (tokens.peek().type != TokenType::CLOSE_PAREN) {
+        if (tokens.peek()->type != TokenType::CLOSE_PAREN) {
             throw std::runtime_error("Expected ')' after 'if' condition but got: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
         tokens.take(); // consume ')'
 
         Statement *thenBranch = parse_statement(tokens);
 
         Statement *elseBranch = nullptr;
-        if (tokens.peek().type == TokenType::ELSE) {
+        if (tokens.peek()->type == TokenType::ELSE) {
             tokens.take(); // consume 'else'
             elseBranch = parse_statement(tokens);
         }
-        return new IfStatement(ifToken, condition, thenBranch, elseBranch);
+        return ast_arena_new<IfStatement>(ifToken, condition, thenBranch, elseBranch);
     }
 
     Statement *parse_let_statement(TokenIterator &tokens) {
         // TODO support initializer, multi-variable declarations, etc
-        assert(tokens.peek().type == TokenType::LET);
-        Token letToken = tokens.take(); // consume 'let'
-        if (tokens.peek().type != TokenType::IDENTIFIER) {
+        assert(tokens.peek()->type == TokenType::LET);
+        Token *letToken = tokens.take(); // consume 'let'
+        if (tokens.peek()->type != TokenType::IDENTIFIER) {
             throw std::runtime_error("Expected identifier after 'let' but got: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
-        Token name = tokens.take(); // consume identifier
+        Token *name = tokens.take(); // consume identifier
 
         Type *type = nullptr;
-        if (tokens.peek().type == TokenType::COLON) {
+        if (tokens.peek()->type == TokenType::COLON) {
             tokens.take(); // consume ':'
-            if (tokens.peek().type != TokenType::IDENTIFIER) {
+            if (tokens.peek()->type != TokenType::IDENTIFIER) {
                 throw std::runtime_error("Expected type after 'let <name>:' but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
             type = parse_type(tokens);
         }
 
-        if (tokens.peek().type != TokenType::SEMICOLON) {
+        if (tokens.peek()->type != TokenType::SEMICOLON) {
             throw std::runtime_error("Expected ';' after 'let' declaration but got: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
         tokens.take(); // consume ';'
 
-        return new LetStatement(letToken, name, type);
+        return ast_arena_new<LetStatement>(letToken, name, type);
     }
 
     Statement *parse_return_statement(TokenIterator &tokens) {
-        assert(tokens.peek().type == TokenType::RET);
-        Token returnToken = tokens.take(); // consume 'ret'
+        assert(tokens.peek()->type == TokenType::RET);
+        Token *returnToken = tokens.take(); // consume 'ret'
         Expression *value = parse_expression(tokens);
-        if (tokens.peek().type != TokenType::SEMICOLON) {
+        if (tokens.peek()->type != TokenType::SEMICOLON) {
             throw std::runtime_error("Expected ';' after 'ret' statement but got: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
         tokens.take(); // consume ';'
-        return new ReturnStatement(returnToken, value);
+        return ast_arena_new<ReturnStatement>(returnToken, value);
     }
 
     BlockStatement *parse_block_statement(TokenIterator &tokens) {
-        assert(tokens.peek().type == TokenType::OPEN_BRACE);
-        Token openBrace = tokens.take(); // consume '{'
+        assert(tokens.peek()->type == TokenType::OPEN_BRACE);
+        Token *openBrace = tokens.take(); // consume '{'
         std::vector<Statement *> statements;
-        while (tokens.peek().type != TokenType::CLOSE_BRACE) {
+        while (tokens.peek()->type != TokenType::CLOSE_BRACE) {
             statements.push_back(parse_statement(tokens));
         }
-        Token closeBrace = tokens.take(); // consume '}'
-        return new BlockStatement(openBrace, statements, closeBrace);
+        Token *closeBrace = tokens.take(); // consume '}'
+        return ast_arena_new<BlockStatement>(openBrace, statements, closeBrace);
     }
 
     Statement *parse_statement(TokenIterator &tokens) {
         // todo: while, for, switch, etc
-        if (tokens.peek().type == TokenType::IF) {
+        if (tokens.peek()->type == TokenType::IF) {
             return parse_if_statement(tokens);
-        } else if (tokens.peek().type == TokenType::LET) {
+        } else if (tokens.peek()->type == TokenType::LET) {
             return parse_let_statement(tokens);
-        } else if (tokens.peek().type == TokenType::RET) {
+        } else if (tokens.peek()->type == TokenType::RET) {
             return parse_return_statement(tokens);
-        } else if (tokens.peek().type == TokenType::OPEN_BRACE) {
+        } else if (tokens.peek()->type == TokenType::OPEN_BRACE) {
             return parse_block_statement(tokens);
         } else {
             // default to expression statement
             Expression *expr = parse_expression(tokens);
-            if (tokens.peek().type != TokenType::SEMICOLON) {
+            if (tokens.peek()->type != TokenType::SEMICOLON) {
                 throw std::runtime_error("Expected ';' after expression statement but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
-            Token semicolon = tokens.take(); // consume ';'
-            return new ExpressionStatement(expr->begin(), expr, semicolon);
+            Token *semicolon = tokens.take(); // consume ';'
+            return ast_arena_new<ExpressionStatement>(expr->begin(), expr, semicolon);
         }
     }
 
     ArgList *parse_arg_list(TokenIterator &tokens) {
-        assert(tokens.peek().type == TokenType::OPEN_PAREN);
-        Token openParen = tokens.take(); // consume '('
+        assert(tokens.peek()->type == TokenType::OPEN_PAREN);
+        Token *openParen = tokens.take(); // consume '('
         std::vector<Argument *> args;
-        while (tokens.peek().type != TokenType::CLOSE_PAREN) {
-            if (tokens.peek().type != TokenType::IDENTIFIER) {
+        while (tokens.peek()->type != TokenType::CLOSE_PAREN) {
+            if (tokens.peek()->type != TokenType::IDENTIFIER) {
                 throw std::runtime_error("Expected argument name but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
-            Token argName = tokens.take(); // consume argument name
-            if (tokens.peek().type != TokenType::COLON) {
+            Token *argName = tokens.take(); // consume argument name
+            if (tokens.peek()->type != TokenType::COLON) {
                 throw std::runtime_error("Expected ':' after argument name but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
             tokens.take(); // consume ':'
             Type *argType = parse_type(tokens);
-            args.push_back(new Argument(argName, argType));
+            args.push_back(ast_arena_new<Argument>(argName, argType));
 
-            if (tokens.peek().type == TokenType::COMMA) {
+            if (tokens.peek()->type == TokenType::COMMA) {
                 tokens.take(); // consume ','
-            } else if (tokens.peek().type == TokenType::CLOSE_PAREN) {
+            } else if (tokens.peek()->type == TokenType::CLOSE_PAREN) {
                 break;
             } else {
                 throw std::runtime_error("Expected ',' or ')' in argument list but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
         }
-        Token closeParen = tokens.take(); // consume ')'
-        return new ArgList(openParen, args, closeParen);
+        Token *closeParen = tokens.take(); // consume ')'
+        return ast_arena_new<ArgList>(openParen, args, closeParen);
     }
 
     Declaration *parse_declaration(TokenIterator &tokens) {
-        if (tokens.peek().type == TokenType::IMPORT) {
-            Token importToken = tokens.take(); // consume 'import'
-            if (tokens.peek().type != TokenType::IDENTIFIER) {
+        if (tokens.peek()->type == TokenType::IMPORT) {
+            Token *importToken = tokens.take(); // consume 'import'
+            if (tokens.peek()->type != TokenType::IDENTIFIER) {
                 throw std::runtime_error("Expected identifier after 'import' but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
-            Token path = tokens.take(); // consume string literal
-            if (tokens.peek().type != TokenType::SEMICOLON) {
+            Token *path = tokens.take(); // consume string literal
+            if (tokens.peek()->type != TokenType::SEMICOLON) {
                 throw std::runtime_error("Expected ';' after import declaration but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
-            Token semicolon = tokens.take(); // consume ';'
-            return new ImportDeclaration(importToken, path, semicolon);
-        } else if (tokens.peek().type == TokenType::FUN) {
-            Token funToken = tokens.take(); // consume 'fun'
-            if (tokens.peek().type != TokenType::IDENTIFIER) {
+            Token *semicolon = tokens.take(); // consume ';'
+            return ast_arena_new<ImportDeclaration>(importToken, path, semicolon);
+        } else if (tokens.peek()->type == TokenType::FUN) {
+            Token *funToken = tokens.take(); // consume 'fun'
+            if (tokens.peek()->type != TokenType::IDENTIFIER) {
                 throw std::runtime_error("Expected identifier after 'fun' but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
-            Token name = tokens.take(); // consume function name
-            if (tokens.peek().type != TokenType::OPEN_PAREN) {
+            Token *name = tokens.take(); // consume function name
+            if (tokens.peek()->type != TokenType::OPEN_PAREN) {
                 // TODO: support generics
                 throw std::runtime_error("Expected '(' after function name but got: " +
-                                         std::string(tokens.peek().text));
+                                         std::string(tokens.peek()->text));
             }
 
             ArgList *args = parse_arg_list(tokens);
 
             Token *returnArrow = nullptr;
             Type *returnType = nullptr;
-            if (tokens.peek().type == TokenType::ARROW) {
-                returnArrow = new Token(tokens.take()); // consume '->'
+            if (tokens.peek()->type == TokenType::ARROW) {
+                returnArrow = tokens.take(); // consume '->'
                 returnType = parse_type(tokens);
             }
 
-            if (tokens.peek().type == TokenType::SEMICOLON) {
+            if (tokens.peek()->type == TokenType::SEMICOLON) {
                 // no return type, just a declaration
-                return new FunctionDeclaration(funToken, name, args, returnArrow, returnType,
+                return ast_arena_new<FunctionDeclaration>(funToken,
+                                               name,
+                                               args,
+                                               returnArrow,
+                                               returnType,
                                                tokens.take());
-            } else if (tokens.peek().type == TokenType::OPEN_BRACE) {
+            } else if (tokens.peek()->type == TokenType::OPEN_BRACE) {
                 auto body = parse_block_statement(tokens);
-                return new FunctionDefinition(funToken, name, args, returnArrow, returnType, body);
+                return ast_arena_new<FunctionDefinition>(funToken, name, args, returnArrow, returnType, body);
             } else {
-                throw std::runtime_error("Expected ';' or '{' after function declaration but got: " +
-                                         std::string(tokens.peek().text));
+                throw std::runtime_error(
+                    "Expected ';' or '{' after function declaration but got: " +
+                    std::string(tokens.peek()->text));
             }
         } else {
             throw std::runtime_error("Expected declaration but got: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
     }
 
     Declaration *parse(std::string_view input) {
+        rena_arena_init(&ast_arena, 4096, 0);
+
         TokenIterator tokens(input);
         Declaration *d = parse_declaration(tokens);
-        if (tokens.peek().type != TokenType::END_OF_INPUT) {
+        if (tokens.peek()->type != TokenType::END_OF_INPUT) {
             throw std::runtime_error("Unexpected token at end of input: " +
-                                     std::string(tokens.peek().text));
+                                     std::string(tokens.peek()->text));
         }
         return d;
     }

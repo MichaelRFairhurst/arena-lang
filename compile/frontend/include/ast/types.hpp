@@ -7,7 +7,7 @@
 namespace arena::ast {
     class Type : public Node {
     public:
-        Type(Token begin, Token end) : Node(begin, end) {}
+        Type(Token *begin, Token *end) : Node(begin, end) {}
 
         virtual std::string to_string() const = 0;
 
@@ -16,7 +16,7 @@ namespace arena::ast {
 
     class TypeArgument : public Node {
     public:
-        TypeArgument(Token begin, Token end) : Node(begin, end) {}
+        TypeArgument(Token *begin, Token *end) : Node(begin, end) {}
 
         virtual std::string to_string() const = 0;
 
@@ -25,7 +25,7 @@ namespace arena::ast {
 
     class TypeArgumentType : public TypeArgument {
     public:
-        TypeArgumentType(Token name, Type *type) : TypeArgument(name, type->end()), name(name), type(type) {}
+        TypeArgumentType(Token *name, Type *type) : TypeArgument(name, type->end()), name(name), type(type) {}
 
         virtual ~TypeArgumentType() = default;
 
@@ -34,34 +34,34 @@ namespace arena::ast {
         }
 
     private:
-        Token name;
+        Token *name;
         Type *type;
     };
 
     class TypeArgumentLifetime : public TypeArgument {
     public:
-        TypeArgumentLifetime(Token star, Token name) : TypeArgument(star, name), star(star), name(name) {}
+        TypeArgumentLifetime(Token *star, Token *name) : TypeArgument(star, name), star(star), name(name) {}
 
         virtual ~TypeArgumentLifetime() = default;
 
         std::string to_string() const override {
-            return "*" + std::string(name.text);
+            return "*" + std::string(name->text);
         }
 
     private:
-        Token star;
-        Token name;
+        Token *star;
+        Token *name;
     };
 
 
     class NamedType : public Type {
     public:
-        NamedType(Token name, std::vector<TypeArgument*> genericArgs) : Type(name, name), name(name), genericArgs(genericArgs) {}
+        NamedType(Token *name, std::vector<TypeArgument*> genericArgs) : Type(name, name), name(name), genericArgs(genericArgs) {}
 
         virtual ~NamedType() = default;
 
         std::string to_string() const override {
-            std::string result = std::string(name.text);
+            std::string result = std::string(name->text);
             if (!genericArgs.empty()) {
                 result += "<";
                 for (size_t i = 0; i < genericArgs.size(); ++i) {
@@ -76,14 +76,14 @@ namespace arena::ast {
         }
 
     private:
-        Token name;
+        Token *name;
         std::vector<TypeArgument*> genericArgs;
     };
 
     class PointerType : public Type {
     public:
-        PointerType(Token asterisk, Type *pointee, Token *lifetime)
-            : Type(asterisk, lifetime == nullptr ? pointee->end() : *lifetime), pointee(pointee), lifetime(lifetime) {}
+        PointerType(Token *asterisk, Type *pointee, Token *lifetime/*optional*/)
+            : Type(asterisk, lifetime == nullptr ? pointee->end() : lifetime), pointee(pointee), lifetime(lifetime) {}
 
         virtual ~PointerType() = default;
 
@@ -99,12 +99,12 @@ namespace arena::ast {
 
     private:
         Type *pointee;
-        Token *lifetime;
+        Token *lifetime; // optional
     };
 
     class ConstType : public Type {
     public:
-        ConstType(Token constToken, Type *baseType)
+        ConstType(Token *constToken, Type *baseType)
             : Type(constToken, baseType->end()), baseType(baseType) {}
 
         virtual ~ConstType() = default;
@@ -119,7 +119,7 @@ namespace arena::ast {
 
     class ArrayType : public Type {
     public:
-        ArrayType(Type *elementType, Token openBracket, Literal *size, Token closeBracket)
+        ArrayType(Type *elementType, Token *openBracket, Literal *size, Token *closeBracket)
             : Type(elementType->begin(), closeBracket), elementType(elementType), size(size) {}
 
         virtual ~ArrayType() = default;

@@ -10,7 +10,7 @@ namespace arena::ast {
     class Expression : public Node {
     public:
         Expression() = default;
-        Expression(Token begin, Token end) : Node(begin, end) {}
+        Expression(Token *begin, Token *end) : Node(begin, end) {}
 
         virtual ~Expression() = default;
 
@@ -20,18 +20,18 @@ namespace arena::ast {
     class IdExpression : public Expression {
     public:
         IdExpression() = default;
-        IdExpression(Token name) : Expression(name, name), name(name) {}
+        IdExpression(Token *name) : Expression(name, name), name(name) {}
         IdExpression(const IdExpression &other) = default;
         IdExpression(IdExpression &&other) = default;
 
         virtual ~IdExpression() = default;
 
         virtual std::string to_string() const override {
-            return std::string(name.text);
+            return std::string(name->text);
         }
 
     private:
-        Token name;
+        Token *name;
     };
 
     class LiteralExpression : public Expression {
@@ -48,7 +48,7 @@ namespace arena::ast {
     class BinaryExpression : public Expression {
     public:
         BinaryExpression() = default;
-        BinaryExpression(Expression *left, Token op, Expression *right)
+        BinaryExpression(Expression *left, Token *op, Expression *right)
             : Expression(left->begin(), right->end()), op(op), left(left), right(right) {}
         BinaryExpression(const BinaryExpression &other) = default;
         BinaryExpression(BinaryExpression &&other) = default;
@@ -56,69 +56,69 @@ namespace arena::ast {
         virtual ~BinaryExpression() = default;
 
         std::string to_string() const override {
-            return "(" + left->to_string() + " " + std::string(op.text) + " " + right->to_string() + ")";
+            return "(" + left->to_string() + " " + std::string(op->text) + " " + right->to_string() + ")";
         }
 
     private:
-        Token op;
+        Token *op;
         Expression *left;
         Expression *right;
     };
 
     class UnaryPrefixExpression : public Expression {
     public:
-        UnaryPrefixExpression(Token op, Expression *operand)
+        UnaryPrefixExpression(Token *op, Expression *operand)
             : Expression(op, operand->end()), op(op), operand(operand) {}
         virtual ~UnaryPrefixExpression() = default;
 
 
         std::string to_string() const override {
-            return "(" + std::string(op.text) + operand->to_string() + ")";
+            return "(" + std::string(op->text) + operand->to_string() + ")";
         }
 
         private:
-        Token op;
+        Token *op;
         Expression *operand;
     };
 
     class DotOperatorExpression : public Expression {
     public:
-        DotOperatorExpression(Expression *operand, Token dot, Token op)
+        DotOperatorExpression(Expression *operand, Token *dot, Token *op)
             : Expression(operand->begin(), op), operand(operand), dot(dot), op(op) {}
 
         virtual ~DotOperatorExpression() = default;
 
         std::string to_string() const override {
-            return "(" + operand->to_string() + " " + std::string(dot.text) + " " + std::string(op.text) + ")";
+            return "(" + operand->to_string() + " " + std::string(dot->text) + " " + std::string(op->text) + ")";
         }
 
     private:
         Expression *operand;
-        Token dot;
-        Token op;
+        Token *dot;
+        Token *op;
     };
 
     class MemberAccessExpression : public Expression {
     public:
-        MemberAccessExpression(Expression *object, Token dot, Token member)
+        MemberAccessExpression(Expression *object, Token *dot, Token *member)
             : Expression(object->begin(), member), object(object), dot(dot), member(member) {}
         virtual ~MemberAccessExpression() = default;
 
         std::string to_string() const override {
-            return "(" + object->to_string() + " " + std::string(dot.text) + " " + std::string(member.text) + ")";
+            return "(" + object->to_string() + " " + std::string(dot->text) + " " + std::string(member->text) + ")";
         }
     private:
         Expression *object;
-        Token dot;
-        Token member;
+        Token *dot;
+        Token *member;
     };
 
     class CallExpression : public Expression {
     public:
         CallExpression(Expression *callee,
-                       Token openParen,
+                       Token *openParen,
                        std::vector<Expression *> args,
-                       Token closeParen)
+                       Token *closeParen)
             : Expression(callee->begin(), closeParen), callee(callee), openParen(openParen),
               args(args), closeParen(closeParen) {}
 
@@ -126,30 +126,30 @@ namespace arena::ast {
 
     private:
         Expression *callee;
-        Token openParen;
+        Token *openParen;
         std::vector<Expression *> args;
-        Token closeParen;
+        Token *closeParen;
     };
 
     class CastExpression : public Expression {
     public:
-        CastExpression(Expression *expr, Token dotToken, Token asToken, Token openParen, Type *targetType, Token closeParen)
+        CastExpression(Expression *expr, Token *dotToken, Token *asToken, Token *openParen, Type *targetType, Token *closeParen)
             : Expression(expr->begin(), closeParen), expr(expr), dotToken(dotToken),
               asToken(asToken), openParen(openParen), targetType(targetType), closeParen(closeParen) {}
 
         virtual ~CastExpression() = default;
 
         std::string to_string() const override {
-            return "(" + expr->to_string() + " " + std::string(dotToken.text) + " " + std::string(asToken.text) + " (" + targetType->to_string() + "))";
+            return "(" + expr->to_string() + " " + std::string(dotToken->text) + " " + std::string(asToken->text) + " (" + targetType->to_string() + "))";
         }
 
     private:
         Expression *expr;
-        Token dotToken;
-        Token asToken;
-        Token openParen;
+        Token *dotToken;
+        Token *asToken;
+        Token *openParen;
         Type *targetType;
-        Token closeParen;
+        Token *closeParen;
     };
 
 } // namespace arena::ast

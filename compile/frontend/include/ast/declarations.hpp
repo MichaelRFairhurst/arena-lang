@@ -10,7 +10,7 @@ namespace arena::ast {
 
     class Declaration : public Node {
     public:
-        Declaration(Token begin, Token end) : Node(begin, end) {}
+        Declaration(Token *begin, Token *end) : Node(begin, end) {}
 
         virtual ~Declaration() = default;
         virtual std::string to_string() const = 0;
@@ -18,37 +18,37 @@ namespace arena::ast {
 
     class ImportDeclaration : public Declaration {
     public:
-        ImportDeclaration(Token includeToken, Token path, Token semicolon)
+        ImportDeclaration(Token *includeToken, Token *path, Token *semicolon)
             : Declaration(includeToken, semicolon), path(path) {}
 
         virtual ~ImportDeclaration() = default;
 
         std::string to_string() const override {
-            return "import " + std::string(path.text) + ";";
+            return "import " + std::string(path->text) + ";";
         }
 
     private:
-        Token path;
+        Token *path;
     };
 
     class Argument : public Node {
     public:
-        Argument(Token name, Type *type) : Node(name, type->end()), name(name), type(type) {}
+        Argument(Token *name, Type *type) : Node(name, type->end()), name(name), type(type) {}
 
         virtual ~Argument() = default;
 
         std::string to_string() const {
-            return std::string(name.text) + ": " + type->to_string();
+            return std::string(name->text) + ": " + type->to_string();
         }
 
     private:
-        Token name;
+        Token *name;
         Type *type;
     };
 
     class ArgList : public Node {
     public:
-        ArgList(Token openParen, std::vector<Argument *> arguments, Token closeParen)
+        ArgList(Token *openParen, std::vector<Argument *> arguments, Token *closeParen)
             : Node(openParen, closeParen), openParen(openParen), closeParen(closeParen),
               arguments(arguments) {}
 
@@ -67,26 +67,26 @@ namespace arena::ast {
         }
 
     private:
-        Token openParen;
-        Token closeParen;
+        Token *openParen;
+        Token *closeParen;
         std::vector<Argument *> arguments;
     };
 
     class FunctionDeclaration : public Declaration {
     public:
-        FunctionDeclaration(Token funToken,
-                            Token name,
+        FunctionDeclaration(Token *funToken,
+                            Token *name,
                             ArgList *args,
-                            Token *returnArrow,
-                            Type *returnType,
-                            Token endToken)
+                            Token *returnArrow, // optional
+                            Type *returnType, // optional
+                            Token *endToken)
             : Declaration(funToken, endToken), name(name), args(args), returnArrow(returnArrow),
               returnType(returnType) {}
 
         virtual ~FunctionDeclaration() = default;
 
         std::string to_string() const override {
-            std::string result = "fun " + std::string(name.text) + args->to_string();
+            std::string result = "fun " + std::string(name->text) + args->to_string();
             if (returnType) {
                 result += " -> " + returnType->to_string();
             }
@@ -97,7 +97,7 @@ namespace arena::ast {
             return returnType;
         }
 
-        const Token &get_name_token() const {
+        const Token *get_name_token() const {
             return name;
         }
 
@@ -106,19 +106,19 @@ namespace arena::ast {
         }
 
     private:
-        Token name;
+        Token *name;
         ArgList *args;
-        Token *returnArrow;
-        Type *returnType;
+        Token *returnArrow; // optional
+        Type *returnType; // optional
     };
 
     class FunctionDefinition : public FunctionDeclaration {
     public:
-        FunctionDefinition(Token funToken,
-                          Token name,
+        FunctionDefinition(Token *funToken,
+                          Token *name,
                           ArgList *args,
-                          Token *returnArrow,
-                          Type *returnType,
+                          Token *returnArrow, // optional
+                          Type *returnType, // optional
                           BlockStatement *body)
             : FunctionDeclaration(funToken, name, args, returnArrow, returnType, body->end()),
               body(body) {}
@@ -126,7 +126,7 @@ namespace arena::ast {
         virtual ~FunctionDefinition() = default;
 
         std::string to_string() const override {
-            std::string result = "fun " + std::string(get_name_token().text) + get_args()->to_string();
+            std::string result = "fun " + std::string(get_name_token()->text) + get_args()->to_string();
             auto return_type = get_return_type();
             if (return_type) {
                 result += " -> " + return_type->to_string();

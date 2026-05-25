@@ -32,4 +32,12 @@ int main(int argc, char **argv) {
 
     auto ast = arena::parse::parse(input);
     std::cout << "Parsed AST: " << ast->to_string() << std::endl;
+
+    arena::ast::Token *current = ast->begin();
+    std::cout << "Tokens: ";
+    while (current != nullptr) {
+        std::cout << current->text;
+        current = current->next;
+    }
+    std::cout << "\n";
 }
