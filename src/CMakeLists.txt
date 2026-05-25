@@ -1,1 +1,1 @@
-target_sources(arena-bin PRIVATE parse/parse2.cpp)
+target_sources(arena-bin PRIVATE parse/parse.cpp)

@@ -21,9 +21,6 @@ target_include_directories(arena-bin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(arena-bin PRIVATE ${LLVM_INCLUDE_DIRS})
 target_compile_definitions(arena-bin PRIVATE ${LLVM_DEFINITIONS})
 
-# Configure Boost.Parser for the target
-target_link_libraries(arena-bin PUBLIC Boost::parser)
-
 # Link LLVM libraries (must use llvm_map_components_to_libnames)
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 target_link_libraries(arena-bin PRIVATE ${llvm_libs})
