@@ -2,62 +2,135 @@
 #define ARENA_INCLUDE_AST_TYPES_HPP
 
 #include "ast/node.hpp"
+#include "ast/literals.hpp"
 
-namespace arena::ast
-{
-    class Literal;
-
-    class Type : public Node
-    {
+namespace arena::ast {
+    class Type : public Node {
     public:
         Type(Token begin, Token end) : Node(begin, end) {}
+
+        virtual std::string to_string() const = 0;
 
         virtual ~Type() = default;
     };
 
-    class NamedType : public Type
-    {
+    class TypeArgument : public Node {
     public:
-        NamedType(Token name) : Type(name, name), name(name) {}
+        TypeArgument(Token begin, Token end) : Node(begin, end) {}
 
-        virtual ~NamedType() = default;
+        virtual std::string to_string() const = 0;
+
+        virtual ~TypeArgument() = default;
+    };
+
+    class TypeArgumentType : public TypeArgument {
+    public:
+        TypeArgumentType(Token name, Type *type) : TypeArgument(name, type->end()), name(name), type(type) {}
+
+        virtual ~TypeArgumentType() = default;
+
+        std::string to_string() const override {
+            return type->to_string();
+        }
 
     private:
         Token name;
+        Type *type;
     };
 
-    class PointerType : public Type
-    {
+    class TypeArgumentLifetime : public TypeArgument {
     public:
-        PointerType(Token asterisk, Type *pointee) : Type(asterisk, pointee->end()), pointee(pointee) {}
+        TypeArgumentLifetime(Token star, Token name) : TypeArgument(star, name), star(star), name(name) {}
+
+        virtual ~TypeArgumentLifetime() = default;
+
+        std::string to_string() const override {
+            return "*" + std::string(name.text);
+        }
+
+    private:
+        Token star;
+        Token name;
+    };
+
+
+    class NamedType : public Type {
+    public:
+        NamedType(Token name, std::vector<TypeArgument*> genericArgs) : Type(name, name), name(name), genericArgs(genericArgs) {}
+
+        virtual ~NamedType() = default;
+
+        std::string to_string() const override {
+            std::string result = std::string(name.text);
+            if (!genericArgs.empty()) {
+                result += "<";
+                for (size_t i = 0; i < genericArgs.size(); ++i) {
+                    result += genericArgs[i]->to_string();
+                    if (i < genericArgs.size() - 1) {
+                        result += ", ";
+                    }
+                }
+                result += ">";
+            }
+            return result;
+        }
+
+    private:
+        Token name;
+        std::vector<TypeArgument*> genericArgs;
+    };
+
+    class PointerType : public Type {
+    public:
+        PointerType(Token asterisk, Type *pointee, Token *lifetime)
+            : Type(asterisk, lifetime == nullptr ? pointee->end() : *lifetime), pointee(pointee), lifetime(lifetime) {}
 
         virtual ~PointerType() = default;
 
+        std::string to_string() const override {
+            std::string result = pointee->to_string();
+            if (lifetime) {
+                result += " *" + std::string(lifetime->text);
+            } else {
+                result += "*";
+            }
+            return result;
+        }
+
     private:
         Type *pointee;
+        Token *lifetime;
     };
 
-    class ConstType : public Type
-    {
+    class ConstType : public Type {
     public:
-        ConstType(Token constToken, Type *baseType) : Type(constToken, baseType->end()), baseType(baseType) {}
+        ConstType(Token constToken, Type *baseType)
+            : Type(constToken, baseType->end()), baseType(baseType) {}
 
         virtual ~ConstType() = default;
 
     private:
         Type *baseType;
+
+        std::string to_string() const override {
+            return "const " + baseType->to_string();
+        }
     };
 
-    class ArrayType : public Type
-    {
+    class ArrayType : public Type {
     public:
-        ArrayType(Type *elementType, Token openBracket, Literal *size, Token closeBracket) : Type(elementType->begin(), closeBracket), elementType(elementType), size(size) {}
+        ArrayType(Type *elementType, Token openBracket, Literal *size, Token closeBracket)
+            : Type(elementType->begin(), closeBracket), elementType(elementType), size(size) {}
 
         virtual ~ArrayType() = default;
 
+        std::string to_string() const override {
+            return elementType->to_string() + "[" + size->to_string() + "]";
+        }
+
     private:
         Literal *size;
-        Node *elementType;
+        Type *elementType;
     };
 
 } // namespace arena::ast

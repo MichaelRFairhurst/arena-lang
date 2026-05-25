@@ -7,13 +7,20 @@ namespace arena::ast {
 
 enum class TokenType
 {
-    Identifier,
-    Literal,
+    IDENTIFIER,
+    INTEGER,
+    STRING,
+    FLOATING,
+    TRUE,
+    FALSE,
     OPEN_BRACE,
     CLOSE_BRACE,
     OPEN_PAREN,
     CLOSE_PAREN,
+    OPEN_BRACKET,
+    CLOSE_BRACKET,
     SEMICOLON,
+    COLON,
     COMMA,
     PLUS,
     MINUS,
@@ -27,12 +34,28 @@ enum class TokenType
     GREATER,
     GREATER_EQUAL,
     AND,
-    OR
+    OR,
+    NOT,
+    DOT,
+    AMP,
+    ARROW,
+    AS,
+    FUN,
+    IF,
+    ELSE,
+    LET,
+    WHILE,
+    FOR,
+    RET,
+    IMPORT,
+    STRUCT,
+    UNINITIALIZED_TOKEN,
+    END_OF_INPUT,
 };
 
 struct Token
 {
-    TokenType type;
+    TokenType type = TokenType::UNINITIALIZED_TOKEN;
     std::string_view text;
 };
 

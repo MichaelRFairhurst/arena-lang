@@ -7,6 +7,7 @@ namespace arena::ast {
 
 class Node {
     public:
+    Node() = default;
     Node(Token begin, Token end) : beginToken(begin), endToken(end) {}
 
     virtual ~Node() = default;
