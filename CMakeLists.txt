@@ -1,26 +1,31 @@
 cmake_minimum_required(VERSION 3.20)
-project(arenalang)
+project(Arena VERSION 0.1.0 LANGUAGES CXX C)
 
 # Set C++ standard
-# set(CMAKE_CXX_STANDARD PUBLIC cxx_std_17)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Options
+option(ARENA_BUILD_COMPILER "Build Arena compiler" ON)
+option(ARENA_BUILD_RUNTIME "Build runtime libraries" ON)
+option(ARENA_ENABLE_LLVM "Enable LLVM backend" ON)
 
 # vcpkg toolchain file is set via CMAKE_TOOLCHAIN_FILE
 # or automatically by vcpkg integration
 
-# Find LLVM
-find_package(LLVM REQUIRED CONFIG)
+# Find dependencies
+if(ARENA_ENABLE_LLVM)
+    find_package(LLVM REQUIRED CONFIG)
+    message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+    message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+endif()
 
-# Add the executable
-add_executable(arena-bin src/main.cpp)
-target_compile_features(arena-bin PUBLIC cxx_std_17)
-add_subdirectory(src)
-target_include_directories(arena-bin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# Add subdirectories
+if(ARENA_BUILD_RUNTIME)
+    add_subdirectory(lib)
+endif()
 
-# Configure LLVM for the target
-target_include_directories(arena-bin PRIVATE ${LLVM_INCLUDE_DIRS})
-target_compile_definitions(arena-bin PRIVATE ${LLVM_DEFINITIONS})
-
-# Link LLVM libraries (must use llvm_map_components_to_libnames)
-llvm_map_components_to_libnames(llvm_libs support core irreader)
-target_link_libraries(arena-bin PRIVATE ${llvm_libs})
+if(ARENA_BUILD_COMPILER)
+    add_subdirectory(compile)
+endif()
