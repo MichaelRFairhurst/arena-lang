@@ -3,10 +3,8 @@
 
 #include <stdlib.h>
 
-#define NULL ((void*)0)
-
 typedef struct rena_arena_page {
-    rena_arena_page *next;
+    struct rena_arena_page *next;
     void *begin;
     void *end;
     void *current;

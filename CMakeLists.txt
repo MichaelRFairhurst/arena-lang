@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Enable testing for the entire project
+enable_testing()
+
 # Options
 option(ARENA_BUILD_COMPILER "Build Arena compiler" ON)
 option(ARENA_BUILD_RUNTIME "Build runtime libraries" ON)

@@ -2,6 +2,8 @@
   "name": "llvm-project",
   "version": "0.1.0",
   "dependencies": [
-    "llvm"
+    "llvm",
+    "boost-parser",
+    "cunit"
   ]
 }
