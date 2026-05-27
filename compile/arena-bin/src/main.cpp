@@ -37,6 +37,13 @@ int main(int argc, char **argv) {
         }
         std::cout << "\n";
 
+        const auto imports = engine.execute(arena::sema::ImportedPathsQuery{file});
+        std::cout << "Imports: ";
+        for (const auto &import : imports) {
+            std::cout << import << " ";
+        }
+        std::cout << "\n";
+
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 }

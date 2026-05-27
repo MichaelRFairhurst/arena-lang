@@ -1,5 +1,6 @@
 #include "query/queries.hpp"
 #include "query/engine.hpp"
+#include "resolve/imports.hpp"
 #include <fstream>
 
 using namespace arena::sema;
@@ -30,4 +31,11 @@ std::vector<FunctionId> arena::sema::compute_query_result(const QueryEngineConte
     FunctionTableBuilder builder(ctx.get_function_registry(), ctx.get_type_registry());
     auto ftable = builder.build(ast.declarations);
     return ftable.get_ids();
+};
+
+std::vector<std::filesystem::path> arena::sema::compute_query_result(const QueryEngineContext &ctx, ImportedPathsQuery query) {
+    const auto &path = query.input;
+    auto &ast = ctx.run_query(ParseQuery{path});
+    ImportResolver resolver;
+    return resolver.resolve_imports(ast.declarations, path);
 };

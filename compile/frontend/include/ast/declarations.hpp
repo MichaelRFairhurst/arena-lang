@@ -32,6 +32,10 @@ namespace arena::ast {
         
         void accept(Visitor *visitor) override { visitor->visit(this); }
 
+        std::string_view get_path() const {
+            return path->text;
+        }
+
     private:
         Token *path;
     };
