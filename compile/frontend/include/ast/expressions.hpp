@@ -5,6 +5,7 @@
 #include "ast/node.hpp"
 #include "ast/types.hpp"
 #include "ast/literals.hpp"
+#include "ast/visitor.hpp"
 
 namespace arena::ast {
     class Expression : public Node {
@@ -15,6 +16,8 @@ namespace arena::ast {
         virtual ~Expression() = default;
 
         virtual std::string to_string() const = 0;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
     class IdExpression : public Expression {
@@ -29,6 +32,8 @@ namespace arena::ast {
         virtual std::string to_string() const override {
             return std::string(name->text);
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -40,6 +45,8 @@ namespace arena::ast {
             : Expression(literal->begin(), literal->end()), literal(literal) {}
 
         virtual ~LiteralExpression() = default;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Literal *literal;
@@ -58,6 +65,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return "(" + left->to_string() + " " + std::string(op->text) + " " + right->to_string() + ")";
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Token *op;
@@ -75,6 +84,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return "(" + std::string(op->text) + operand->to_string() + ")";
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
         private:
         Token *op;
@@ -91,6 +102,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return "(" + operand->to_string() + " " + std::string(dot->text) + " " + std::string(op->text) + ")";
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Expression *operand;
@@ -107,6 +120,9 @@ namespace arena::ast {
         std::string to_string() const override {
             return "(" + object->to_string() + " " + std::string(dot->text) + " " + std::string(member->text) + ")";
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
+        
     private:
         Expression *object;
         Token *dot;
@@ -123,6 +139,8 @@ namespace arena::ast {
               args(args), closeParen(closeParen) {}
 
         virtual ~CallExpression() = default;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Expression *callee;
@@ -142,6 +160,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return "(" + expr->to_string() + " " + std::string(dotToken->text) + " " + std::string(asToken->text) + " (" + targetType->to_string() + "))";
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Expression *expr;

@@ -5,6 +5,8 @@
 
 namespace arena::ast {
 
+class Visitor;  // Forward declaration
+
 class Node {
     public:
     Node() = default;
@@ -16,6 +18,9 @@ class Node {
     const Token *begin() const { return beginToken; }
     Token *end() { return endToken; }
     const Token *end() const { return endToken; }
+
+    // Accept a visitor (to be overridden by concrete nodes)
+    virtual void accept(Visitor *visitor) = 0;
 
     private:
     Token *beginToken;

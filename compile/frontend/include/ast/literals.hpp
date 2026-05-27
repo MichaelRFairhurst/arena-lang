@@ -2,6 +2,7 @@
 #define ARENA_INCLUDE_AST_LITERALS_HPP
 
 #include "ast/node.hpp"
+#include "ast/visitor.hpp"
 
 namespace arena::ast {
     class Literal : public Node {
@@ -13,16 +14,22 @@ namespace arena::ast {
         std::string to_string() const {
             return std::string(begin()->text);
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
     class StringLiteral : public Literal {
     public:
         StringLiteral(Token *token) : Literal(token) {}
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
     class IntegerLiteral : public Literal {
     public:
         IntegerLiteral(Token *token) : Literal(token) {}
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 } // namespace arena::ast
 #endif // ARENA_INCLUDE_AST_LITERALS_HPP

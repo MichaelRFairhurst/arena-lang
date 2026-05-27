@@ -5,6 +5,7 @@
 #include "ast/node.hpp"
 #include "ast/types.hpp"
 #include "ast/statements.hpp"
+#include "ast/visitor.hpp"
 
 namespace arena::ast {
 
@@ -14,6 +15,8 @@ namespace arena::ast {
 
         virtual ~Declaration() = default;
         virtual std::string to_string() const = 0;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
     class ImportDeclaration : public Declaration {
@@ -26,6 +29,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return "import " + std::string(path->text) + ";";
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Token *path;
@@ -40,7 +45,16 @@ namespace arena::ast {
         std::string to_string() const {
             return std::string(name->text) + ": " + type->to_string();
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
+        std::string_view get_name() const {
+            return name->text;
+        }
+
+        Type *get_type() const {
+            return type;
+        }
     private:
         Token *name;
         Type *type;
@@ -64,6 +78,12 @@ namespace arena::ast {
             }
             result += ")";
             return result;
+        }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
+
+        const std::vector<Argument *> &get_args() const {
+            return arguments;
         }
 
     private:
@@ -104,6 +124,8 @@ namespace arena::ast {
         const ArgList *get_args() const {
             return args;
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -133,6 +155,8 @@ namespace arena::ast {
             }
             return result + body->to_string();
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         BlockStatement *body;

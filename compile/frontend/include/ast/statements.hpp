@@ -4,6 +4,7 @@
 #include "ast/node.hpp"
 #include "ast/types.hpp"
 #include "ast/expressions.hpp"
+#include "ast/visitor.hpp"
 
 namespace arena::ast {
 
@@ -14,6 +15,8 @@ namespace arena::ast {
         virtual std::string to_string() const = 0;
 
         virtual ~Statement() = default;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
     class IfStatement : public Statement {
@@ -30,6 +33,8 @@ namespace arena::ast {
             }
             return result;
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
         private:
         Expression *condition;
@@ -52,6 +57,8 @@ namespace arena::ast {
             result += ";";
             return result;
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -68,6 +75,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return "return " + value->to_string() + ";";
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Expression *value;
@@ -83,6 +92,8 @@ namespace arena::ast {
         }
 
         virtual ~ExpressionStatement() = default;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Expression *expression;
@@ -103,6 +114,8 @@ namespace arena::ast {
         }
 
         virtual ~BlockStatement() = default;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         std::vector<Statement *> statements;

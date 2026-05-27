@@ -11,12 +11,10 @@ target_include_directories(arena-frontend
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/lib/c/include
 )
 
 target_link_libraries(arena-frontend
-    PRIVATE
+    PUBLIC
         arena-rt
 )
 

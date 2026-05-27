@@ -3,6 +3,7 @@
 
 #include "ast/node.hpp"
 #include "ast/literals.hpp"
+#include "ast/visitor.hpp"
 
 namespace arena::ast {
     class Type : public Node {
@@ -12,6 +13,8 @@ namespace arena::ast {
         virtual std::string to_string() const = 0;
 
         virtual ~Type() = default;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
     class TypeArgument : public Node {
@@ -21,6 +24,8 @@ namespace arena::ast {
         virtual std::string to_string() const = 0;
 
         virtual ~TypeArgument() = default;
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
     class TypeArgumentType : public TypeArgument {
@@ -32,6 +37,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return type->to_string();
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -47,6 +54,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return "*" + std::string(name->text);
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Token *star;
@@ -74,6 +83,8 @@ namespace arena::ast {
             }
             return result;
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -96,6 +107,8 @@ namespace arena::ast {
             }
             return result;
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Type *pointee;
@@ -115,6 +128,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return "const " + baseType->to_string();
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
     class ArrayType : public Type {
@@ -127,6 +142,8 @@ namespace arena::ast {
         std::string to_string() const override {
             return elementType->to_string() + "[" + size->to_string() + "]";
         }
+        
+        void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
         Literal *size;

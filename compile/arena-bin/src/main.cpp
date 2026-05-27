@@ -1,10 +1,10 @@
-#include "parse/parse.hpp"
 #include <iostream>
-#include <fstream>
 #include <filesystem>
+#include <chrono>
+#include <thread>
+#include "query/engine.hpp"
 
 int main(int argc, char **argv) {
-    /// auto ast = arena::parse::parse("a.*.*.b.& * 3.as(int)");
     if (argc == 1) {
         std::cerr << "Usage: " << argv[0] << " <source-file>\n";
         return 1;
@@ -15,29 +15,28 @@ int main(int argc, char **argv) {
 
     // create a filesystem path
     std::filesystem::path file(argv[1]);
-    if (!std::filesystem::exists(file)) {
-        std::cerr << "Error: File does not exist: " << file << "\n";
-        return 1;
+
+    arena::sema::QueryEngine engine;
+    while (true) {
+        const auto &ast = engine.execute(arena::sema::ParseQuery{file});
+        auto decl = ast.declarations.at(0);
+        std::cout << "Parsed AST: " << decl->to_string() << std::endl;
+
+        arena::ast::Token *current = decl->begin();
+        std::cout << "Tokens: ";
+        while (current != nullptr) {
+            std::cout << current->text;
+            current = current->next;
+        }
+        std::cout << "\n";
+
+        const auto ids = engine.execute(arena::sema::FunctionIdsQuery{file});
+        std::cout << "Function IDs: ";
+        for (const auto &id : ids) {
+            std::cout << id.f_id << " ";
+        }
+        std::cout << "\n";
+
+        std::this_thread::sleep_for(std::chrono::seconds(5));
     }
-
-    // read the file into a string
-    std::ifstream input_file(file);
-    if (!input_file) {
-        std::cerr << "Error: Could not open file: " << file << "\n";
-        return 1;
-    }
-
-    // TODO: support larger files
-    std::string input((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
-
-    auto ast = arena::parse::parse(input);
-    std::cout << "Parsed AST: " << ast->to_string() << std::endl;
-
-    arena::ast::Token *current = ast->begin();
-    std::cout << "Tokens: ";
-    while (current != nullptr) {
-        std::cout << current->text;
-        current = current->next;
-    }
-    std::cout << "\n";
 }

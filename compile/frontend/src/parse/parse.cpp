@@ -174,9 +174,7 @@ namespace arena::parse {
             });
 
             tokenText = std::string_view(state.data(), alphaNumEnd - state.begin());
-            std::cout << tokenText << std::endl;
             state = std::string_view(alphaNumEnd, state.end() - alphaNumEnd);
-            std::cout << state << std::endl;
 
             if (tokenText == "as") {
                 return set_head(TokenType::AS, tokenText);
@@ -267,8 +265,6 @@ namespace arena::parse {
                 if (tokens.peek()->type == TokenType::IDENTIFIER) {
                     Token *lifetime = tokens.take();
                     type = ast_arena_new<PointerType>(asterisk, type, lifetime);
-                    std::cout << "Parsed pointer type with lifetime: " << lifetime->text
-                              << std::endl;
                 } else {
                     type = ast_arena_new<PointerType>(asterisk, type, nullptr);
                 }
@@ -610,16 +606,17 @@ namespace arena::parse {
         }
     }
 
-    Declaration *parse(std::string_view input) {
+    ParseResult parse(std::string_view input) {
         rena_arena_init(&ast_arena, 4096, 0);
 
         TokenIterator tokens(input);
-        Declaration *d = parse_declaration(tokens);
-        if (tokens.peek()->type != TokenType::END_OF_INPUT) {
-            throw std::runtime_error("Unexpected token at end of input: " +
-                                     std::string(tokens.peek()->text));
-        }
-        return d;
+        ParseResult result;
+        do {
+            result.declarations.push_back(parse_declaration(tokens));
+        } while (tokens.peek()->type != TokenType::END_OF_INPUT);
+
+        result.ast_arena = ast_arena;
+        return result;
     }
 
 } // namespace arena::parse
