@@ -10,7 +10,8 @@
 
 namespace arena::sema {
 
-    class QueryEngine;
+    class QueryCache;
+    class QueryEngineContext;
 
     enum class QueryRefreshType {
         // A query with no dependencies may have this refresh type, and it will always re-run when
@@ -24,64 +25,95 @@ namespace arena::sema {
         RefreshOnDependentChange,
     };
 
-    struct SourceContentsQuery {
-        using ResultType = std::string;
-        // TODO: use file system listener or timestamp to determine when source contents have
-        // changed.
-        static constexpr QueryRefreshType refresh_type = QueryRefreshType::AlwaysRefresh;
-        std::filesystem::path path;
+    template <typename Tag, typename Input, typename Result, QueryRefreshType refresh_type_v>
+    struct QueryBase {
+        using TagType = Tag;
+        using ResultType = Result;
+        using InputType = Input;
+        using CacheType = std::unordered_map<Input, ResultType>;
+        static constexpr QueryRefreshType refresh_type = refresh_type_v;
 
-        bool operator==(const SourceContentsQuery &other) const { return path == other.path; }
-    };
+        QueryBase(Input input) : input(input) {}
+        Input input;
 
-    struct ParseQuery {
-        using ResultType = ::arena::parse::ParseResult;
-        static constexpr QueryRefreshType refresh_type = QueryRefreshType::RefreshOnDependentChange;
-        std::filesystem::path path;
-
-        bool operator==(const ParseQuery &other) const { return path == other.path; }
-    };
-
-    struct FunctionIdsQuery {
-        using ResultType = std::vector<FunctionId>;
-        static constexpr QueryRefreshType refresh_type = QueryRefreshType::RefreshOnDependentChange;
-        std::filesystem::path path;
-
-        bool operator==(const FunctionIdsQuery &other) const {
-            auto [ours, theirs] =
-                std::mismatch(path.begin(),
-                              path.end(),
-                              other.path.begin(),
-                              other.path.end(),
-                              [](const auto &a, const auto &b) { return a == b; });
-
-            return ours == path.end() && theirs == other.path.end();
+        template <typename Self>
+        bool operator==(const Self &other) const {
+            return input == other.input;
         }
     };
 
+    using SourceContentsQuery = QueryBase<struct SourceContentsQueryTag,
+                                          std::filesystem::path,
+                                          std::string,
+                                          // TODO: use file system listener or timestamp to
+                                          // determine when source contents have changed.
+                                          QueryRefreshType::AlwaysRefresh>;
+
+    using ParseQuery = QueryBase<struct ParseQueryTag,
+                                 std::filesystem::path,
+                                 arena::parse::ParseResult,
+                                 QueryRefreshType::RefreshOnDependentChange>;
+
+    using FunctionIdsQuery = QueryBase<struct FunctionIdsQueryTag,
+                                       std::filesystem::path,
+                                       std::vector<FunctionId>,
+                                       QueryRefreshType::RefreshOnDependentChange>;
+
+
+    std::string compute_query_result(const QueryEngineContext &ctx, SourceContentsQuery query);
+    arena::parse::ParseResult compute_query_result(const QueryEngineContext &ctx, ParseQuery query);
+    std::vector<FunctionId> compute_query_result(const QueryEngineContext &ctx, FunctionIdsQuery query);
+
+    struct QueryCache {
+        SourceContentsQuery::CacheType source_contents_cache;
+        ParseQuery::CacheType parse_cache;
+        FunctionIdsQuery::CacheType function_ids_cache;
+
+        template <typename QueryType>
+        typename QueryType::CacheType &get_cache() {
+            if constexpr (std::is_same_v<QueryType, SourceContentsQuery>) {
+                return source_contents_cache;
+            } else if constexpr (std::is_same_v<QueryType, ParseQuery>) {
+                return parse_cache;
+            } else if constexpr (std::is_same_v<QueryType, FunctionIdsQuery>) {
+                return function_ids_cache;
+            } else {
+                static_assert(false && sizeof(QueryType), "Unsupported query type");
+            }
+        }
+
+        template <typename T>
+        std::optional<std::reference_wrapper<const typename T::ResultType>> get_cached(const T &query) {
+            auto &cache = get_cache<T>();
+            auto it = cache.find(query.input);
+            if (it != cache.end()) {
+                return std::optional(std::cref(it->second));
+            }
+            return std::nullopt;
+        }
+
+        template <typename T>
+        void update_cache(const T &query, typename T::ResultType result) {
+            auto &cache = get_cache<T>();
+            cache[query.input] = std::move(result);
+        }
+    };
 
     using Query = std::variant<SourceContentsQuery, ParseQuery, FunctionIdsQuery>;
+
+    template <typename QueryType>
+    struct QueryHashBase {
+        size_t operator()(const QueryType &query) const {
+            return std::hash<typename QueryType::InputType>()(query.input);
+        }
+    };
 } // namespace arena::sema
 
-template <>
-struct std::hash<arena::sema::SourceContentsQuery> {
-    size_t operator()(const arena::sema::SourceContentsQuery &query) const {
-        return std::hash<std::filesystem::path>()(query.path);
-    }
-};
-
-template <>
-struct std::hash<arena::sema::ParseQuery> {
-    size_t operator()(const arena::sema::ParseQuery &query) const {
-        return std::hash<std::filesystem::path>()(query.path);
-    }
-};
-
-template <>
-struct std::hash<arena::sema::FunctionIdsQuery> {
-    size_t operator()(const arena::sema::FunctionIdsQuery &query) const {
-        return std::hash<std::filesystem::path>()(query.path);
-    }
-};
+template<>
+struct std::hash<arena::sema::SourceContentsQuery> : arena::sema::QueryHashBase<arena::sema::SourceContentsQuery> {};
+template<>
+struct std::hash<arena::sema::ParseQuery> : arena::sema::QueryHashBase<arena::sema::ParseQuery> {};
+template<>
+struct std::hash<arena::sema::FunctionIdsQuery> : arena::sema::QueryHashBase<arena::sema::FunctionIdsQuery> {};
 
 #endif // ARENA_INCLUDE_QUERY_QUERIES_HPP

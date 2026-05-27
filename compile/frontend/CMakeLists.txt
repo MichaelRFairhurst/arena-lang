@@ -1,10 +1,8 @@
 # Frontend library - parsing and semantic analysis
 add_library(arena-frontend
     src/parse/parse.cpp
-    # Add other source files as you create them:
-    # src/ast/expressions.cpp
-    # src/ast/statements.cpp
-    # src/sema/type_checker.cpp
+    src/query/engine.cpp
+    src/query/queries.cpp
 )
 
 target_include_directories(arena-frontend
