@@ -6,6 +6,7 @@
 #include "ast/types.hpp"
 #include "ast/literals.hpp"
 #include "ast/visitor.hpp"
+#include "util/concat.hpp"
 
 namespace arena::ast {
     class Expression : public Node {
@@ -16,7 +17,7 @@ namespace arena::ast {
         virtual ~Expression() = default;
 
         virtual std::string to_string() const = 0;
-        
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
     };
 
@@ -29,10 +30,8 @@ namespace arena::ast {
 
         virtual ~IdExpression() = default;
 
-        virtual std::string to_string() const override {
-            return std::string(name->text);
-        }
-        
+        virtual std::string to_string() const override { return std::string(name->text); }
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
@@ -45,7 +44,7 @@ namespace arena::ast {
             : Expression(literal->begin(), literal->end()), literal(literal) {}
 
         virtual ~LiteralExpression() = default;
-        
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
@@ -63,9 +62,10 @@ namespace arena::ast {
         virtual ~BinaryExpression() = default;
 
         std::string to_string() const override {
-            return "(" + left->to_string() + " " + std::string(op->text) + " " + right->to_string() + ")";
+            return "(" + left->to_string() + " " + std::string(op->text) + " " +
+                   right->to_string() + ")";
         }
-        
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
@@ -84,10 +84,10 @@ namespace arena::ast {
         std::string to_string() const override {
             return "(" + std::string(op->text) + operand->to_string() + ")";
         }
-        
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
 
-        private:
+    private:
         Token *op;
         Expression *operand;
     };
@@ -100,9 +100,10 @@ namespace arena::ast {
         virtual ~DotOperatorExpression() = default;
 
         std::string to_string() const override {
-            return "(" + operand->to_string() + " " + std::string(dot->text) + " " + std::string(op->text) + ")";
+            return "(" + operand->to_string() + " " + std::string(dot->text) + " " +
+                   std::string(op->text) + ")";
         }
-        
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:
@@ -118,11 +119,12 @@ namespace arena::ast {
         virtual ~MemberAccessExpression() = default;
 
         std::string to_string() const override {
-            return "(" + object->to_string() + " " + std::string(dot->text) + " " + std::string(member->text) + ")";
+            return "(" + object->to_string() + " " + std::string(dot->text) + " " +
+                   std::string(member->text) + ")";
         }
-        
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
-        
+
     private:
         Expression *object;
         Token *dot;
@@ -139,8 +141,13 @@ namespace arena::ast {
               args(args), closeParen(closeParen) {}
 
         virtual ~CallExpression() = default;
-        
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
+
+        std::string to_string() const override {
+            return callee->to_string() + "(" + util::concat(args, ", ") + ")";
+        }
+
 
     private:
         Expression *callee;
@@ -151,16 +158,23 @@ namespace arena::ast {
 
     class CastExpression : public Expression {
     public:
-        CastExpression(Expression *expr, Token *dotToken, Token *asToken, Token *openParen, Type *targetType, Token *closeParen)
+        CastExpression(Expression *expr,
+                       Token *dotToken,
+                       Token *asToken,
+                       Token *openParen,
+                       Type *targetType,
+                       Token *closeParen)
             : Expression(expr->begin(), closeParen), expr(expr), dotToken(dotToken),
-              asToken(asToken), openParen(openParen), targetType(targetType), closeParen(closeParen) {}
+              asToken(asToken), openParen(openParen), targetType(targetType),
+              closeParen(closeParen) {}
 
         virtual ~CastExpression() = default;
 
         std::string to_string() const override {
-            return "(" + expr->to_string() + " " + std::string(dotToken->text) + " " + std::string(asToken->text) + " (" + targetType->to_string() + "))";
+            return "(" + expr->to_string() + " " + std::string(dotToken->text) + " " +
+                   std::string(asToken->text) + " (" + targetType->to_string() + "))";
         }
-        
+
         void accept(Visitor *visitor) override { visitor->visit(this); }
 
     private:

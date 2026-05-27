@@ -20,7 +20,10 @@ int main(int argc, char **argv) {
     while (true) {
         const auto &ast = engine.execute(arena::sema::ParseQuery{file});
         auto decl = ast.declarations.at(0);
-        std::cout << "Parsed AST: " << decl->to_string() << std::endl;
+        std::cout << "Parsed AST:\n";
+        for (const auto &decl : ast.declarations) {
+            std::cout << decl->to_string() << "\n";
+        }
 
         arena::ast::Token *current = decl->begin();
         std::cout << "Tokens: ";
