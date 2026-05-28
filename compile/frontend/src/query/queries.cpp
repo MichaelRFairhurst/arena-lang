@@ -39,3 +39,26 @@ std::vector<std::filesystem::path> arena::sema::compute_query_result(const Query
     ImportResolver resolver;
     return resolver.resolve_imports(ast.declarations, path);
 };
+
+arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(const QueryEngineContext &ctx, ResolvedCallsQuery query) {
+    const auto &path = query.input;
+    auto &imports = ctx.run_query(ImportedPathsQuery{path});
+
+    std::vector<FunctionId> all_function_ids;
+    for (const auto &import : imports) {
+        auto &function_ids = ctx.run_query(FunctionIdsQuery{import});
+        all_function_ids.insert(all_function_ids.end(), function_ids.begin(), function_ids.end());
+    }
+    auto &my_function_ids = ctx.run_query(FunctionIdsQuery{path});
+    all_function_ids.insert(all_function_ids.end(), my_function_ids.begin(), my_function_ids.end());
+
+    FunctionTable ftable(ctx.get_function_registry());
+    for (const auto &func : all_function_ids) {
+        auto symbol = ctx.get_function_registry().get_function_symbol(func);
+        ftable.add_function(symbol, {func, symbol, {}, std::nullopt}, nullptr);
+    }
+
+    auto &ast = ctx.run_query(ParseQuery{path});
+    ExpressionResolver resolver;
+    return resolver.resolve(ast.declarations, ftable);
+};

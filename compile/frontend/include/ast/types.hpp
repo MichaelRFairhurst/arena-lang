@@ -14,7 +14,7 @@ namespace arena::ast {
 
         virtual ~Type() = default;
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
     class TypeArgument : public Node {
@@ -25,7 +25,7 @@ namespace arena::ast {
 
         virtual ~TypeArgument() = default;
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
     class TypeArgumentType : public TypeArgument {
@@ -38,7 +38,7 @@ namespace arena::ast {
             return type->to_string();
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -55,7 +55,7 @@ namespace arena::ast {
             return "*" + std::string(name->text);
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Token *star;
@@ -84,7 +84,7 @@ namespace arena::ast {
             return result;
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -108,7 +108,7 @@ namespace arena::ast {
             return result;
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Type *pointee;
@@ -129,7 +129,7 @@ namespace arena::ast {
             return "const " + baseType->to_string();
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
     class ArrayType : public Type {
@@ -143,7 +143,7 @@ namespace arena::ast {
             return elementType->to_string() + "[" + size->to_string() + "]";
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Literal *size;

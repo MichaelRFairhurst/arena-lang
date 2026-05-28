@@ -16,7 +16,7 @@ namespace arena::ast {
 
         virtual ~Statement() = default;
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
     class IfStatement : public Statement {
@@ -34,7 +34,19 @@ namespace arena::ast {
             return result;
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Expression *get_condition() const {
+            return condition;
+        }
+
+        const Statement *get_then() const {
+            return thenBranch;
+        }
+
+        const Statement *get_else() const {
+            return elseBranch;
+        }
 
         private:
         Expression *condition;
@@ -49,6 +61,10 @@ namespace arena::ast {
 
         virtual ~LetStatement() = default;
 
+        std::string_view get_name() const {
+            return name->text;
+        }
+
         std::string to_string() const override {
             std::string result = "let " + std::string(name->text);
             if (type) {
@@ -58,7 +74,7 @@ namespace arena::ast {
             return result;
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -76,7 +92,11 @@ namespace arena::ast {
             return "return " + value->to_string() + ";";
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Expression *get_expr() const {
+            return value;
+        }
 
     private:
         Expression *value;
@@ -93,7 +113,11 @@ namespace arena::ast {
 
         virtual ~ExpressionStatement() = default;
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Expression *get_expr() const {
+            return expression;
+        }
 
     private:
         Expression *expression;
@@ -115,7 +139,11 @@ namespace arena::ast {
 
         virtual ~BlockStatement() = default;
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        std::vector<const Statement *> get_statements() const {
+            return std::vector<const Statement *>(statements.begin(), statements.end());
+        }
 
     private:
         std::vector<Statement *> statements;

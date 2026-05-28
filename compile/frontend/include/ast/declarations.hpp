@@ -16,7 +16,7 @@ namespace arena::ast {
         virtual ~Declaration() = default;
         virtual std::string to_string() const = 0;
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
     class ImportDeclaration : public Declaration {
@@ -30,7 +30,7 @@ namespace arena::ast {
             return "import " + std::string(path->text) + ";";
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
         std::string_view get_path() const {
             return path->text;
@@ -50,7 +50,7 @@ namespace arena::ast {
             return std::string(name->text) + ": " + type->to_string();
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
         std::string_view get_name() const {
             return name->text;
@@ -84,7 +84,7 @@ namespace arena::ast {
             return result;
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
         const std::vector<Argument *> &get_args() const {
             return arguments;
@@ -129,7 +129,7 @@ namespace arena::ast {
             return args;
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Token *name;
@@ -160,7 +160,11 @@ namespace arena::ast {
             return result + body->to_string();
         }
         
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const BlockStatement *get_body() const {
+            return body;
+        }
 
     private:
         BlockStatement *body;

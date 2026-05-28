@@ -89,7 +89,7 @@ namespace arena::sema {
 
         void add_function(FunctionSymbol symbol,
                           ResolvedFunction function,
-                          arena::ast::FunctionDeclaration *source) {
+                          const arena::ast::FunctionDeclaration *source) {
             auto id = registry->get_function_id(symbol);
             functions[id] = function;
             this->source[id] = source;
@@ -115,7 +115,7 @@ namespace arena::sema {
     private:
         const FunctionSymbolRegistry *registry;
         std::unordered_map<FunctionId, ResolvedFunction> functions;
-        std::unordered_map<FunctionId, arena::ast::FunctionDeclaration *> source;
+        std::unordered_map<FunctionId, const arena::ast::FunctionDeclaration *> source;
     };
 
     class FunctionTableBuilderVisitor : public arena::ast::Visitor {
@@ -125,7 +125,7 @@ namespace arena::sema {
                                     FunctionTable &ftable)
             : ftable(&ftable), type_table(&type_table), registry(&registry) {}
 
-        void visit(arena::ast::FunctionDeclaration *decl) override {
+        void visit(const arena::ast::FunctionDeclaration *decl) override {
             auto symbol = FunctionSymbol{decl->get_name_token()->text};
             auto id = registry->get_function_id(symbol);
             std::vector<TypeId> param_types;
@@ -148,9 +148,9 @@ namespace arena::sema {
             ftable->add_function(symbol, function, decl);
         }
 
-        void visit(arena::ast::FunctionDefinition *def) override {
+        void visit(const arena::ast::FunctionDefinition *def) override {
             // Function definitions are also function declarations, so we can reuse the same logic.
-            visit(static_cast<arena::ast::FunctionDeclaration *>(def));
+            visit(static_cast<const arena::ast::FunctionDeclaration *>(def));
         }
 
     private:

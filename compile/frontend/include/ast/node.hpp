@@ -20,7 +20,7 @@ class Node {
     const Token *end() const { return endToken; }
 
     // Accept a visitor (to be overridden by concrete nodes)
-    virtual void accept(Visitor *visitor) = 0;
+    virtual void accept(Visitor *visitor) const = 0;
 
     private:
     Token *beginToken;

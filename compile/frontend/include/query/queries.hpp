@@ -7,6 +7,7 @@
 #include <vector>
 #include "parse/parse.hpp"
 #include "resolve/symbols.hpp"
+#include "resolve/expressions.hpp"
 
 namespace arena::sema {
 
@@ -64,17 +65,24 @@ namespace arena::sema {
                                        std::vector<std::filesystem::path>,
                                        QueryRefreshType::RefreshOnDependentChange>;
 
+    using ResolvedCallsQuery = QueryBase<struct ResolvedCallsQueryTag,
+                                       std::filesystem::path,
+                                       ResolvedExpressionsResult,
+                                       QueryRefreshType::RefreshOnDependentChange>;
+
 
     std::string compute_query_result(const QueryEngineContext &ctx, SourceContentsQuery query);
     arena::parse::ParseResult compute_query_result(const QueryEngineContext &ctx, ParseQuery query);
     std::vector<FunctionId> compute_query_result(const QueryEngineContext &ctx, FunctionIdsQuery query);
     std::vector<std::filesystem::path> compute_query_result(const QueryEngineContext &ctx, ImportedPathsQuery query);
+    arena::sema::ResolvedExpressionsResult compute_query_result(const QueryEngineContext &ctx, ResolvedCallsQuery query);
 
     struct QueryCache {
         SourceContentsQuery::CacheType source_contents_cache;
         ParseQuery::CacheType parse_cache;
         FunctionIdsQuery::CacheType function_ids_cache;
         ImportedPathsQuery::CacheType imported_paths_cache;
+        ResolvedCallsQuery::CacheType resolved_calls_cache;
 
         template <typename QueryType>
         typename QueryType::CacheType &get_cache() {
@@ -86,6 +94,8 @@ namespace arena::sema {
                 return function_ids_cache;
             } else if constexpr (std::is_same_v<QueryType, ImportedPathsQuery>) {
                 return imported_paths_cache;
+            } else if constexpr (std::is_same_v<QueryType, ResolvedCallsQuery>) {
+                return resolved_calls_cache;
             } else {
                 static_assert(false && sizeof(QueryType), "Unsupported query type");
             }
@@ -108,7 +118,7 @@ namespace arena::sema {
         }
     };
 
-    using Query = std::variant<SourceContentsQuery, ParseQuery, FunctionIdsQuery, ImportedPathsQuery>;
+    using Query = std::variant<SourceContentsQuery, ParseQuery, FunctionIdsQuery, ImportedPathsQuery, ResolvedCallsQuery>;
 
     template <typename QueryType>
     struct QueryHashBase {
@@ -126,5 +136,7 @@ template<>
 struct std::hash<arena::sema::FunctionIdsQuery> : arena::sema::QueryHashBase<arena::sema::FunctionIdsQuery> {};
 template<>
 struct std::hash<arena::sema::ImportedPathsQuery> : arena::sema::QueryHashBase<arena::sema::ImportedPathsQuery> {};
+template<>
+struct std::hash<arena::sema::ResolvedCallsQuery> : arena::sema::QueryHashBase<arena::sema::ResolvedCallsQuery> {};
 
 #endif // ARENA_INCLUDE_QUERY_QUERIES_HPP

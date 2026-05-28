@@ -47,6 +47,18 @@ int main(int argc, char **argv) {
         }
         std::cout << "\n";
 
+        const auto &resolved_calls = engine.execute(arena::sema::ResolvedCallsQuery{file});
+        std::cout << "Resolved Exprs:\n";
+        auto resolved_exprs = resolved_calls.get_resolved_exprs();
+        for (const auto &expr : resolved_exprs) {
+            std::cout << expr->to_string() << "\n";
+        }
+        auto errors = resolved_calls.get_errors();
+        std::cout << "Errors:\n";
+        for (const auto &error : errors) {
+            std::cout << "Error: " << error.message << " at node: " << error.node->begin()->text << "\n";
+        }
+
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 }

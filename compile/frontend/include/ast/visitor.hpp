@@ -68,46 +68,46 @@ namespace arena::ast {
         virtual ~Visitor() = default;
 
         // Expression visitors
-        virtual void visit(Expression *node) {}
-        virtual void visit(IdExpression *node) {}
-        virtual void visit(LiteralExpression *node) {}
-        virtual void visit(BinaryExpression *node) {}
-        virtual void visit(UnaryPrefixExpression *node) {}
-        virtual void visit(DotOperatorExpression *node) {}
-        virtual void visit(MemberAccessExpression *node) {}
-        virtual void visit(CallExpression *node) {}
-        virtual void visit(CastExpression *node) {}
+        virtual void visit(const Expression *node) {}
+        virtual void visit(const IdExpression *node) {}
+        virtual void visit(const LiteralExpression *node) {}
+        virtual void visit(const BinaryExpression *node) {}
+        virtual void visit(const UnaryPrefixExpression *node) {}
+        virtual void visit(const DotOperatorExpression *node) {}
+        virtual void visit(const MemberAccessExpression *node) {}
+        virtual void visit(const CallExpression *node) {}
+        virtual void visit(const CastExpression *node) {}
 
         // Statement visitors
-        virtual void visit(Statement *node) {}
-        virtual void visit(IfStatement *node) {}
-        virtual void visit(LetStatement *node) {}
-        virtual void visit(ReturnStatement *node) {}
-        virtual void visit(ExpressionStatement *node) {}
-        virtual void visit(BlockStatement *node) {}
+        virtual void visit(const Statement *node) {}
+        virtual void visit(const IfStatement *node) {}
+        virtual void visit(const LetStatement *node) {}
+        virtual void visit(const ReturnStatement *node) {}
+        virtual void visit(const ExpressionStatement *node) {}
+        virtual void visit(const BlockStatement *node) {}
 
         // Type visitors
-        virtual void visit(Type *node) {}
-        virtual void visit(TypeArgument *node) {}
-        virtual void visit(TypeArgumentType *node) {}
-        virtual void visit(TypeArgumentLifetime *node) {}
-        virtual void visit(NamedType *node) {}
-        virtual void visit(PointerType *node) {}
-        virtual void visit(ConstType *node) {}
-        virtual void visit(ArrayType *node) {}
+        virtual void visit(const Type *node) {}
+        virtual void visit(const TypeArgument *node) {}
+        virtual void visit(const TypeArgumentType *node) {}
+        virtual void visit(const TypeArgumentLifetime *node) {}
+        virtual void visit(const NamedType *node) {}
+        virtual void visit(const PointerType *node) {}
+        virtual void visit(const ConstType *node) {}
+        virtual void visit(const ArrayType *node) {}
 
         // Declaration visitors
-        virtual void visit(Declaration *node) {}
-        virtual void visit(ImportDeclaration *node) {}
-        virtual void visit(FunctionDeclaration *node) {}
-        virtual void visit(FunctionDefinition *node) {}
-        virtual void visit(Argument *node) {}
-        virtual void visit(ArgList *node) {}
+        virtual void visit(const Declaration *node) {}
+        virtual void visit(const ImportDeclaration *node) {}
+        virtual void visit(const FunctionDeclaration *node) {}
+        virtual void visit(const FunctionDefinition *node) {}
+        virtual void visit(const Argument *node) {}
+        virtual void visit(const ArgList *node) {}
 
         // Literal visitors
-        virtual void visit(Literal *node) {}
-        virtual void visit(StringLiteral *node) {}
-        virtual void visit(IntegerLiteral *node) {}
+        virtual void visit(const Literal *node) {}
+        virtual void visit(const StringLiteral *node) {}
+        virtual void visit(const IntegerLiteral *node) {}
     };
 
 } // namespace arena::ast

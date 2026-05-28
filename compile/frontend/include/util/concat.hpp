@@ -14,9 +14,11 @@ namespace arena::util {
             }
             if constexpr (std::is_convertible_v<decltype(*it), std::string>) {
                 result += *it;
+            } else if constexpr (std::is_pointer_v<std::decay_t<decltype(*it)>>) {
+                result += (*it)->to_string();
             } else {
                 // TODO: handle more types, and std::to_string, etc
-                result += (*it)->to_string();
+                result += (*it).to_string();
             }
         }
         return result;

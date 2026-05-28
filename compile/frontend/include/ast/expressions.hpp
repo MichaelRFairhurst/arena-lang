@@ -18,7 +18,7 @@ namespace arena::ast {
 
         virtual std::string to_string() const = 0;
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
     class IdExpression : public Expression {
@@ -32,7 +32,9 @@ namespace arena::ast {
 
         virtual std::string to_string() const override { return std::string(name->text); }
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        std::string_view get_id() const { return std::string_view(name->text); }
 
     private:
         Token *name;
@@ -45,7 +47,7 @@ namespace arena::ast {
 
         virtual ~LiteralExpression() = default;
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Literal *literal;
@@ -66,7 +68,15 @@ namespace arena::ast {
                    right->to_string() + ")";
         }
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Expression *get_left() const {
+            return left;
+        }
+
+        const Expression *get_right() const {
+            return right;
+        }
 
     private:
         Token *op;
@@ -85,7 +95,11 @@ namespace arena::ast {
             return "(" + std::string(op->text) + operand->to_string() + ")";
         }
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Expression *get_operand() const {
+            return operand;
+        }
 
     private:
         Token *op;
@@ -104,7 +118,11 @@ namespace arena::ast {
                    std::string(op->text) + ")";
         }
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Expression *get_operand() const {
+            return operand;
+        }
 
     private:
         Expression *operand;
@@ -123,7 +141,11 @@ namespace arena::ast {
                    std::string(member->text) + ")";
         }
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Expression *get_object() const {
+            return object;
+        }
 
     private:
         Expression *object;
@@ -142,12 +164,19 @@ namespace arena::ast {
 
         virtual ~CallExpression() = default;
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
 
         std::string to_string() const override {
             return callee->to_string() + "(" + util::concat(args, ", ") + ")";
         }
 
+        const Expression *get_callee() const {
+            return callee;
+        }
+
+        const std::vector<Expression *> &get_args() const {
+            return args;
+        }
 
     private:
         Expression *callee;
@@ -175,7 +204,11 @@ namespace arena::ast {
                    std::string(asToken->text) + " (" + targetType->to_string() + "))";
         }
 
-        void accept(Visitor *visitor) override { visitor->visit(this); }
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Expression *get_expr() const {
+            return expr;
+        }
 
     private:
         Expression *expr;
