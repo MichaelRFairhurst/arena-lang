@@ -236,7 +236,7 @@ namespace arena::parse {
                 tokens.take(); // consume '>'
                 break;
             } else {
-                throw std::runtime_error("Expected ',' or '>' in generic argument list but got: " +
+                throw std::runtime_error("Expected ',' or '>' in generic parameter list but got: " +
                                          std::string(tokens.peek()->text));
             }
         }
@@ -557,35 +557,35 @@ namespace arena::parse {
         }
     }
 
-    ArgList *parse_arg_list(TokenIterator &tokens) {
+    ParamList *parse_param_list(TokenIterator &tokens) {
         assert(tokens.peek()->type == TokenType::OPEN_PAREN);
         Token *openParen = tokens.take(); // consume '('
-        std::vector<Argument *> args;
+        std::vector<Parameter *> params;
         while (tokens.peek()->type != TokenType::CLOSE_PAREN) {
             if (tokens.peek()->type != TokenType::IDENTIFIER) {
-                throw std::runtime_error("Expected argument name but got: " +
+                throw std::runtime_error("Expected parameter name but got: " +
                                          std::string(tokens.peek()->text));
             }
-            Token *argName = tokens.take(); // consume argument name
+            Token *paramName = tokens.take(); // consume parameter name
             if (tokens.peek()->type != TokenType::COLON) {
-                throw std::runtime_error("Expected ':' after argument name but got: " +
+                throw std::runtime_error("Expected ':' after parameter name but got: " +
                                          std::string(tokens.peek()->text));
             }
             tokens.take(); // consume ':'
-            Type *argType = parse_type(tokens);
-            args.push_back(ast_arena_new<Argument>(argName, argType));
+            Type *paramType = parse_type(tokens);
+            params.push_back(ast_arena_new<Parameter>(paramName, paramType));
 
             if (tokens.peek()->type == TokenType::COMMA) {
                 tokens.take(); // consume ','
             } else if (tokens.peek()->type == TokenType::CLOSE_PAREN) {
                 break;
             } else {
-                throw std::runtime_error("Expected ',' or ')' in argument list but got: " +
+                throw std::runtime_error("Expected ',' or ')' in parameter list but got: " +
                                          std::string(tokens.peek()->text));
             }
         }
         Token *closeParen = tokens.take(); // consume ')'
-        return ast_arena_new<ArgList>(openParen, args, closeParen);
+        return ast_arena_new<ParamList>(openParen, params, closeParen);
     }
 
     Declaration *parse_declaration(TokenIterator &tokens) {
@@ -615,7 +615,7 @@ namespace arena::parse {
                                          std::string(tokens.peek()->text));
             }
 
-            ArgList *args = parse_arg_list(tokens);
+            ParamList *params = parse_param_list(tokens);
 
             Token *returnArrow = nullptr;
             Type *returnType = nullptr;
@@ -628,7 +628,7 @@ namespace arena::parse {
                 // no return type, just a declaration
                 return ast_arena_new<FunctionDeclaration>(funToken,
                                                           name,
-                                                          args,
+                                                          params,
                                                           returnArrow,
                                                           returnType,
                                                           tokens.take());
@@ -636,7 +636,7 @@ namespace arena::parse {
                 auto body = parse_block_statement(tokens);
                 return ast_arena_new<FunctionDefinition>(funToken,
                                                          name,
-                                                         args,
+                                                         params,
                                                          returnArrow,
                                                          returnType,
                                                          body);

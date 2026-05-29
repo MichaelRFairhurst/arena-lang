@@ -3,13 +3,13 @@
 
 #include <string_view>
 #include "ast/statements.hpp"
-#include "resolve/types.hpp"
+#include "signatures/types.hpp"
 
 namespace arena::sema {
 
     struct ResolvedVariable {
         std::string_view name;
-        const ast::LetStatement *declaration;
+        const ast::Node *declaration;
 
         std::optional<TypeId> explicit_type_id;
         std::optional<TypeId> inferred_type_id;
@@ -20,8 +20,8 @@ namespace arena::sema {
         VariableScope() = default;
         VariableScope(VariableScope *parent) : parent(parent) {}
 
-        void add_variable(std::string_view name, const ast::LetStatement *declaration) {
-            variables[name] = ResolvedVariable{name, declaration};
+        void add_variable(std::string_view name, ResolvedVariable variable) {
+            variables[name] = variable;
         }
 
         std::optional<ResolvedVariable> resolve_variable(std::string_view name) const {

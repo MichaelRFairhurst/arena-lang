@@ -39,8 +39,8 @@ namespace arena::ast {
     class ImportDeclaration;
     class FunctionDeclaration;
     class FunctionDefinition;
-    class Argument;
-    class ArgList;
+    class Parameter;
+    class ParamList;
     
     // Literals
     class Literal;
@@ -101,8 +101,8 @@ namespace arena::ast {
         virtual void visit(const ImportDeclaration *node) {}
         virtual void visit(const FunctionDeclaration *node) {}
         virtual void visit(const FunctionDefinition *node) {}
-        virtual void visit(const Argument *node) {}
-        virtual void visit(const ArgList *node) {}
+        virtual void visit(const Parameter *node) {}
+        virtual void visit(const ParamList *node) {}
 
         // Literal visitors
         virtual void visit(const Literal *node) {}

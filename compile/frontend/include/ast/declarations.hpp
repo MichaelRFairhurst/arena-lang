@@ -40,11 +40,11 @@ namespace arena::ast {
         Token *path;
     };
 
-    class Argument : public Node {
+    class Parameter : public Node {
     public:
-        Argument(Token *name, Type *type) : Node(name, type->end()), name(name), type(type) {}
+        Parameter(Token *name, Type *type) : Node(name, type->end()), name(name), type(type) {}
 
-        virtual ~Argument() = default;
+        virtual ~Parameter() = default;
 
         std::string to_string() const {
             return std::string(name->text) + ": " + type->to_string();
@@ -64,13 +64,13 @@ namespace arena::ast {
         Type *type;
     };
 
-    class ArgList : public Node {
+    class ParamList : public Node {
     public:
-        ArgList(Token *openParen, std::vector<Argument *> arguments, Token *closeParen)
+        ParamList(Token *openParen, std::vector<Parameter *> arguments, Token *closeParen)
             : Node(openParen, closeParen), openParen(openParen), closeParen(closeParen),
               arguments(arguments) {}
 
-        virtual ~ArgList() = default;
+        virtual ~ParamList() = default;
 
         std::string to_string() const {
             std::string result = "(";
@@ -86,31 +86,31 @@ namespace arena::ast {
         
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        const std::vector<Argument *> &get_args() const {
+        const std::vector<Parameter *> &get_params() const {
             return arguments;
         }
 
     private:
         Token *openParen;
         Token *closeParen;
-        std::vector<Argument *> arguments;
+        std::vector<Parameter *> arguments;
     };
 
     class FunctionDeclaration : public Declaration {
     public:
         FunctionDeclaration(Token *funToken,
                             Token *name,
-                            ArgList *args,
+                            ParamList *params,
                             Token *returnArrow, // optional
                             Type *returnType, // optional
                             Token *endToken)
-            : Declaration(funToken, endToken), name(name), args(args), returnArrow(returnArrow),
+            : Declaration(funToken, endToken), name(name), params(params), returnArrow(returnArrow),
               returnType(returnType) {}
 
         virtual ~FunctionDeclaration() = default;
 
         std::string to_string() const override {
-            std::string result = "fun " + std::string(name->text) + args->to_string();
+            std::string result = "fun " + std::string(name->text) + params->to_string();
             if (returnType) {
                 result += " -> " + returnType->to_string();
             }
@@ -125,15 +125,15 @@ namespace arena::ast {
             return name;
         }
 
-        const ArgList *get_args() const {
-            return args;
+        const ParamList *get_params() const {
+            return params;
         }
         
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
     private:
         Token *name;
-        ArgList *args;
+        ParamList *params;
         Token *returnArrow; // optional
         Type *returnType; // optional
     };
@@ -142,17 +142,17 @@ namespace arena::ast {
     public:
         FunctionDefinition(Token *funToken,
                           Token *name,
-                          ArgList *args,
+                          ParamList *params,
                           Token *returnArrow, // optional
                           Type *returnType, // optional
                           BlockStatement *body)
-            : FunctionDeclaration(funToken, name, args, returnArrow, returnType, body->end()),
+            : FunctionDeclaration(funToken, name, params, returnArrow, returnType, body->end()),
               body(body) {}
 
         virtual ~FunctionDefinition() = default;
 
         std::string to_string() const override {
-            std::string result = "fun " + std::string(get_name_token()->text) + get_args()->to_string();
+            std::string result = "fun " + std::string(get_name_token()->text) + get_params()->to_string();
             auto return_type = get_return_type();
             if (return_type) {
                 result += " -> " + return_type->to_string();

@@ -33,29 +33,27 @@ int main(int argc, char **argv) {
         }
         std::cout << "\n";
 
-        const auto ids = engine.execute(arena::sema::FunctionIdsQuery{file});
-        std::cout << "Function IDs: ";
-        for (const auto &id : ids) {
-            std::cout << id.f_id << " ";
-        }
-        std::cout << "\n";
-
-        const auto imports = engine.execute(arena::sema::ImportedPathsQuery{file});
-        std::cout << "Imports: ";
-        for (const auto &import : imports) {
-            std::cout << import << " ";
-        }
-        std::cout << "\n";
-
         const auto &resolved_calls = engine.execute(arena::sema::ResolvedCallsQuery{file});
-        std::cout << "Resolved Exprs:\n";
-        auto resolved_exprs = resolved_calls.get_resolved_exprs();
-        for (const auto &expr : resolved_exprs) {
-            std::cout << expr->to_string() << "\n";
+        //std::cout << "Resolved Exprs:\n";
+        //auto resolved_exprs = resolved_calls.get_resolved_decls();
+        //for (const auto &expr : resolved_exprs) {
+        //    std::cout << expr->to_string() << "\n";
+        //}
+        auto rerrors = resolved_calls.get_errors();
+        std::cout << "Resolve Errors:\n";
+        for (const auto &error : rerrors) {
+            std::cout << "Error: " << error.message << " at node: " << error.node->begin()->text << "\n";
         }
-        auto errors = resolved_calls.get_errors();
-        std::cout << "Errors:\n";
-        for (const auto &error : errors) {
+
+        const auto &typechecked = engine.execute(arena::sema::TypecheckedFileQuery{file});
+        //std::cout << "Resolved Exprs:\n";
+        //auto resolved_exprs = resolved_calls.get_resolved_decls();
+        //for (const auto &expr : resolved_exprs) {
+        //    std::cout << expr->to_string() << "\n";
+        //}
+        auto terrors = typechecked.get_errors();
+        std::cout << "Type Errors:\n";
+        for (const auto &error : terrors) {
             std::cout << "Error: " << error.message << " at node: " << error.node->begin()->text << "\n";
         }
 

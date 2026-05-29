@@ -3,6 +3,12 @@ add_library(arena-frontend
     src/parse/parse.cpp
     src/query/engine.cpp
     src/query/queries.cpp
+    src/resolve/functions.cpp
+    src/resolve/symbols.cpp
+    src/resolve/expressions.cpp
+    src/types/typecheck.cpp
+    src/signatures/functions.cpp
+    src/signatures/types.cpp
 )
 
 target_include_directories(arena-frontend

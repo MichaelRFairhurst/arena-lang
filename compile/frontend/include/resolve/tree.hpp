@@ -25,7 +25,8 @@ namespace arena::sema {
 
     struct UnresolvedExprInfo {};
 
-    using ResolvedExpressionInfo = std::variant<UnresolvedExprInfo, ResolvedFunctionInfo, ResolvedVariableInfo>;
+    using ResolvedExpressionInfo = std::
+        variant<UnresolvedExprInfo, ResolvedFunctionInfo, ResolvedVariableInfo, ResolvedTypeInfo>;
 
     struct ResolvedExpression;
 
@@ -64,9 +65,13 @@ namespace arena::sema {
                                                ResolvedReturnStatement,
                                                ResolvedBlockStatement,
                                                ResolvedExprStatement>;
-    class ResolvedStatement {
-    public:
+    struct ResolvedStatement {
         ResolvedStatementType info;
+    };
+
+    struct ResolvedDeclaration {
+        const ast::Declaration *original = nullptr;
+        ResolvedStatement *resolved_stmt = nullptr;
     };
 
     struct ResolvedExpression {
@@ -91,8 +96,7 @@ namespace arena::sema {
 
     class ResolvedExpressionBuilder : public ast::Visitor {
     public:
-        ResolvedExpressionBuilder(util::Arena &arena)
-            : arena(&arena) {}
+        ResolvedExpressionBuilder(util::Arena &arena) : arena(&arena) {}
 
         void set_children(size_t num_children) {
             expr_stack.top()->children = arena->alloc_array<ResolvedExpression>(num_children);
@@ -165,8 +169,7 @@ namespace arena::sema {
 
     class ResolvedStatementBuilder : public ast::Visitor {
     public:
-        ResolvedStatementBuilder(util::Arena &arena)
-            : arena(&arena) {}
+        ResolvedStatementBuilder(util::Arena &arena) : arena(&arena) {}
 
         template <typename T>
         T *resolve_as(const decltype(std::declval<T>().original) decl) {
@@ -221,16 +224,16 @@ namespace arena::sema {
             resolved->expr = resolve_expression(expr_stmt->get_expr());
         }
 
-        void visit(const ast::BlockStatement *block_stmt) override {
-            auto *block = resolve_as<ResolvedBlockStatement>(block_stmt);
+        void visit(const ast::BlockStatement *ast_block) override {
+            auto *resolved = resolve_as<ResolvedBlockStatement>(ast_block);
 
-            block->statements =
-                arena->alloc_array<ResolvedStatement>(block_stmt->get_statements().size());
-            block->num_statements = block_stmt->get_statements().size();
-            auto stmts = block_stmt->get_statements();
-            for (size_t i = 0; i < stmts.size(); ++i) {
-                stmt_stack.push(&block->statements[i]);
-                stmts[i]->accept(this);
+            resolved->statements =
+                arena->alloc_array<ResolvedStatement>(ast_block->get_statements().size());
+            resolved->num_statements = ast_block->get_statements().size();
+            auto ast_stmts = ast_block->get_statements();
+            for (size_t i = 0; i < ast_stmts.size(); ++i) {
+                stmt_stack.push(&resolved->statements[i]);
+                ast_stmts[i]->accept(this);
                 stmt_stack.pop();
             }
         }
@@ -240,7 +243,10 @@ namespace arena::sema {
             resolved->variable.name = let_stmt->get_name();
         }
 
-        ResolvedStatement *get_resolved_stmt() {
+        ResolvedStatement *get_resolved_stmt(const ast::Statement *stmt) {
+            stmt_stack.push(arena->alloc<ResolvedStatement>());
+            stmt->accept(this);
+
             if (!stmt_stack.empty()) {
                 return stmt_stack.top();
             }
@@ -249,6 +255,31 @@ namespace arena::sema {
 
     private:
         std::stack<ResolvedStatement *> stmt_stack;
+        util::Arena *arena;
+    };
+
+    class ResolvedDeclarationBuilder : public ast::Visitor {
+    public:
+        ResolvedDeclarationBuilder(util::Arena &arena) : arena(&arena) {}
+
+        void visit(const ast::FunctionDeclaration *func_decl) override {
+            result = arena->alloc<ResolvedDeclaration>();
+            result->original = func_decl;
+            result->resolved_stmt = nullptr;
+        }
+
+        void visit(const ast::FunctionDefinition *func_def) override {
+            result = arena->alloc<ResolvedDeclaration>();
+            result->original = func_def;
+
+            ResolvedStatementBuilder stmt_builder(*arena);
+            result->resolved_stmt = stmt_builder.get_resolved_stmt(func_def->get_body());
+        }
+
+        ResolvedDeclaration *get_resolved_decl() { return result; }
+
+    private:
+        ResolvedDeclaration *result = nullptr;
         util::Arena *arena;
     };
 } // namespace arena::sema

@@ -65,6 +65,10 @@ namespace arena::ast {
             return name->text;
         }
 
+        const Type *get_type() const {
+            return type;
+        }
+
         std::string to_string() const override {
             std::string result = "let " + std::string(name->text);
             if (type) {
