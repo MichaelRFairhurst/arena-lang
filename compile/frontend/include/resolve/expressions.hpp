@@ -36,7 +36,8 @@ namespace arena::sema {
     public:
         ResolvedExpressionsResult resolve(const std::vector<ast::Declaration *> &decls,
                                           const FunctionSymbolSet *functions,
-                                          const TypeSymbolSet *types);
+                                          const TypeSymbolSet *types,
+                                          const TypeSymbolRegistry *registry);
     };
 } // namespace arena::sema
 

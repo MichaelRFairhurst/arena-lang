@@ -42,7 +42,8 @@ bool FunctionSymbolSet::operator==(const FunctionSymbolSet &other) const {
         return false;
     }
 
-    auto [our_end, their_end] = std::mismatch(sorted_ids.begin(), sorted_ids.end(), other.sorted_ids.begin());
+    auto [our_end, their_end] =
+        std::mismatch(sorted_ids.begin(), sorted_ids.end(), other.sorted_ids.begin());
     if (our_end != sorted_ids.end() || their_end != other.sorted_ids.end()) {
         return false;
     }
@@ -50,7 +51,8 @@ bool FunctionSymbolSet::operator==(const FunctionSymbolSet &other) const {
     return true;
 }
 
-TypeSymbolSet::TypeSymbolSet(const TypeTable *ttable) {
+TypeSymbolSet::TypeSymbolSet(const TypeTable *ttable, const TypeSymbolRegistry &registry)
+    : registry(&registry) {
     for (const auto &type : ttable->get_types()) {
         symbol_to_id[type->get_symbol()] = type->get_id();
         sorted_ids.push_back(type->get_id());
@@ -73,11 +75,11 @@ void TypeSymbolSet::import(const TypeSymbolSet &other) {
 }
 
 std::optional<TypeId> TypeSymbolSet::get_id(TypeSymbol symbol) const {
-    auto it = symbol_to_id.find(symbol);
-    if (it != symbol_to_id.end()) {
+    if (auto it = symbol_to_id.find(symbol); it != symbol_to_id.end()) {
         return it->second;
     }
-    return std::nullopt;
+    return registry->get_type_id(symbol);
+    // return std::nullopt;
 }
 
 bool TypeSymbolSet::operator==(const TypeSymbolSet &other) const {
@@ -85,7 +87,8 @@ bool TypeSymbolSet::operator==(const TypeSymbolSet &other) const {
         return false;
     }
 
-    auto [our_end, their_end] = std::mismatch(sorted_ids.begin(), sorted_ids.end(), other.sorted_ids.begin());
+    auto [our_end, their_end] =
+        std::mismatch(sorted_ids.begin(), sorted_ids.end(), other.sorted_ids.begin());
     if (our_end != sorted_ids.end() || their_end != other.sorted_ids.end()) {
         return false;
     }

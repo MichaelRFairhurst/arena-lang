@@ -6,8 +6,9 @@ namespace {
     public:
         FunctionTableBuilderVisitor(const FunctionSymbolRegistry &registry,
                                     const TypeTable &type_table,
-                                    FunctionTable &ftable)
-            : ftable(&ftable), type_table(&type_table), registry(&registry) {}
+                                    FunctionTable &ftable,
+                                    const TypeSymbolRegistry &type_registry)
+            : ftable(&ftable), type_table(&type_table), registry(&registry), symbolizer(&type_registry) {}
 
         void visit(const arena::ast::FunctionDeclaration *decl) override {
             auto symbol = FunctionSymbol{decl->get_name_token()->text};
@@ -20,7 +21,7 @@ namespace {
                 auto arg_type = arg->get_type();
                 auto arg_type_name = arg_type->to_string();
                 // TODO: Support more complex types
-                auto arg_type_id = type_table->get_type_id(NamedTypeSymbol{arg_type_name});
+                auto arg_type_id = type_table->get_type_id(symbolizer.resolve(arg_type));
                 param_types.push_back(arg_type_id);
             }
 
@@ -28,7 +29,7 @@ namespace {
             if (decl->get_return_type()) {
                 auto return_type_name = decl->get_return_type()->to_string();
                 // TODO: Support more complex types
-                return_type_id = type_table->get_type_id(NamedTypeSymbol{return_type_name});
+                return_type_id = type_table->get_type_id(symbolizer.resolve(decl->get_return_type()));
             }
 
             ResolvedFunction function{id, symbol, param_types, return_type_id};
@@ -44,13 +45,14 @@ namespace {
         FunctionTable *ftable;
         const TypeTable *type_table;
         const FunctionSymbolRegistry *registry;
+        TypeSymbolResolver symbolizer;
     };
 } // namespace
 
 FunctionTable arena::sema::FunctionTableBuilder::build(
     const std::vector<arena::ast::Declaration *> &declarations) const {
     FunctionTable ftable(*registry);
-    FunctionTableBuilderVisitor visitor(*registry, *type_table, ftable);
+    FunctionTableBuilderVisitor visitor(*registry, *type_table, ftable, *type_registry);
     for (auto decl : declarations) {
         decl->accept(&visitor);
     }

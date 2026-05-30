@@ -231,6 +231,14 @@ namespace arena::sema {
             return types[id.t_id];
         }
 
+        TypeSymbol get_interned(TypeSymbol symbol) const {
+            if (auto it = name_to_id.find(symbol); it != name_to_id.end()) {
+                return it->first;
+            }
+            return intern(symbol);
+        }
+
+    private:
         TypeSymbol intern(TypeSymbol symbol) const {
             if (NamedTypeSymbol *named = std::get_if<NamedTypeSymbol>(&symbol)) {
                 auto interned_name = intern(named->name);
@@ -259,7 +267,6 @@ namespace arena::sema {
             return std::string_view(static_cast<char *>(interned), str.size());
         }
 
-    private:
         mutable std::unordered_map<TypeSymbol, TypeId> name_to_id;
         mutable std::vector<TypeSymbol> types;
         mutable rena_arena registry_arena;
@@ -289,7 +296,8 @@ namespace arena::sema {
     class TypeSymbolSet {
         public:
         TypeSymbolSet() = default;
-        explicit TypeSymbolSet(const TypeTable *ttable);
+        explicit TypeSymbolSet(const TypeSymbolRegistry &registry);
+        TypeSymbolSet(const TypeTable *ttable, const TypeSymbolRegistry &registry);
 
         void import(const TypeSymbolSet &other);
 
@@ -300,6 +308,7 @@ namespace arena::sema {
 
         private:
         std::unordered_map<TypeSymbol, TypeId> symbol_to_id;
+        const TypeSymbolRegistry *registry = nullptr;
         std::vector<TypeId> sorted_ids; // For equality checking
     };
 

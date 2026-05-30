@@ -5,6 +5,7 @@
 #include "ast/declarations.hpp"
 
 namespace arena::sema {
+
     class ResolvedFunction {
     public:
         ResolvedFunction() = default;
@@ -33,7 +34,7 @@ namespace arena::sema {
             if (param_types.size() != other.param_types.size()) {
                 return false;
             }
-            
+
             for (size_t i = 0; i < param_types.size(); i++) {
                 if (param_types[i] != other.param_types[i]) {
                     return false;
@@ -65,7 +66,7 @@ namespace arena::sema {
 
         std::vector<FunctionId> get_ids() const;
 
-        std::vector<const ResolvedFunction*> get_functions() const;
+        std::vector<const ResolvedFunction *> get_functions() const;
 
         std::optional<ResolvedFunction> resolve(std::string_view name) const;
 

@@ -49,8 +49,9 @@ namespace {
         ExpressionResolverVisitor(const FunctionSymbolSet *functions,
                                   const TypeSymbolSet *types,
                                   std::vector<ResolveError> &errors,
-                                  VariableScope *variable_scope)
-            : functions(functions), types(types), errors(&errors), variable_scope(variable_scope) {}
+                                  VariableScope *variable_scope,
+                                  const TypeSymbolRegistry *registry)
+            : functions(functions), types(types), errors(&errors), variable_scope(variable_scope), symbolizer(registry) {}
 
         void operator()(ResolvedExpression &expr) {
             // This visitor is only used for visiting the root expression, so we can just resolve it
@@ -93,9 +94,7 @@ namespace {
 
             auto type = let_stmt.original->get_type();
             if (type != nullptr) {
-                // TODO: handle more complex types here (e.g. pointers, arrays, generics, etc.)
-                auto symbol = NamedTypeSymbol{type->to_string()};
-                explicit_type_id = types->get_id(symbol);
+                explicit_type_id = types->get_id(symbolizer.resolve(type));
             }
 
             auto var = ResolvedVariable{
@@ -129,11 +128,12 @@ namespace {
         VariableScope *variable_scope = nullptr;
         const FunctionSymbolSet *functions;
         const TypeSymbolSet *types;
+        const TypeSymbolResolver symbolizer;
     };
 
     class FunctionScopeVisitor : public ast::Visitor {
     public:
-        explicit FunctionScopeVisitor(const TypeSymbolSet *type_symbols) : type_symbols(type_symbols) {}
+        explicit FunctionScopeVisitor(const TypeSymbolSet *type_symbols, const TypeSymbolRegistry *registry) : type_symbols(type_symbols), symbolizer(registry) {}
 
         void visit(const ast::FunctionDefinition *func_def) override {
             auto param_list = func_def->get_params()->get_params();
@@ -142,8 +142,7 @@ namespace {
                 std::optional<TypeId> param_type;
 
                 if (param->get_type() != nullptr) {
-                    // TODO: handle more complex types here (e.g. pointers, arrays, generics, etc.)
-                    auto symbol = NamedTypeSymbol{param->get_type()->to_string()};
+                    auto symbol = symbolizer.resolve(param->get_type());
                     param_type = type_symbols->get_id(symbol);
                 }
 
@@ -162,6 +161,7 @@ namespace {
     private:
         VariableScope variable_scope;
         const TypeSymbolSet *type_symbols;
+        TypeSymbolResolver symbolizer;
     };
 
 } // namespace
@@ -193,7 +193,7 @@ bool ResolvedExpressionsResult::operator==(const ResolvedExpressionsResult &othe
 
 ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Declaration *> &decls,
                                                       const FunctionSymbolSet *functions,
-                                                      const TypeSymbolSet *types) {
+                                                      const TypeSymbolSet *types, const TypeSymbolRegistry *registry) {
     util::Arena arena;
 
     std::vector<ResolveError> errors;
@@ -207,14 +207,14 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
             resolved_decls.push_back(tree);
 
             // Resolve parameters into the scope
-            FunctionScopeVisitor func_scope_visitor{types};
+            FunctionScopeVisitor func_scope_visitor{types, registry};
             decl->accept(&func_scope_visitor);
 
             // Resolve expressions in the function body
             ExpressionResolverVisitor expr_resolver{functions,
                                                     types,
                                                     errors,
-                                                    func_scope_visitor.get_variable_scope()};
+                                                    func_scope_visitor.get_variable_scope(), registry};
             expr_resolver(*tree->resolved_stmt);
         }
     }

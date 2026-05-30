@@ -40,6 +40,10 @@ namespace arena::ast {
         
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
+        std::string_view get_name() const {
+            return name->text;
+        }
+
     private:
         Token *name;
         Type *type;
@@ -56,6 +60,10 @@ namespace arena::ast {
         }
         
         void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        std::string_view get_name() const {
+            return name->text;
+        }
 
     private:
         Token *star;
@@ -86,6 +94,10 @@ namespace arena::ast {
         
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
+        std::string_view get_name() const {
+            return name->text;
+        }
+
     private:
         Token *name;
         std::vector<TypeArgument*> genericArgs;
@@ -110,6 +122,17 @@ namespace arena::ast {
         
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
+        const Type *get_pointee() const {
+            return pointee;
+        }
+
+        std::optional<std::string_view> get_lifetime() const {
+            if (lifetime) {
+                return lifetime->text;
+            }
+            return std::nullopt;
+        }
+
     private:
         Type *pointee;
         Token *lifetime; // optional
@@ -121,6 +144,10 @@ namespace arena::ast {
             : Type(constToken, baseType->end()), baseType(baseType) {}
 
         virtual ~ConstType() = default;
+
+        const Type *get_base_type() const {
+            return baseType;
+        }
 
     private:
         Type *baseType;
@@ -144,6 +171,14 @@ namespace arena::ast {
         }
         
         void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const Type *get_element_type() const {
+            return elementType;
+        }
+
+        const Literal *get_size_literal() const {
+            return size;
+        }
 
     private:
         Literal *size;

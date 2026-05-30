@@ -41,7 +41,7 @@ FunctionTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
     const auto &path = query.input;
     auto &ast = ctx.run_query(ParseQuery{path});
     TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
-    FunctionTableBuilder builder(ctx.get_function_registry(), ttable);
+    FunctionTableBuilder builder(ctx.get_function_registry(), ctx.get_type_registry(), ttable);
     return builder.build(ast.declarations);
 };
 
@@ -93,8 +93,8 @@ arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
     auto &ast = ctx.run_query(ParseQuery{path});
     ExpressionResolver resolver;
     TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
-    TypeSymbolSet ttable_symbols(&ttable);
-    return resolver.resolve(ast.declarations, &all_symbols, &ttable_symbols);
+    TypeSymbolSet ttable_symbols(&ttable, ctx.get_type_registry());
+    return resolver.resolve(ast.declarations, &all_symbols, &ttable_symbols, &ctx.get_type_registry());
 }
 
 arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(

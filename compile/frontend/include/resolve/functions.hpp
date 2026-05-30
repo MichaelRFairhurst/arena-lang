@@ -14,13 +14,14 @@ namespace arena::sema {
 
     class FunctionTableBuilder {
     public:
-        FunctionTableBuilder(const FunctionSymbolRegistry &registry, const TypeTable &type_table)
-            : registry(&registry), type_table(&type_table) {}
+        FunctionTableBuilder(const FunctionSymbolRegistry &registry, const TypeSymbolRegistry &type_registry, const TypeTable &type_table)
+            : registry(&registry), type_registry(&type_registry), type_table(&type_table) {}
 
         FunctionTable build(const std::vector<arena::ast::Declaration *> &declarations) const;
 
     private:
         const FunctionSymbolRegistry *registry;
+        const TypeSymbolRegistry *type_registry;
         const TypeTable *type_table;
     };
 
