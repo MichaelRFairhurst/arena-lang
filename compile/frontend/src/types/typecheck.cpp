@@ -27,6 +27,15 @@ namespace {
                                  node);
         }
 
+        void add_error_expected(std::string_view expected,
+                                TypeId actual,
+                                const ast::Node *node,
+                                std::string message) {
+            errors->emplace_back(message + ": expected " + std::string(expected) + ", got '" +
+                                     std::string(ttable->get_type(actual).get_name()) + "'",
+                                 node);
+        }
+
         void add_error_expected(size_t num_expected,
                                 size_t num_actual,
                                 const ast::Node *node,
@@ -174,9 +183,36 @@ namespace {
         }
 
         TypeId operator()(ExprTransformStep<ast::DotOperatorExpression> step) {
-            // For now we do not support member access, so this is always an error.
-            errors->emplace_back("Member access is not supported yet", step.ast);
-            return set_type(step.out_info(), ErrorTypeSymbol{});
+            auto operand_id = middleware.transform_child<TypeId>(step, 0, *this);
+            auto operand_symbol = ttable->get_type(operand_id);
+
+            switch (step.ast->get_operator()) {
+            case ast::TokenType::STAR: {
+                if (auto ptr = std::get_if<PointerType>(&operand_symbol.get_program_type())) {
+                    // TODO: handle lifetime
+                    return set_type(step.out_info(), ptr->pointee_type);
+                } else {
+                    if (!std::holds_alternative<ErrorType>(operand_symbol.get_program_type())) {
+                        add_error_expected("a pointer type",
+                                           operand_id,
+                                           step.ast,
+                                           "Invalid dereference");
+                    }
+                    return set_type(step.out_info(), ErrorTypeSymbol{});
+                }
+            }
+
+            case ast::TokenType::AMP: {
+                // TODO: handle lifetime
+                TypeSymbol ptr{PointerTypeSymbol{operand_symbol.get_id()}};
+                return set_type(step.out_info(), ttable->get_type_id(ptr));
+            }
+
+
+            default:
+                throw std::runtime_error("Unexpected .? operator type: " +
+                                         std::string(step.ast->get_operator_token()->text));
+            }
         }
 
         TypeId operator()(ExprTransformStep<ast::CastExpression> step) {

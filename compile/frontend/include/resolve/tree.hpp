@@ -159,6 +159,10 @@ namespace arena::sema {
             recurse_exprs(binary_expr->get_left(), binary_expr->get_right());
         }
 
+        void visit(const ast::DotOperatorExpression *dot_op_expr) override {
+            recurse_exprs(dot_op_expr->get_operand());
+        }
+
         std::vector<ResolvedExpression *> &get_resolved_exprs() { return resolved_exprs; }
 
     private:
