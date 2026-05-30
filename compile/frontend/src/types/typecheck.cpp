@@ -228,8 +228,14 @@ namespace {
         }
 
         TypeId operator()(ExprTransformStep<ast::UnaryPrefixExpression> step) {
+            auto operand_type = middleware.transform_child<TypeId>(step, 0, *this);
+            if (step.ast->get_operator() != ast::TokenType::NOT) {
+                throw std::runtime_error("Unexpected unary prefix operator: " +
+                                         std::string(step.ast->get_operator_token()->text));
+            }
             // For now we do not support unary operators, so this is always an error.
-            errors->emplace_back("Unary operators are not supported yet", step.ast);
+            auto bool_id = ttable->get_named_type(NamedTypeSymbol{"bool"});
+            require_type(bool_id.get_id(), operand_type, step.ast, "Negation of non-bool type");
             return set_type(step.out_info(), ErrorTypeSymbol{});
         }
 

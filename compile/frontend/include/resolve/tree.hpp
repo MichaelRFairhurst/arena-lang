@@ -163,6 +163,10 @@ namespace arena::sema {
             recurse_exprs(dot_op_expr->get_operand());
         }
 
+        void visit(const ast::UnaryPrefixExpression *prefix_expr) override {
+            recurse_exprs(prefix_expr->get_operand());
+        }
+
         std::vector<ResolvedExpression *> &get_resolved_exprs() { return resolved_exprs; }
 
     private:

@@ -101,6 +101,12 @@ namespace arena::ast {
             return operand;
         }
 
+        const Token* get_operator_token() const {
+            return op;
+        }
+
+        TokenType get_operator() const { return op->type; }
+
     private:
         Token *op;
         Expression *operand;
