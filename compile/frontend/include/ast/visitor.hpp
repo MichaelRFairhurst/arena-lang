@@ -41,6 +41,9 @@ namespace arena::ast {
     class FunctionDefinition;
     class Parameter;
     class ParamList;
+    class Field;
+    class StructDeclaration;
+    class StructDefinition;
     
     // Literals
     class Literal;
@@ -103,6 +106,9 @@ namespace arena::ast {
         virtual void visit(const FunctionDefinition *node) {}
         virtual void visit(const Parameter *node) {}
         virtual void visit(const ParamList *node) {}
+        virtual void visit(const Field *node) {}
+        virtual void visit(const StructDeclaration *node) {}
+        virtual void visit(const StructDefinition *node) {}
 
         // Literal visitors
         virtual void visit(const Literal *node) {}
