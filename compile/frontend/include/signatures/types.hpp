@@ -15,16 +15,6 @@ extern "C" {
 
 namespace arena::sema {
 
-    class TypeSymbolResolver {
-    public:
-        TypeSymbolResolver(const TypeSymbolRegistry *registry) : registry(registry) {}
-
-        TypeSymbol resolve(const ast::Type *type) const;
-
-    private:
-        const TypeSymbolRegistry *registry;
-    };
-
     struct IntegralType {
         bool is_signed;
         size_t size_bytes;
@@ -88,6 +78,8 @@ namespace arena::sema {
         std::vector<const ResolvedType*> get_types() const;
 
         ResolvedType get_type(TypeId id) const;
+
+        ResolvedType get_type(const ast::Type *type) const;
 
         ResolvedType get_named_type(NamedTypeSymbol named) const;
 

@@ -5,40 +5,6 @@ using namespace arena::sema;
 using namespace arena;
 
 namespace {
-    class TypeSymbolResolverVisitor : public ast::Visitor {
-    public:
-        TypeSymbolResolverVisitor(const TypeSymbolRegistry &registry) : registry(&registry) {}
-
-        void visit(const ast::NamedType *named_type) override {
-            result = registry->get_interned(NamedTypeSymbol{named_type->get_name()});
-        }
-
-        void visit(const ast::PointerType *pointer_type) override {
-            pointer_type->get_pointee()->accept(this);
-            auto lifetime = pointer_type->get_lifetime();
-            auto pointee_id = registry->get_type_id(result);
-            result = registry->get_interned(PointerTypeSymbol{pointee_id, lifetime});
-        }
-
-        void visit(const ast::ArrayType *array_type) override {
-            array_type->get_element_type()->accept(this);
-            auto element_id = registry->get_type_id(result);
-            // TODO: use size literal
-            // auto size_literal = array_type->get_size_literal();
-            result = registry->get_interned(ArrayTypeSymbol{element_id, 10});
-        }
-
-        void visit(const ast::ConstType *const_type) override {
-            throw std::runtime_error("Const types are not supported in type symbols yet");
-        }
-
-        TypeSymbol get_result() const { return result; }
-
-    private:
-        const TypeSymbolRegistry *registry;
-        TypeSymbol result;
-    };
-
     class TypeMaterializer {
         public:
         TypeMaterializer(const TypeTable *type_table, const TypeSymbolRegistry *registry) : type_table(type_table), registry(registry) {}
@@ -94,12 +60,6 @@ namespace {
 
 } // namespace
 
-TypeSymbol TypeSymbolResolver::resolve(const ast::Type *type) const {
-    TypeSymbolResolverVisitor visitor(*registry);
-    type->accept(&visitor);
-    return visitor.get_result();
-}
-
 TypeTable TypeTable::builtin_type_table(const TypeSymbolRegistry &registry) {
     std::unordered_map<std::string_view, ProgramType> builtin_types = {
         {"bool", IntegralType{true, 1, "bool"}},
@@ -147,6 +107,13 @@ std::vector<const ResolvedType *> TypeTable::get_types() const {
 ResolvedType TypeTable::get_type(TypeId id) const {
     TypeMaterializer materializer{this, &registry};
     return std::visit(materializer, registry.get_type_symbol(id));
+}
+
+ResolvedType TypeTable::get_type(const ast::Type *type) const {
+    TypeSymbolResolver symbol_resolver(&registry);
+    auto symbol = symbol_resolver.resolve(type);
+    TypeMaterializer materializer{this, &registry};
+    return std::visit(materializer, symbol);
 }
 
 ResolvedType TypeTable::get_named_type(NamedTypeSymbol name) const {

@@ -6,12 +6,19 @@
 #include <variant>
 #include <vector>
 #include <optional>
+#include "ast/types.hpp"
 
 extern "C" {
 #include "arena.h"
 }
 
 namespace arena::sema {
+    /**
+     * Function names are mapped to universal IDs for faster comparison, etc., by the
+     * `FunctionSymbolRegistry`.
+     * 
+     * These IDs can be used to lookup resolved functions from a `FunctionTable`.
+     */
     struct FunctionId {
         FunctionId() = default;
 
@@ -26,6 +33,9 @@ namespace arena::sema {
         }
     };
 
+    /**
+     * A function symbol can be used to get a function ID from a `FunctionSymbolRegistry`.
+     */
     struct FunctionSymbol {
         FunctionSymbol() = default;
 
@@ -36,6 +46,14 @@ namespace arena::sema {
         }
     };
 
+    /**
+     * Types are also assigned unique IDs for faster comparison and lookup, including pointer types
+     * and array types, etc., by the `TypeSymbolRegistry`.
+     * 
+     * Note that type ID lookup works slightly differently than function ID lookup, because many
+     * types can be basically created on the fly. (Type `T*` does not have to be defined or imported
+     * so long as `T` is an available type.)
+     */
     struct TypeId {
         TypeId() = default;
 
@@ -50,6 +68,12 @@ namespace arena::sema {
         }
     };
 
+    /**
+     * A symbol for a named type, such as `int` or some struct.
+     * 
+     * These can be turned into a `TypeId` via the `TypeSymbolRegistry`, which can be used for
+     * resolved type lookup etc.
+     */
     struct NamedTypeSymbol {
         std::string_view name;
 
@@ -58,6 +82,13 @@ namespace arena::sema {
         }
     };
 
+    /**
+     * A symbol for an array type, such as `int[4]`, where the inner type is described by a
+     * `TypeId`.
+     * 
+     * These can be turned into a `TypeId` by the `TypeSymbolRegistry`, and the resulting ID can be
+     * used for looking up resolved types etc.
+     */
     struct ArrayTypeSymbol {
         TypeId element_type;
         size_t size;
@@ -67,6 +98,14 @@ namespace arena::sema {
         }
     };
 
+    /**
+     * A symbol for a pointer type, such as `int*`, where the inner type is described by a `TypeId`.
+     * 
+     * These can be turned into a `TypeId` by the `TypeSymbolRegistry`, and the resulting ID can be
+     * used for looking up resolved types etc.
+     * 
+     * Currently, lifetime is here as a string, but it should be a `LifetimeId` in the future.
+     */
     struct PointerTypeSymbol {
         TypeId pointee_type;
         std::optional<std::string_view> lifetime;
@@ -76,12 +115,18 @@ namespace arena::sema {
         }
     };
 
+    /**
+     * A symbol for a `void` type, used internally.
+     */
     struct VoidTypeSymbol {
         bool operator==(const VoidTypeSymbol &) const {
             return true; // All void type symbols are considered equal
         }
     };
 
+    /**
+     * A symbel for an `error` type, used internally.
+     */
     struct ErrorTypeSymbol {
         bool operator==(const ErrorTypeSymbol &) const {
             return true; // All error type symbols are considered equal
@@ -90,6 +135,10 @@ namespace arena::sema {
 
     using TypeSymbol = std::variant<NamedTypeSymbol, ArrayTypeSymbol, PointerTypeSymbol, VoidTypeSymbol, ErrorTypeSymbol>;
 
+    /**
+     * A class to turn function names into unique IDs, and to intern their names for later use via
+     * `string_view`s.
+     */
     class FunctionSymbolRegistry {
     public:
         FunctionSymbolRegistry() {
@@ -201,6 +250,10 @@ struct std::hash<arena::sema::TypeId> {
 
 namespace arena::sema {
 
+    /**
+     * A class to turn `TypeSymbol`s into `TypeId`s, and intern type name strings for later use as
+     * `string_view`s.
+     */
     class TypeSymbolRegistry {
     public:
         TypeSymbolRegistry() { rena_arena_init(&registry_arena, RENA_ARENA_LARGE_PAGE_SIZE, 0); }
@@ -274,6 +327,9 @@ namespace arena::sema {
 
     class FunctionTable;
 
+    /**
+     * A set of function symbols available in a scope.
+     */
     class FunctionSymbolSet {
         public:
         FunctionSymbolSet() = default;
@@ -293,6 +349,18 @@ namespace arena::sema {
 
     class TypeTable;
 
+    /**
+     * An unbouded set of symbols available in a scope.
+     *
+     * The set of types is unbounded because for all explicitly available types `T`, there are an
+     * infinite number of implicitly available types such as `T*`, `T**`, `T[1]`, `T[2]`, ...
+     * 
+     * Upon lookup, the symbols will be looked up from and/or added to the `TypeSymbolRegistry`
+     * member to give them unique universal IDs. If the inner named types are not available in the
+     * symbol set, the lookup will fail.
+     * 
+     * Lookups of complex types such as `T*` will be cached for future lookups.
+     */
     class TypeSymbolSet {
         public:
         TypeSymbolSet() = default;
@@ -302,14 +370,25 @@ namespace arena::sema {
         void import(const TypeSymbolSet &other);
 
         std::optional<TypeId> get_id(TypeSymbol symbol) const;
+        bool is_available(TypeSymbol symbol) const;
 
         bool operator==(const TypeSymbolSet &other) const;
         bool operator!=(const TypeSymbolSet &other) const { return !(*this == other); }
 
         private:
-        std::unordered_map<TypeSymbol, TypeId> symbol_to_id;
+        mutable std::unordered_map<TypeSymbol, TypeId> symbol_to_id;
         const TypeSymbolRegistry *registry = nullptr;
         std::vector<TypeId> sorted_ids; // For equality checking
+    };
+
+    class TypeSymbolResolver {
+    public:
+        TypeSymbolResolver(const TypeSymbolRegistry *registry) : registry(registry) {}
+
+        TypeSymbol resolve(const ast::Type *type) const;
+
+    private:
+        const TypeSymbolRegistry *registry;
     };
 
 

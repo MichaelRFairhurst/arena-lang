@@ -216,9 +216,11 @@ namespace {
         }
 
         TypeId operator()(ExprTransformStep<ast::CastExpression> step) {
+            auto operand_type = middleware.transform_child<TypeId>(step, 0, *this);
+            auto casted_type = ttable->get_type(step.ast->get_type());
+
             // For now we do not support casts, so this is always an error.
-            errors->emplace_back("Casts are not supported yet", step.ast);
-            return set_type(step.out_info(), ErrorTypeSymbol{});
+            return set_type(step.out_info(), casted_type.get_symbol());
         }
 
         TypeId operator()(ExprTransformStep<ast::MemberAccessExpression> step) {

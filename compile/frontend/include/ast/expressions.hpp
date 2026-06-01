@@ -224,6 +224,10 @@ namespace arena::ast {
             return expr;
         }
 
+        const Type* get_type() const {
+            return targetType;
+        }
+
     private:
         Expression *expr;
         Token *dotToken;

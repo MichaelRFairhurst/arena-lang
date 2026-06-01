@@ -1,9 +1,47 @@
 #include "resolve/symbols.hpp"
 #include "signatures/functions.hpp"
 #include "signatures/types.hpp"
+#include "signatures/types.hpp"
 #include <iostream>
 
 using namespace arena::sema;
+using namespace arena;
+
+namespace {
+    class TypeSymbolResolverVisitor : public ast::Visitor {
+    public:
+        TypeSymbolResolverVisitor(const TypeSymbolRegistry &registry) : registry(&registry) {}
+
+        void visit(const ast::NamedType *named_type) override {
+            result = registry->get_interned(NamedTypeSymbol{named_type->get_name()});
+        }
+
+        void visit(const ast::PointerType *pointer_type) override {
+            pointer_type->get_pointee()->accept(this);
+            auto lifetime = pointer_type->get_lifetime();
+            auto pointee_id = registry->get_type_id(result);
+            result = registry->get_interned(PointerTypeSymbol{pointee_id, lifetime});
+        }
+
+        void visit(const ast::ArrayType *array_type) override {
+            array_type->get_element_type()->accept(this);
+            auto element_id = registry->get_type_id(result);
+            // TODO: use size literal
+            // auto size_literal = array_type->get_size_literal();
+            result = registry->get_interned(ArrayTypeSymbol{element_id, 10});
+        }
+
+        void visit(const ast::ConstType *const_type) override {
+            throw std::runtime_error("Const types are not supported in type symbols yet");
+        }
+
+        TypeSymbol get_result() const { return result; }
+
+    private:
+        const TypeSymbolRegistry *registry;
+        TypeSymbol result;
+    };
+}; // namespace
 
 FunctionSymbolSet::FunctionSymbolSet(const FunctionTable *ftable) {
     auto functions = ftable->get_functions();
@@ -78,8 +116,40 @@ std::optional<TypeId> TypeSymbolSet::get_id(TypeSymbol symbol) const {
     if (auto it = symbol_to_id.find(symbol); it != symbol_to_id.end()) {
         return it->second;
     }
-    return registry->get_type_id(symbol);
-    // return std::nullopt;
+
+    if (!is_available(symbol)) {
+        return std::nullopt;
+    }
+
+    auto id = registry->get_type_id(symbol);
+    symbol_to_id[symbol] = id;
+    return id;
+}
+
+bool TypeSymbolSet::is_available(TypeSymbol symbol) const {
+    return std::visit(
+        [this](auto &&s) {
+            using T = std::decay_t<decltype(s)>;
+
+            if constexpr (std::is_same_v<T, NamedTypeSymbol>) {
+                return symbol_to_id.find(s) != symbol_to_id.end();
+            } else if constexpr (std::is_same_v<T, PointerTypeSymbol>) {
+                auto pointee_id = s.pointee_type;
+                auto pointee_symbol = registry->get_type_symbol(pointee_id);
+                return is_available(pointee_symbol);
+            } else if constexpr (std::is_same_v<T, ArrayTypeSymbol>) {
+                auto element_id = s.element_type;
+                auto element_symbol = registry->get_type_symbol(element_id);
+                return is_available(element_symbol);
+            } else if constexpr (std::is_same_v<T, VoidTypeSymbol>) {
+                return true;
+            } else if constexpr (std::is_same_v<T, ErrorTypeSymbol>) {
+                return true;
+            } else {
+                static_assert(false && sizeof(T), "Missing type in visit handler.");
+            }
+        },
+        symbol);
 }
 
 bool TypeSymbolSet::operator==(const TypeSymbolSet &other) const {
@@ -94,4 +164,10 @@ bool TypeSymbolSet::operator==(const TypeSymbolSet &other) const {
     }
 
     return true;
+}
+
+TypeSymbol TypeSymbolResolver::resolve(const ast::Type *type) const {
+    TypeSymbolResolverVisitor visitor(*registry);
+    type->accept(&visitor);
+    return visitor.get_result();
 }

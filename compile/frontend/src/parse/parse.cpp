@@ -341,13 +341,13 @@ namespace arena::parse {
                         throw std::runtime_error("Expected ')' after type but got: " +
                                                  std::string(tokens.peek()->text));
                     }
-                    tokens.take(); // consume close paren
+                    auto closeParen = tokens.take(); // consume close paren
                     expr = ast_arena_new<CastExpression>(expr,
                                                          dot,
                                                          asToken,
                                                          openParen,
                                                          targetType,
-                                                         tokens.take());
+                                                         closeParen);
                 } else {
                     throw std::runtime_error("Expected identifier or operator after '.' but got: " +
                                              std::string(tokens.peek()->text));
