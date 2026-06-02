@@ -65,6 +65,11 @@ namespace arena::sema {
                                          FunctionTable,
                                          QueryRefreshType::RefreshOnDependentChange>;
 
+    using TypeTableQuery = QueryBase<struct TypeTableQueryTag,
+                                     std::filesystem::path,
+                                     TypeTable,
+                                     QueryRefreshType::RefreshOnDependentChange>;
+
     using FunctionIdsQuery = QueryBase<struct FunctionIdsQueryTag,
                                        std::filesystem::path,
                                        FunctionSymbolSet,
@@ -75,9 +80,24 @@ namespace arena::sema {
                                                 FunctionSymbolSet,
                                                 QueryRefreshType::RefreshOnDependentChange>;
 
+    using TypeIdsQuery = QueryBase<struct TypeIdsQueryTag,
+                                       std::filesystem::path,
+                                       TypeSymbolSet,
+                                       QueryRefreshType::RefreshOnDependentChange>;
+
+    using AvailableTypeIdsQuery = QueryBase<struct AvailableTypeIdsQueryTag,
+                                       std::filesystem::path,
+                                       TypeSymbolSet,
+                                       QueryRefreshType::RefreshOnDependentChange>;
+
     using AvailableFunctionsTableQuery = QueryBase<struct AvailableFunctionsTableQueryTag,
                                                    std::filesystem::path,
                                                    FunctionTable,
+                                                   QueryRefreshType::RefreshOnDependentChange>;
+
+    using AvailableTypesTableQuery = QueryBase<struct AvailableTypesTableQueryTag,
+                                                   std::filesystem::path,
+                                                   TypeTable,
                                                    QueryRefreshType::RefreshOnDependentChange>;
 
     using ResolvedCallsQuery = QueryBase<struct ResolvedCallsQueryTag,
@@ -96,12 +116,16 @@ namespace arena::sema {
     std::vector<std::filesystem::path> compute_query_result(const QueryEngineContext &ctx,
                                                             ImportedPathsQuery query);
     FunctionTable compute_query_result(const QueryEngineContext &ctx, FunctionTableQuery query);
+    TypeTable compute_query_result(const QueryEngineContext &ctx, TypeTableQuery query);
+    FunctionSymbolSet compute_query_result(const QueryEngineContext &ctx, FunctionIdsQuery query);
     FunctionSymbolSet compute_query_result(const QueryEngineContext &ctx,
-                                                 FunctionIdsQuery query);
-    FunctionSymbolSet compute_query_result(const QueryEngineContext &ctx,
-                                                 AvailableFunctionIdsQuery query);
+                                           AvailableFunctionIdsQuery query);
+    TypeSymbolSet compute_query_result(const QueryEngineContext &ctx, TypeIdsQuery query);
+    TypeSymbolSet compute_query_result(const QueryEngineContext &ctx, AvailableTypeIdsQuery query);
     FunctionTable compute_query_result(const QueryEngineContext &ctx,
                                        AvailableFunctionsTableQuery query);
+    TypeTable compute_query_result(const QueryEngineContext &ctx,
+                                       AvailableTypesTableQuery query);
     arena::sema::ResolvedExpressionsResult compute_query_result(const QueryEngineContext &ctx,
                                                                 ResolvedCallsQuery query);
     arena::sema::ResolvedExpressionsResult compute_query_result(const QueryEngineContext &ctx,
@@ -112,9 +136,13 @@ namespace arena::sema {
         ParseQuery::CacheType parse_cache;
         ImportedPathsQuery::CacheType imported_paths_cache;
         FunctionTableQuery::CacheType function_table_cache;
+        TypeTableQuery::CacheType type_table_cache;
         FunctionIdsQuery::CacheType function_ids_cache;
         AvailableFunctionIdsQuery::CacheType available_function_ids_cache;
+        TypeIdsQuery::CacheType type_ids_cache;
+        AvailableTypeIdsQuery::CacheType available_type_ids_cache;
         AvailableFunctionsTableQuery::CacheType available_functions_table_cache;
+        AvailableTypesTableQuery::CacheType available_types_table_cache;
         ResolvedCallsQuery::CacheType resolved_calls_cache;
         TypecheckedFileQuery::CacheType typechecked_file_cache;
 
@@ -128,12 +156,20 @@ namespace arena::sema {
                 return imported_paths_cache;
             } else if constexpr (std::is_same_v<QueryType, FunctionTableQuery>) {
                 return function_table_cache;
+            } else if constexpr (std::is_same_v<QueryType, TypeTableQuery>) {
+                return type_table_cache;
             } else if constexpr (std::is_same_v<QueryType, FunctionIdsQuery>) {
                 return function_ids_cache;
             } else if constexpr (std::is_same_v<QueryType, AvailableFunctionIdsQuery>) {
                 return available_function_ids_cache;
+            } else if constexpr (std::is_same_v<QueryType, TypeIdsQuery>) {
+                return type_ids_cache;
+            } else if constexpr (std::is_same_v<QueryType, AvailableTypeIdsQuery>) {
+                return available_type_ids_cache;
             } else if constexpr (std::is_same_v<QueryType, AvailableFunctionsTableQuery>) {
                 return available_functions_table_cache;
+            } else if constexpr (std::is_same_v<QueryType, AvailableTypesTableQuery>) {
+                return available_types_table_cache;
             } else if constexpr (std::is_same_v<QueryType, ResolvedCallsQuery>) {
                 return resolved_calls_cache;
             } else if constexpr (std::is_same_v<QueryType, TypecheckedFileQuery>) {
@@ -165,9 +201,13 @@ namespace arena::sema {
                                ParseQuery,
                                ImportedPathsQuery,
                                FunctionTableQuery,
+                               TypeTableQuery,
                                FunctionIdsQuery,
                                AvailableFunctionIdsQuery,
                                AvailableFunctionsTableQuery,
+                               AvailableTypesTableQuery,
+                               TypeIdsQuery,
+                               AvailableTypeIdsQuery,
                                ResolvedCallsQuery,
                                TypecheckedFileQuery>;
 
@@ -195,6 +235,10 @@ struct std::hash<arena::sema::FunctionTableQuery>
     : arena::sema::QueryHashBase<arena::sema::FunctionTableQuery> {};
 
 template <>
+struct std::hash<arena::sema::TypeTableQuery>
+    : arena::sema::QueryHashBase<arena::sema::TypeTableQuery> {};
+
+template <>
 struct std::hash<arena::sema::FunctionIdsQuery>
     : arena::sema::QueryHashBase<arena::sema::FunctionIdsQuery> {};
 
@@ -203,8 +247,20 @@ struct std::hash<arena::sema::AvailableFunctionIdsQuery>
     : arena::sema::QueryHashBase<arena::sema::AvailableFunctionIdsQuery> {};
 
 template <>
+struct std::hash<arena::sema::TypeIdsQuery>
+    : arena::sema::QueryHashBase<arena::sema::TypeIdsQuery> {};
+
+template <>
+struct std::hash<arena::sema::AvailableTypeIdsQuery>
+    : arena::sema::QueryHashBase<arena::sema::AvailableTypeIdsQuery> {};
+
+template <>
 struct std::hash<arena::sema::AvailableFunctionsTableQuery>
     : arena::sema::QueryHashBase<arena::sema::AvailableFunctionsTableQuery> {};
+
+template <>
+struct std::hash<arena::sema::AvailableTypesTableQuery>
+    : arena::sema::QueryHashBase<arena::sema::AvailableTypesTableQuery> {};
 
 template <>
 struct std::hash<arena::sema::ResolvedCallsQuery>

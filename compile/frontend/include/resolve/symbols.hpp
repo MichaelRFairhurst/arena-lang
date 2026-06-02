@@ -279,7 +279,7 @@ namespace arena::sema {
 
         TypeSymbol get_type_symbol(TypeId id) const {
             if (types.size() <= id.t_id) {
-                throw std::runtime_error("Type ID not found");
+                throw std::runtime_error("Type ID not found for symbol resolution");
             }
             return types[id.t_id];
         }
@@ -364,7 +364,7 @@ namespace arena::sema {
     class TypeSymbolSet {
         public:
         TypeSymbolSet() = default;
-        explicit TypeSymbolSet(const TypeSymbolRegistry &registry);
+        explicit TypeSymbolSet(const TypeSymbolRegistry &registry) : registry(&registry) {}
         TypeSymbolSet(const TypeTable *ttable, const TypeSymbolRegistry &registry);
 
         void import(const TypeSymbolSet &other);

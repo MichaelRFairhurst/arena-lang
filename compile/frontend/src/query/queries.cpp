@@ -45,6 +45,15 @@ FunctionTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
     return builder.build(ast.declarations);
 };
 
+TypeTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                                          TypeTableQuery query) {
+    const auto &path = query.input;
+    auto &ast = ctx.run_query(ParseQuery{path});
+    TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
+    TypeTableBuilder builder(&ctx.get_type_registry());
+    return builder.build(ast.declarations);
+};
+
 FunctionSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
                                                           FunctionIdsQuery query) {
     const auto &path = query.input;
@@ -68,6 +77,29 @@ FunctionSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ct
     return all_functions;
 };
 
+TypeSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                                          TypeIdsQuery query) {
+    const auto &path = query.input;
+    auto &ttable = ctx.run_query(TypeTableQuery{path});
+    return TypeSymbolSet(&ttable, ctx.get_type_registry());
+};
+
+TypeSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                                          AvailableTypeIdsQuery query) {
+    const auto &path = query.input;
+    auto &imports = ctx.run_query(ImportedPathsQuery{path});
+
+    TypeSymbolSet all_types{ctx.get_type_registry()};
+    for (const auto &import : imports) {
+        auto &types = ctx.run_query(TypeIdsQuery{import});
+        all_types.import(types);
+    }
+    auto &my_types = ctx.run_query(TypeIdsQuery{path});
+    all_types.import(my_types);
+
+    return all_types;
+};
+
 FunctionTable arena::sema::compute_query_result(
     const QueryEngineContext &ctx, AvailableFunctionsTableQuery query) {
     const auto &path = query.input;
@@ -85,26 +117,42 @@ FunctionTable arena::sema::compute_query_result(
     return ftable;
 }
 
+TypeTable arena::sema::compute_query_result(
+    const QueryEngineContext &ctx, AvailableTypesTableQuery query) {
+    const auto &path = query.input;
+    auto &imports = ctx.run_query(ImportedPathsQuery{path});
+
+    TypeTable ttable(ctx.get_type_registry());
+
+    for (const auto &import : imports) {
+        auto &imported_ttable = ctx.run_query(TypeTableQuery{import});
+        ttable.import(imported_ttable);
+    }
+    auto &my_ttable = ctx.run_query(TypeTableQuery{path});
+    ttable.import(my_ttable);
+
+    return ttable;
+}
+
 arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
     const QueryEngineContext &ctx, ResolvedCallsQuery query) {
     const auto &path = query.input;
-    auto all_symbols = ctx.run_query(AvailableFunctionIdsQuery{path});
+    auto all_fsymbols = ctx.run_query(AvailableFunctionIdsQuery{path});
+    auto all_tsymbols = ctx.run_query(AvailableTypeIdsQuery{path});
 
     auto &ast = ctx.run_query(ParseQuery{path});
     ExpressionResolver resolver;
-    TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
-    TypeSymbolSet ttable_symbols(&ttable, ctx.get_type_registry());
-    return resolver.resolve(ast.declarations, &all_symbols, &ttable_symbols, &ctx.get_type_registry());
+    return resolver.resolve(ast.declarations, &all_fsymbols, &all_tsymbols, &ctx.get_type_registry());
 }
 
 arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
     const QueryEngineContext &ctx, TypecheckedFileQuery query) {
     const auto &path = query.input;
     const FunctionTable &ftable = ctx.run_query(AvailableFunctionsTableQuery{path});
+    const TypeTable &ttable = ctx.run_query(AvailableTypesTableQuery{path});
     auto &resolved_calls = ctx.run_query(ResolvedCallsQuery{path});
 
     auto &ast = ctx.run_query(ParseQuery{path});
-    const TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
     TypeChecker typechecker(ftable, ttable);
 
     return typechecker.type_check(resolved_calls.get_resolved_decls());

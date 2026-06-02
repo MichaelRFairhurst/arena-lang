@@ -15,6 +15,10 @@ extern "C" {
 
 namespace arena::sema {
 
+    struct StructType {
+        std::string_view name;
+    };
+
     struct IntegralType {
         bool is_signed;
         size_t size_bytes;
@@ -41,15 +45,17 @@ namespace arena::sema {
 
     struct ErrorType {};
 
-    using ProgramType = std::variant<IntegralType, FloatingType, PointerType, ArrayType, VoidType, ErrorType>;
+    using ProgramType =
+        std::variant<StructType, IntegralType, FloatingType, PointerType, ArrayType, VoidType, ErrorType>;
 
     class ResolvedType {
     public:
+        ResolvedType() = default;
         ResolvedType(TypeId id, ProgramType program_type, TypeSymbol symbol, std::string_view name)
             : id(id), program_type(program_type), symbol(symbol), name(name) {}
 
         TypeId get_id() const { return id; }
-        
+
         TypeSymbol get_symbol() const { return symbol; }
 
         bool is_void() const { return std::holds_alternative<VoidType>(program_type); }
@@ -71,11 +77,16 @@ namespace arena::sema {
     public:
         static TypeTable builtin_type_table(const TypeSymbolRegistry &registry);
 
-        TypeTable(const TypeSymbolRegistry &registry) : registry(registry) {}
+        TypeTable() = default;
+        TypeTable(const TypeSymbolRegistry &registry) : registry(&registry) {}
 
-        TypeId get_type_id(TypeSymbol symbol) const { return registry.get_type_id(symbol); }
+        void add_type(ResolvedType type);
 
-        std::vector<const ResolvedType*> get_types() const;
+        void import(const TypeTable &other);
+
+        TypeId get_type_id(TypeSymbol symbol) const { return registry->get_type_id(symbol); }
+
+        std::vector<const ResolvedType *> get_types() const;
 
         ResolvedType get_type(TypeId id) const;
 
@@ -83,11 +94,24 @@ namespace arena::sema {
 
         ResolvedType get_named_type(NamedTypeSymbol named) const;
 
+        bool operator==(const TypeTable& other) const;
+
     private:
-        const TypeSymbolRegistry &registry;
+        const TypeSymbolRegistry *registry = nullptr;
         std::unordered_map<TypeId, ResolvedType> types;
+        mutable std::vector<TypeId> type_ids; // for equality checking
     };
 
+    class TypeTableBuilder {
+    public:
+        TypeTableBuilder(const TypeSymbolRegistry *registry)
+            : registry(registry) {}
+
+        TypeTable build(const std::vector<arena::ast::Declaration *> &declarations) const;
+
+    private:
+        const TypeSymbolRegistry *registry;
+    };
 
 }; // namespace arena::sema
 
