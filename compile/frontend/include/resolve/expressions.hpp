@@ -12,14 +12,17 @@ namespace arena::sema {
 
         ResolvedExpressionsResult(util::Arena arena,
                                   std::vector<ResolvedDeclaration *> resolved_decls,
-                                  std::vector<ResolveError> errors)
+                                  std::vector<ResolveError> errors,
+                                VariableRegistry resolved_variables)
             : arena(std::move(arena)), resolved_decls(std::move(resolved_decls)),
-              errors(std::move(errors)) {}
+              errors(std::move(errors)), resolved_variables(std::move(resolved_variables)) {}
 
         std::vector<const ResolvedDeclaration *> get_resolved_decls() const {
             return std::vector<const ResolvedDeclaration *>(resolved_decls.begin(),
                                                             resolved_decls.end());
         }
+
+        const VariableRegistry *get_resolved_variables() const { return &resolved_variables; }
 
         const std::vector<ResolveError> &get_errors() const { return errors; }
 
@@ -30,6 +33,7 @@ namespace arena::sema {
         std::vector<ResolveError> errors;
         std::vector<ResolvedDeclaration *> resolved_decls;
         std::vector<ResolvedStatement *> resolved_stmts;
+        VariableRegistry resolved_variables;
     };
 
     class ExpressionResolver {

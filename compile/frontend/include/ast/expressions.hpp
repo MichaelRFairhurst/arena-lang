@@ -78,6 +78,10 @@ namespace arena::ast {
             return right;
         }
 
+        TokenType get_operator() const {
+            return op->type;
+        }
+
     private:
         Token *op;
         Expression *left;

@@ -36,7 +36,7 @@ namespace arena::util {
             if (rena_arena_alloc(&arena, sizeof(T), alignof(T), &ptr) != RENA_ARENA_SUCCESS) {
                 return nullptr;
             }
-            return new (ptr) T(std::forward<Args>(args)...);
+            return new (ptr) T{std::forward<Args>(args)...};
         }
 
         template <typename T>

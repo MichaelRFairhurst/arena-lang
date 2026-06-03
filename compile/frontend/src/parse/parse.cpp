@@ -455,7 +455,18 @@ namespace arena::parse {
         return left;
     }
 
-    Expression *parse_expression(TokenIterator &tokens) { return parse_bin_expression(tokens); }
+    Expression *parse_assignment_expression(TokenIterator &tokens) {
+        Expression *left = parse_bin_expression(tokens);
+        if (tokens.peek()->type == TokenType::EQUAL) {
+            Token *op = tokens.take();
+            Expression *right = parse_assignment_expression(tokens);
+            return ast_arena_new<BinaryExpression>(left, op, right);
+        } else {
+            return left;
+        }
+    }
+
+    Expression *parse_expression(TokenIterator &tokens) { return parse_assignment_expression(tokens); }
 
     Statement *parse_if_statement(TokenIterator &tokens) {
         assert(tokens.peek()->type == TokenType::IF);
@@ -483,7 +494,7 @@ namespace arena::parse {
     }
 
     Statement *parse_let_statement(TokenIterator &tokens) {
-        // TODO support initializer, multi-variable declarations, etc
+        // TODO multi-variable declarations, etc
         assert(tokens.peek()->type == TokenType::LET);
         Token *letToken = tokens.take(); // consume 'let'
         if (tokens.peek()->type != TokenType::IDENTIFIER) {
@@ -502,13 +513,20 @@ namespace arena::parse {
             type = parse_type(tokens);
         }
 
-        if (tokens.peek()->type != TokenType::SEMICOLON) {
-            throw std::runtime_error("Expected ';' after 'let' declaration but got: " +
-                                     std::string(tokens.peek()->text));
+        Token *equalToken = nullptr;
+        Expression* initializer = nullptr;
+        if (tokens.peek()->type == TokenType::EQUAL) {
+            equalToken = tokens.take(); // consume '='
+            initializer = parse_expression(tokens);
         }
-        tokens.take(); // consume ';'
 
-        return ast_arena_new<LetStatement>(letToken, name, type);
+        Token *semicolon = tokens.take();
+        if (semicolon->type != TokenType::SEMICOLON) {
+            throw std::runtime_error("Expected ';' after 'let' declaration but got: " +
+                                     std::string(semicolon->text));
+        }
+
+        return ast_arena_new<LetStatement>(letToken, name, type, equalToken, initializer, semicolon);
     }
 
     Statement *parse_return_statement(TokenIterator &tokens) {

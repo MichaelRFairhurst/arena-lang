@@ -37,7 +37,7 @@ std::vector<std::filesystem::path> arena::sema::compute_query_result(const Query
 };
 
 FunctionTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
-                                                          FunctionTableQuery query) {
+                                                FunctionTableQuery query) {
     const auto &path = query.input;
     auto &ast = ctx.run_query(ParseQuery{path});
     TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
@@ -45,8 +45,7 @@ FunctionTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
     return builder.build(ast.declarations);
 };
 
-TypeTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
-                                                          TypeTableQuery query) {
+TypeTable arena::sema::compute_query_result(const QueryEngineContext &ctx, TypeTableQuery query) {
     const auto &path = query.input;
     auto &ast = ctx.run_query(ParseQuery{path});
     TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
@@ -55,14 +54,14 @@ TypeTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
 };
 
 FunctionSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
-                                                          FunctionIdsQuery query) {
+                                                    FunctionIdsQuery query) {
     const auto &path = query.input;
     auto &ftable = ctx.run_query(FunctionTableQuery{path});
     return FunctionSymbolSet(&ftable);
 };
 
 FunctionSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
-                                                          AvailableFunctionIdsQuery query) {
+                                                    AvailableFunctionIdsQuery query) {
     const auto &path = query.input;
     auto &imports = ctx.run_query(ImportedPathsQuery{path});
 
@@ -77,15 +76,14 @@ FunctionSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ct
     return all_functions;
 };
 
-TypeSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
-                                                          TypeIdsQuery query) {
+TypeSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx, TypeIdsQuery query) {
     const auto &path = query.input;
     auto &ttable = ctx.run_query(TypeTableQuery{path});
     return TypeSymbolSet(&ttable, ctx.get_type_registry());
 };
 
 TypeSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
-                                                          AvailableTypeIdsQuery query) {
+                                                AvailableTypeIdsQuery query) {
     const auto &path = query.input;
     auto &imports = ctx.run_query(ImportedPathsQuery{path});
 
@@ -100,8 +98,8 @@ TypeSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
     return all_types;
 };
 
-FunctionTable arena::sema::compute_query_result(
-    const QueryEngineContext &ctx, AvailableFunctionsTableQuery query) {
+FunctionTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                                AvailableFunctionsTableQuery query) {
     const auto &path = query.input;
     auto &imports = ctx.run_query(ImportedPathsQuery{path});
 
@@ -117,8 +115,8 @@ FunctionTable arena::sema::compute_query_result(
     return ftable;
 }
 
-TypeTable arena::sema::compute_query_result(
-    const QueryEngineContext &ctx, AvailableTypesTableQuery query) {
+TypeTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                            AvailableTypesTableQuery query) {
     const auto &path = query.input;
     auto &imports = ctx.run_query(ImportedPathsQuery{path});
 
@@ -142,7 +140,10 @@ arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
 
     auto &ast = ctx.run_query(ParseQuery{path});
     ExpressionResolver resolver;
-    return resolver.resolve(ast.declarations, &all_fsymbols, &all_tsymbols, &ctx.get_type_registry());
+    return resolver.resolve(ast.declarations,
+                            &all_fsymbols,
+                            &all_tsymbols,
+                            &ctx.get_type_registry());
 }
 
 arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
@@ -155,5 +156,6 @@ arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
     auto &ast = ctx.run_query(ParseQuery{path});
     TypeChecker typechecker(ftable, ttable);
 
-    return typechecker.type_check(resolved_calls.get_resolved_decls());
+    return typechecker.type_check(resolved_calls.get_resolved_decls(),
+                                  resolved_calls.get_resolved_variables());
 }

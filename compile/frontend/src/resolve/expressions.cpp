@@ -21,7 +21,7 @@ namespace {
 
             std::optional<FunctionId> fid = functions->get_id(FunctionSymbol{ident});
 
-            auto var = variable_scope->resolve_variable(ident);
+            auto var = variable_scope->resolve_variable_id(ident);
             if (fid && var) {
                 errors->emplace_back("Identifier '" + std::string(ident) +
                                          "' is ambiguous (could refer to both a function and a "
@@ -46,12 +46,14 @@ namespace {
 
     class ExpressionResolverVisitor {
     public:
-        ExpressionResolverVisitor(const FunctionSymbolSet *functions,
+        ExpressionResolverVisitor(util::Arena *arena,
+                                  const FunctionSymbolSet *functions,
                                   const TypeSymbolSet *types,
                                   std::vector<ResolveError> &errors,
                                   VariableScope *variable_scope,
                                   const TypeSymbolRegistry *registry)
-            : functions(functions), types(types), errors(&errors), variable_scope(variable_scope), symbolizer(registry) {}
+            : arena(arena), functions(functions), types(types), errors(&errors),
+              variable_scope(variable_scope), symbolizer(registry) {}
 
         void operator()(ResolvedExpression &expr) {
             // This visitor is only used for visiting the root expression, so we can just resolve it
@@ -92,19 +94,30 @@ namespace {
         void operator()(ResolvedLetStatement &let_stmt) {
             std::optional<TypeId> explicit_type_id;
 
+            auto name = let_stmt.original->get_name();
             auto type = let_stmt.original->get_type();
             if (type != nullptr) {
                 explicit_type_id = types->get_id(symbolizer.resolve(type));
             }
 
-            auto var = ResolvedVariable{
-                let_stmt.variable.name,
-                let_stmt.variable.declaration,
-                explicit_type_id,
-                std::nullopt // inferred type id will be filled in during type checking
-            };
-            variable_scope->add_variable(let_stmt.variable.name, var);
-            let_stmt.variable = var;
+            auto var = arena->alloc<ResolvedVariable>(name,
+                                                      let_stmt.original,
+                                                      explicit_type_id,
+                                                      std::nullopt // inferred type id will be
+                                                                   // filled in during type checking
+            );
+
+            auto id = variable_scope->add_variable(name, var);
+            let_stmt.variable_id = id;
+
+            // Note: Ordinarily, we would want to resolve the initializer expression in the previous
+            // scope to prevent self-referential assignment. However, we handle this differently. In
+            // Arena, we allow initializers to refer to the variable's address, and preventing
+            // self-referential initializers is the responsibility of variable initialization
+            // analysis.
+            if (let_stmt.initializer) {
+                (*this)(*let_stmt.initializer);
+            }
         }
 
         void operator()(ResolvedReturnStatement &return_stmt) { (*this)(*return_stmt.expr); }
@@ -124,6 +137,7 @@ namespace {
         }
 
     private:
+        util::Arena *arena;
         std::vector<ResolveError> *errors;
         VariableScope *variable_scope = nullptr;
         const FunctionSymbolSet *functions;
@@ -133,7 +147,12 @@ namespace {
 
     class FunctionScopeVisitor : public ast::Visitor {
     public:
-        explicit FunctionScopeVisitor(const TypeSymbolSet *type_symbols, const TypeSymbolRegistry *registry) : type_symbols(type_symbols), symbolizer(registry) {}
+        explicit FunctionScopeVisitor(util::Arena *arena,
+                                      const TypeSymbolSet *type_symbols,
+                                      const TypeSymbolRegistry *registry,
+                                      VariableScope *variable_scope)
+            : arena(arena), type_symbols(type_symbols), symbolizer(registry),
+              variable_scope(variable_scope) {}
 
         void visit(const ast::FunctionDefinition *func_def) override {
             auto param_list = func_def->get_params()->get_params();
@@ -146,20 +165,20 @@ namespace {
                     param_type = type_symbols->get_id(symbol);
                 }
 
-                variable_scope.add_variable(param->get_name(),
-                                            ResolvedVariable{
-                                                param->get_name(),
-                                                param,
-                                                param_type,
-                                                std::nullopt // No inferred type for parameters
-                                            });
+                variable_scope
+                    ->add_variable(param->get_name(),
+                                   arena->alloc<ResolvedVariable>(param->get_name(),
+                                                                  param,
+                                                                  param_type,
+                                                                  std::nullopt // No inferred type
+                                                                               // for parameters
+                                                                  ));
             }
         }
 
-        VariableScope *get_variable_scope() { return &variable_scope; }
-
     private:
-        VariableScope variable_scope;
+        util::Arena *arena;
+        VariableScope *variable_scope;
         const TypeSymbolSet *type_symbols;
         TypeSymbolResolver symbolizer;
     };
@@ -193,11 +212,13 @@ bool ResolvedExpressionsResult::operator==(const ResolvedExpressionsResult &othe
 
 ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Declaration *> &decls,
                                                       const FunctionSymbolSet *functions,
-                                                      const TypeSymbolSet *types, const TypeSymbolRegistry *registry) {
+                                                      const TypeSymbolSet *types,
+                                                      const TypeSymbolRegistry *registry) {
     util::Arena arena;
 
     std::vector<ResolveError> errors;
     std::vector<ResolvedDeclaration *> resolved_decls;
+    VariableRegistry variable_registry;
     for (auto decl : decls) {
         ResolvedDeclarationBuilder builder{arena};
         decl->accept(&builder);
@@ -205,18 +226,21 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
 
         if (tree) {
             resolved_decls.push_back(tree);
+            VariableScope variable_scope{&variable_registry};
 
             // Resolve parameters into the scope
-            FunctionScopeVisitor func_scope_visitor{types, registry};
+            FunctionScopeVisitor func_scope_visitor{&arena, types, registry, &variable_scope};
             decl->accept(&func_scope_visitor);
 
             // Resolve expressions in the function body
-            ExpressionResolverVisitor expr_resolver{functions,
+            ExpressionResolverVisitor expr_resolver{&arena,
+                                                    functions,
                                                     types,
                                                     errors,
-                                                    func_scope_visitor.get_variable_scope(), registry};
+                                                    &variable_scope,
+                                                    registry};
             expr_resolver(*tree->resolved_stmt);
         }
     }
-    return ResolvedExpressionsResult{std::move(arena), resolved_decls, std::move(errors)};
+    return ResolvedExpressionsResult{std::move(arena), resolved_decls, std::move(errors), std::move(variable_registry)};
 }

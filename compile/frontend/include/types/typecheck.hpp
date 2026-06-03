@@ -9,9 +9,11 @@ namespace arena::sema {
 
     class TypeChecker {
     public:
-        TypeChecker(const FunctionTable &ftable, const TypeTable &ttable) : ftable(&ftable), ttable(&ttable) {}
+        TypeChecker(const FunctionTable &ftable, const TypeTable &ttable)
+            : ftable(&ftable), ttable(&ttable) {}
 
-        ResolvedExpressionsResult type_check(const std::vector<const ResolvedDeclaration *> &decls);
+        ResolvedExpressionsResult type_check(const std::vector<const ResolvedDeclaration *> &decls,
+                                             const VariableRegistry *registry);
 
     private:
         const FunctionTable *ftable;

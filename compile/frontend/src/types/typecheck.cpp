@@ -9,8 +9,10 @@ namespace {
         TypeCheckTransform(util::Arena *arena,
                            const FunctionTable *ftable,
                            const TypeTable *ttable,
+                           const VariableRegistry *variables,
                            std::vector<ResolveError> *errors)
-            : middleware(arena), ftable(ftable), ttable(ttable), errors(errors) {}
+            : middleware(arena), ftable(ftable), ttable(ttable), variables(variables),
+              errors(errors) {}
 
         ResolvedExpression *typecheck_root(const ResolvedExpression *expr_in) {
             return middleware.transform_root(*expr_in, *this);
@@ -111,12 +113,14 @@ namespace {
                 return set_type(step.out_info(), ErrorTypeSymbol{});
             }
 
-            auto inferred = var_info->variable.inferred_type_id;
-            auto explicit_ = var_info->variable.explicit_type_id;
+            auto variable = variables->resolve_variable(var_info->variable_id);
+
+            auto inferred = variable->inferred_type_id;
+            auto explicit_ = variable->explicit_type_id;
             auto type_id =
                 explicit_.value_or(inferred.value_or(ttable->get_type_id(ErrorTypeSymbol{})));
             if (!explicit_ && !inferred) {
-                add_error_uninferred(var_info->variable.name, step.ast);
+                add_error_uninferred(variable->name, step.ast);
             }
             return set_type(step.out_info(), type_id);
         }
@@ -138,7 +142,17 @@ namespace {
                                 "Expected binary expression operands to have the same type");
 
             // Assume the output type is the input type (not the case for `==`)
-            return set_type(step.out_info(), left_type_id);
+            switch (step.ast->get_operator()) {
+                case ast::TokenType::EQUAL_EQUAL:
+                case ast::TokenType::NOT_EQUAL:
+                case ast::TokenType::LESS:
+                case ast::TokenType::LESS_EQUAL:
+                case ast::TokenType::GREATER:
+                case ast::TokenType::GREATER_EQUAL:
+                    return set_type(step.out_info(), NamedTypeSymbol{"bool"});
+                default:
+                    return set_type(step.out_info(), left_type_id);
+            }
         }
 
         TypeId operator()(ExprTransformStep<ast::CallExpression> step) {
@@ -245,13 +259,16 @@ namespace {
         const FunctionTable *ftable;
         const TypeTable *ttable;
         ExprTransformMiddleware middleware;
+        const VariableRegistry *variables;
         std::vector<ResolveError> *errors;
     };
 
     class StatementTypeCheckTransform {
     public:
-        StatementTypeCheckTransform(util::Arena *arena, TypeCheckTransform *expr_typecheck)
-            : middleware(arena), expr_typecheck(expr_typecheck) {}
+        StatementTypeCheckTransform(util::Arena *arena,
+                                    const VariableRegistry *registry,
+                                    TypeCheckTransform *expr_typecheck)
+            : middleware(arena), variables(registry), expr_typecheck(expr_typecheck) {}
 
         ResolvedStatement *typecheck(const ResolvedStatement &stmt_in) {
             return middleware.transform_root(&stmt_in, *this);
@@ -271,7 +288,26 @@ namespace {
         }
 
         void operator()(StmtTransformStep<ResolvedLetStatement> step) {
-            // nothing to do for let statements until we add initializers
+            if (step.original->initializer) {
+                auto ast = step.original->initializer->original;
+                step.out->variable_id = step.original->variable_id;
+                auto initializer = expr_typecheck->typecheck_root(step.original->initializer);
+                step.out->initializer = initializer;
+
+                auto variable = variables->resolve_variable(step.out->variable_id);
+                if (auto type = std::get_if<ResolvedTypeInfo>(&initializer->info)) {
+                    variable->inferred_type_id = variable->inferred_type_id.value_or(type->type_id);
+                    auto variable_type =
+                        variable->explicit_type_id.value_or(variable->inferred_type_id.value());
+                    expr_typecheck
+                        ->require_type(variable_type,
+                                       type->type_id,
+                                       ast,
+                                       "Type of initializer does not match explicit type");
+                } else {
+                    throw std::runtime_error("Initializer did not have a type after typechecking");
+                }
+            }
         }
 
         void operator()(StmtTransformStep<ResolvedReturnStatement> step) {
@@ -285,18 +321,19 @@ namespace {
     private:
         StmtTransformMiddleware middleware;
         TypeCheckTransform *expr_typecheck;
+        const VariableRegistry *variables;
     };
 
 } // namespace
 
 ResolvedExpressionsResult TypeChecker::type_check(
-    const std::vector<const ResolvedDeclaration *> &decls) {
+    const std::vector<const ResolvedDeclaration *> &decls, const VariableRegistry *variables) {
     util::Arena arena;
     std::vector<ResolvedDeclaration *> resolved_decls;
     std::vector<ResolveError> errors;
 
-    TypeCheckTransform typecheck(&arena, ftable, ttable, &errors);
-    StatementTypeCheckTransform stmt_typecheck(&arena, &typecheck);
+    TypeCheckTransform typecheck(&arena, ftable, ttable, variables, &errors);
+    StatementTypeCheckTransform stmt_typecheck(&arena, variables, &typecheck);
 
     for (auto decl : decls) {
         if (!decl->resolved_stmt) {
@@ -312,5 +349,7 @@ ResolvedExpressionsResult TypeChecker::type_check(
 
     return ResolvedExpressionsResult(std::move(arena),
                                      std::move(resolved_decls),
-                                     std::move(errors));
+                                     std::move(errors),
+                                     *variables // intentionally copied.
+    );
 }

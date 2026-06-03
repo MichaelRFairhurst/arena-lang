@@ -20,7 +20,7 @@ namespace arena::sema {
     };
 
     struct ResolvedVariableInfo {
-        ResolvedVariable variable;
+        VariableId variable_id;
     };
 
     struct UnresolvedExprInfo {};
@@ -40,7 +40,8 @@ namespace arena::sema {
 
     struct ResolvedLetStatement {
         const ast::LetStatement *original = nullptr;
-        ResolvedVariable variable;
+        VariableId variable_id;
+        ResolvedExpression *initializer = nullptr;
     };
 
     struct ResolvedIfStatement {
@@ -248,7 +249,11 @@ namespace arena::sema {
 
         void visit(const ast::LetStatement *let_stmt) override {
             auto *resolved = resolve_as<ResolvedLetStatement>(let_stmt);
-            resolved->variable.name = let_stmt->get_name();
+
+            auto initializer = let_stmt->get_initializer();
+            if (initializer != nullptr) {
+                resolved->initializer = resolve_expression(initializer);
+            }
         }
 
         ResolvedStatement *get_resolved_stmt(const ast::Statement *stmt) {

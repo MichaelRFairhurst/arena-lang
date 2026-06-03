@@ -56,8 +56,8 @@ namespace arena::ast {
 
     class LetStatement : public Statement {
     public:
-        LetStatement(Token *let, Token *name, Type *type)
-            : Statement(let, type == nullptr ? name : type->end()), name(name), type(type) {}
+        LetStatement(Token *let, Token *name, Type *type, Token *equalToken, Expression *initializer, Token *semicolon)
+            : Statement(let, semicolon), name(name), type(type), equalToken(equalToken), initializer(initializer) {}
 
         virtual ~LetStatement() = default;
 
@@ -69,10 +69,17 @@ namespace arena::ast {
             return type;
         }
 
+        const Expression *get_initializer() const {
+            return initializer;
+        }
+
         std::string to_string() const override {
             std::string result = "let " + std::string(name->text);
             if (type) {
                 result += ": " + type->to_string();
+            }
+            if (initializer) {
+                result += " = " + initializer->to_string();
             }
             result += ";";
             return result;
@@ -83,6 +90,8 @@ namespace arena::ast {
     private:
         Token *name;
         Type *type;
+        Token *equalToken;
+        Expression *initializer;
     };
 
     class ReturnStatement : public Statement {
