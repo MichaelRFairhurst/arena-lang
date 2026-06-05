@@ -10,13 +10,9 @@ namespace arena::sema {
     struct VariableId {
         size_t v_id;
 
-        bool operator==(const VariableId &other) const {
-            return v_id == other.v_id;
-        }
+        bool operator==(const VariableId &other) const { return v_id == other.v_id; }
 
-        bool operator!=(const VariableId &other) const {
-            return !(*this == other);
-        }
+        bool operator!=(const VariableId &other) const { return !(*this == other); }
     };
 
     struct ResolvedVariable {
@@ -25,10 +21,23 @@ namespace arena::sema {
 
         std::optional<TypeId> explicit_type_id;
         std::optional<TypeId> inferred_type_id;
+
+        std::optional<TypeId> get_type_id() const {
+            if (explicit_type_id.has_value()) {
+                return explicit_type_id;
+            } else if (inferred_type_id.has_value()) {
+                return inferred_type_id;
+            }
+            return std::nullopt;
+        }
+
+        bool has_type() const {
+            return explicit_type_id.has_value() || inferred_type_id.has_value();
+        }
     };
 
     class VariableRegistry {
-        public:
+    public:
         VariableRegistry() = default;
 
         bool operator==(const VariableRegistry &other) const {
@@ -45,20 +54,20 @@ namespace arena::sema {
             return true;
         }
 
-        ResolvedVariable* resolve_variable(VariableId id) const {
+        ResolvedVariable *resolve_variable(VariableId id) const {
             if (id.v_id < variables.size()) {
                 return variables[id.v_id];
             }
             throw std::runtime_error("Invalid variable ID: " + std::to_string(id.v_id));
         }
 
-         VariableId add_variable(std::string_view name, ResolvedVariable *var) {
+        VariableId add_variable(std::string_view name, ResolvedVariable *var) {
             auto id = VariableId{variables.size()};
             variables.push_back(var);
             return id;
         }
 
-        private:
+    private:
         std::vector<ResolvedVariable *> variables;
     };
 
@@ -102,5 +111,12 @@ namespace arena::sema {
     };
 
 } // namespace arena::sema
+
+template <>
+struct std::hash<arena::sema::VariableId> {
+    std::size_t operator()(const arena::sema::VariableId &id) const {
+        return std::hash<size_t>{}(id.v_id);
+    }
+};
 
 #endif

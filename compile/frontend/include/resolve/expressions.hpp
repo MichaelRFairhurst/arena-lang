@@ -2,7 +2,7 @@
 #define ARENA_INCLUDE_RESOLVE_EXPRESSIONS_HPP
 
 #include "resolve/tree.hpp"
-#include "resolve/error.hpp"
+#include "errors/errors.hpp"
 
 namespace arena::sema {
 
@@ -12,7 +12,7 @@ namespace arena::sema {
 
         ResolvedExpressionsResult(util::Arena arena,
                                   std::vector<ResolvedDeclaration *> resolved_decls,
-                                  std::vector<ResolveError> errors,
+                                  std::vector<error::Error> errors,
                                 VariableRegistry resolved_variables)
             : arena(std::move(arena)), resolved_decls(std::move(resolved_decls)),
               errors(std::move(errors)), resolved_variables(std::move(resolved_variables)) {}
@@ -24,13 +24,13 @@ namespace arena::sema {
 
         const VariableRegistry *get_resolved_variables() const { return &resolved_variables; }
 
-        const std::vector<ResolveError> &get_errors() const { return errors; }
+        const std::vector<error::Error> &get_errors() const { return errors; }
 
         bool operator==(const ResolvedExpressionsResult &other) const;
 
     private:
         util::Arena arena;
-        std::vector<ResolveError> errors;
+        std::vector<error::Error> errors;
         std::vector<ResolvedDeclaration *> resolved_decls;
         std::vector<ResolvedStatement *> resolved_stmts;
         VariableRegistry resolved_variables;

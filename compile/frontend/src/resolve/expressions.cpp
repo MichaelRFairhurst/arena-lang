@@ -11,7 +11,7 @@ namespace {
                               const FunctionSymbolSet *functions,
                               const TypeSymbolSet *types,
                               VariableScope *variable_scope,
-                              std::vector<ResolveError> *errors)
+                              error::Reporter *errors)
             : current_expr(expr), functions(functions), types(types),
               variable_scope(variable_scope), errors(errors) {}
         using ast::Visitor::visit;
@@ -23,16 +23,15 @@ namespace {
 
             auto var = variable_scope->resolve_variable_id(ident);
             if (fid && var) {
-                errors->emplace_back("Identifier '" + std::string(ident) +
+                errors->report(id_expr, "Identifier '" + std::string(ident) +
                                          "' is ambiguous (could refer to both a function and a "
-                                         "variable)",
-                                     id_expr);
+                                         "variable)");
             } else if (var) {
                 current_expr->info = ResolvedVariableInfo{*var};
             } else if (fid) {
                 current_expr->info = ResolvedFunctionInfo{*fid};
             } else {
-                errors->emplace_back("Unresolved identifier: " + std::string(ident), id_expr);
+                errors->report(id_expr, "Unresolved identifier: " + std::string(ident));
             }
         }
 
@@ -41,7 +40,7 @@ namespace {
         const FunctionSymbolSet *functions;
         const TypeSymbolSet *types;
         VariableScope *variable_scope;
-        std::vector<ResolveError> *errors;
+        error::Reporter *errors;
     };
 
     class ExpressionResolverVisitor {
@@ -49,10 +48,10 @@ namespace {
         ExpressionResolverVisitor(util::Arena *arena,
                                   const FunctionSymbolSet *functions,
                                   const TypeSymbolSet *types,
-                                  std::vector<ResolveError> &errors,
+                                  error::Reporter *errors,
                                   VariableScope *variable_scope,
                                   const TypeSymbolRegistry *registry)
-            : arena(arena), functions(functions), types(types), errors(&errors),
+            : arena(arena), functions(functions), types(types), errors(errors),
               variable_scope(variable_scope), symbolizer(registry) {}
 
         void operator()(ResolvedExpression &expr) {
@@ -138,7 +137,7 @@ namespace {
 
     private:
         util::Arena *arena;
-        std::vector<ResolveError> *errors;
+        error::Reporter *errors;
         VariableScope *variable_scope = nullptr;
         const FunctionSymbolSet *functions;
         const TypeSymbolSet *types;
@@ -216,7 +215,7 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
                                                       const TypeSymbolRegistry *registry) {
     util::Arena arena;
 
-    std::vector<ResolveError> errors;
+    error::Reporter errors;
     std::vector<ResolvedDeclaration *> resolved_decls;
     VariableRegistry variable_registry;
     for (auto decl : decls) {
@@ -236,11 +235,11 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
             ExpressionResolverVisitor expr_resolver{&arena,
                                                     functions,
                                                     types,
-                                                    errors,
+                                                    &errors,
                                                     &variable_scope,
                                                     registry};
             expr_resolver(*tree->resolved_stmt);
         }
     }
-    return ResolvedExpressionsResult{std::move(arena), resolved_decls, std::move(errors), std::move(variable_registry)};
+    return ResolvedExpressionsResult{std::move(arena), resolved_decls, errors.get_errors(), std::move(variable_registry)};
 }

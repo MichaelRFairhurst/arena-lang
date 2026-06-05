@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
         auto rerrors = resolved_calls.get_errors();
         std::cout << "Resolve Errors:\n";
         for (const auto &error : rerrors) {
-            std::cout << "Error: " << error.message << " at node: " << error.node->begin()->text << "\n";
+            std::cout << error.to_string() << "\n";
         }
 
         const auto &typechecked = engine.execute(arena::sema::TypecheckedFileQuery{file});
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
         auto terrors = typechecked.get_errors();
         std::cout << "Type Errors:\n";
         for (const auto &error : terrors) {
-            std::cout << "Error: " << error.message << " at node: " << error.node->begin()->text << "\n";
+            std::cout << error.to_string() << "\n";
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(5));

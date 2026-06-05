@@ -1,50 +1,61 @@
 #include "types/typecheck.hpp"
+#include "types/inference.hpp"
+#include "errors/errors.hpp"
 #include <iostream>
 
 namespace {
     using namespace arena;
     using namespace arena::sema;
+
     class TypeCheckTransform {
     public:
         TypeCheckTransform(util::Arena *arena,
                            const FunctionTable *ftable,
                            const TypeTable *ttable,
                            const VariableRegistry *variables,
-                           std::vector<ResolveError> *errors)
+                           error::Reporter *errors)
             : middleware(arena), ftable(ftable), ttable(ttable), variables(variables),
               errors(errors) {}
 
-        ResolvedExpression *typecheck_root(const ResolvedExpression *expr_in) {
-            return middleware.transform_root(*expr_in, *this);
+        ResolvedExpression *typecheck_root(const ResolvedExpression *expr_in,
+                                           InferenceContext *inference_ctx = nullptr) {
+            InferenceContext ctx{variables, ttable, expr_in->original, errors};
+            if (inference_ctx == nullptr) {
+                inference_ctx = &ctx;
+            }
+
+            this->inference_ctx = inference_ctx;
+            auto expr = middleware.transform_root(*expr_in, *this);
+            this->inference_ctx = nullptr;
+            return expr;
         }
 
         void add_error_expected(TypeId expected,
                                 TypeId actual,
                                 const ast::Node *node,
                                 std::string message) {
-            errors->emplace_back(message + ": expected '" +
-                                     std::string(ttable->get_type(expected).get_name()) +
-                                     "', got '" + std::string(ttable->get_type(actual).get_name()) +
-                                     "'",
-                                 node);
+            errors->report(node,
+                           message + ": expected '" +
+                               std::string(ttable->get_type(expected).get_name()) + "', got '" +
+                               std::string(ttable->get_type(actual).get_name()) + "'");
         }
 
         void add_error_expected(std::string_view expected,
                                 TypeId actual,
                                 const ast::Node *node,
                                 std::string message) {
-            errors->emplace_back(message + ": expected " + std::string(expected) + ", got '" +
-                                     std::string(ttable->get_type(actual).get_name()) + "'",
-                                 node);
+            errors->report(node,
+                           message + ": expected " + std::string(expected) + ", got '" +
+                               std::string(ttable->get_type(actual).get_name()) + "'");
         }
 
         void add_error_expected(size_t num_expected,
                                 size_t num_actual,
                                 const ast::Node *node,
                                 std::string message) {
-            errors->emplace_back(message + ": expected '" + std::to_string(num_expected) +
-                                     "', got '" + std::to_string(num_actual) + "'",
-                                 node);
+            errors->report(node,
+                           message + ": expected '" + std::to_string(num_expected) + "', got '" +
+                               std::to_string(num_actual) + "'");
         }
 
         void require_type(TypeId expected,
@@ -63,95 +74,100 @@ namespace {
             }
         }
 
-        void add_error_type(TypeId actual, const ast::Node *node, std::string message) {
-            errors->emplace_back(message + ", but got '" +
-                                     std::string(ttable->get_type(actual).get_name()) + "'",
-                                 node);
-        }
-
-        void add_error_mismatch(TypeId left,
-                                TypeId right,
-                                const ast::Node *node,
-                                std::string message) {
-            errors->emplace_back(message + ", but got types '" +
-                                     std::string(ttable->get_type(left).get_name()) + "' and '" +
-                                     std::string(ttable->get_type(right).get_name()) + "'",
-                                 node);
-        }
-
-        void require_types_equal(TypeId a, TypeId b, const ast::Node *node, std::string message) {
+        bool types_equal(TypeId a, TypeId b) {
             auto left_type = ttable->get_type(a);
             auto right_type = ttable->get_type(b);
             if (left_type.is_error() || right_type.is_error()) {
                 // Don't report spurious errors if one of the types is already an error
-                return;
+                return true;
             }
 
-            if (a != b) {
-                add_error_mismatch(a, b, node, message);
-            }
+            return a == b;
         }
 
-        void add_error_uninferred(std::string_view name, const ast::Node *node) {
-            errors->emplace_back("Could not infer type of '" + std::string(name) + "'", node);
-        }
-
-        TypeId set_type(ResolvedExpressionInfo &info, TypeId type_id) {
+        TypeId set_resolved_info(ResolvedExpressionInfo &info) {
+            auto type_id = inference_ctx->get_inferred_context_type();
             info = ResolvedTypeInfo{type_id};
             return type_id;
         }
 
-        TypeId set_type(ResolvedExpressionInfo &info, TypeSymbol symbol) {
+        TypeId set_type(ResolvedExpression *expr, TypeId type_id) {
+            expr->info = ResolvedTypeInfo{type_id};
+            inference_ctx->constrain_context_type(type_id, error::Link(expr->original));
+            return type_id;
+        }
+
+        TypeId set_type(ResolvedExpression *expr, TypeSymbol symbol) {
             auto type_id = ttable->get_type_id(symbol);
-            info = ResolvedTypeInfo{type_id};
-            return type_id;
+            return set_type(expr, type_id);
         }
 
         TypeId operator()(ExprTransformStep<ast::IdExpression> step) {
             auto var_info = std::get_if<ResolvedVariableInfo>(&step.original_info());
             if (!var_info) {
-                return set_type(step.out_info(), ErrorTypeSymbol{});
+                inference_ctx->constrain_context_type(ttable->get_type_id(ErrorTypeSymbol{}),
+                                       error::Link{step.original->original, "unknown identifier"});
             }
 
             auto variable = variables->resolve_variable(var_info->variable_id);
-
-            auto inferred = variable->inferred_type_id;
-            auto explicit_ = variable->explicit_type_id;
-            auto type_id =
-                explicit_.value_or(inferred.value_or(ttable->get_type_id(ErrorTypeSymbol{})));
-            if (!explicit_ && !inferred) {
-                add_error_uninferred(variable->name, step.ast);
-            }
-            return set_type(step.out_info(), type_id);
+            inference_ctx->constrain_context_type(var_info->variable_id);
+            return set_resolved_info(step.out_info());
         }
 
         TypeId operator()(ExprTransformStep<ast::LiteralExpression> step) {
             // For now we treat all literals as ints...
-            return set_type(step.out_info(), NamedTypeSymbol{"int"});
+            return set_type(step.out, NamedTypeSymbol{"int"});
+        }
+
+        template <typename Ast>
+        InferenceContext make_child_context(ExprTransformStep<Ast> step, size_t child_index) {
+            auto node = step.original->children[child_index].original;
+            return InferenceContext(variables, ttable, node, errors);
+        }
+
+        template <typename Ast>
+        TypeId resolve_child(ExprTransformStep<Ast> step,
+                             size_t child_index,
+                             InferenceContext *ctx) {
+            auto prev_ctx = inference_ctx;
+            inference_ctx = ctx;
+            auto child_type_id = middleware.transform_child<TypeId>(step, child_index, *this);
+            inference_ctx = prev_ctx;
+            return child_type_id;
         }
 
         TypeId operator()(ExprTransformStep<ast::BinaryExpression> step) {
-            auto left_type_id = middleware.transform_child<TypeId>(step, 0, *this);
-            auto right_type_id = middleware.transform_child<TypeId>(step, 1, *this);
+            auto left_inference_ctx = make_child_context(step, 0);
+            auto left_type_id = resolve_child(step, 0, &left_inference_ctx);
+
+            auto right_inference_ctx = make_child_context(step, 1);
+            auto right_type_id = resolve_child(step, 1, &right_inference_ctx);
 
             // We do not support many implicit conversions. For now, the types must match exactly,
             // or we produce an error type.
-            require_types_equal(left_type_id,
-                                right_type_id,
-                                step.ast,
-                                "Expected binary expression operands to have the same type");
+            if (!types_equal(left_type_id, right_type_id)) {
+                auto type_left = ttable->get_type(left_type_id).get_name();
+                auto type_right = ttable->get_type(right_type_id).get_name();
+                auto link_left = error::Link{step.ast->get_left(), std::string(type_left)};
+                auto link_right = error::Link{step.ast->get_right(), std::string(type_right)};
+                errors->report(step.ast,
+                               "Expected both binary operands to have matching types, but got ",
+                               link_left,
+                               " and ",
+                               link_right);
+            }
 
             // Assume the output type is the input type (not the case for `==`)
             switch (step.ast->get_operator()) {
-                case ast::TokenType::EQUAL_EQUAL:
-                case ast::TokenType::NOT_EQUAL:
-                case ast::TokenType::LESS:
-                case ast::TokenType::LESS_EQUAL:
-                case ast::TokenType::GREATER:
-                case ast::TokenType::GREATER_EQUAL:
-                    return set_type(step.out_info(), NamedTypeSymbol{"bool"});
-                default:
-                    return set_type(step.out_info(), left_type_id);
+            case ast::TokenType::EQUAL_EQUAL:
+            case ast::TokenType::NOT_EQUAL:
+            case ast::TokenType::LESS:
+            case ast::TokenType::LESS_EQUAL:
+            case ast::TokenType::GREATER:
+            case ast::TokenType::GREATER_EQUAL:
+                return set_type(step.out, NamedTypeSymbol{"bool"});
+            default:
+                return set_type(step.out, left_type_id);
             }
         }
 
@@ -160,14 +176,14 @@ namespace {
             auto finfo = std::get_if<ResolvedFunctionInfo>(&callee.info);
             if (!finfo) {
                 // For now, the callee must be a function. Soon we'll add function types.
-                errors->emplace_back("Expected a function in call expression", callee.original);
-                return set_type(step.out_info(), ErrorTypeSymbol{});
+                errors->report(callee.original, "Expected a function in call expression");
+                return set_type(step.out, ErrorTypeSymbol{});
             }
 
             auto func = ftable->get_function(finfo->function_id);
             if (!func) {
-                errors->emplace_back("Unknown function in call expression", callee.original);
-                return set_type(step.out_info(), ErrorTypeSymbol{});
+                errors->report(callee.original, "Unknown function in call expression");
+                return set_type(step.out, ErrorTypeSymbol{});
             }
 
             auto params = func->get_param_types();
@@ -178,81 +194,86 @@ namespace {
                                    step.original->num_children - 1,
                                    step.ast,
                                    "Argument count mismatch in call expression");
-                return set_type(step.out_info(), ErrorTypeSymbol{});
+                return set_type(step.out, ErrorTypeSymbol{});
             }
 
             for (size_t i = 1; i < step.original->num_children; ++i) {
-                auto arg_id = middleware.transform_child<TypeId>(step, i, *this);
-                require_type(params->at(i - 1),
-                             arg_id,
-                             step.original->children[i].original,
-                             "Type mismatch in call expression argument " + std::to_string(i));
+                auto arg_inference_ctx = make_child_context(step, i);
+                arg_inference_ctx.constrain_context_type(params->at(i - 1),
+                                                         error::Link(step.ast,
+                                                                     "argument " +
+                                                                         std::to_string(i)));
+                auto arg_id = resolve_child(step, i, &arg_inference_ctx);
             }
 
-            if (return_type.has_value()) {
-                return set_type(step.out_info(), return_type.value());
+            if (return_type) {
+                inference_ctx->constrain_context_type(return_type.value(),
+                                                      error::Link(step.ast, "return type"));
             } else {
-                return set_type(step.out_info(), VoidTypeSymbol{});
+                inference_ctx->constrain_context_type(ttable->get_type_id(VoidTypeSymbol{}),
+                                                      error::Link(step.ast, "return type"));
             }
+
+            return set_resolved_info(step.out_info());
         }
 
         TypeId operator()(ExprTransformStep<ast::DotOperatorExpression> step) {
-            auto operand_id = middleware.transform_child<TypeId>(step, 0, *this);
-            auto operand_symbol = ttable->get_type(operand_id);
+            auto inference_ctx_parent = inference_ctx;
+            auto operand_inference_ctx = make_child_context(step, 0);
 
             switch (step.ast->get_operator()) {
             case ast::TokenType::STAR: {
-                if (auto ptr = std::get_if<PointerType>(&operand_symbol.get_program_type())) {
-                    // TODO: handle lifetime
-                    return set_type(step.out_info(), ptr->pointee_type);
-                } else {
-                    if (!std::holds_alternative<ErrorType>(operand_symbol.get_program_type())) {
-                        add_error_expected("a pointer type",
-                                           operand_id,
-                                           step.ast,
-                                           "Invalid dereference");
-                    }
-                    return set_type(step.out_info(), ErrorTypeSymbol{});
-                }
+                operand_inference_ctx.constrain_points_to(inference_ctx_parent, step.ast);
+                resolve_child(step, 0, &operand_inference_ctx);
+                inference_ctx_parent->constrain_dereferences(&operand_inference_ctx, step.ast);
+                break;
             }
 
             case ast::TokenType::AMP: {
-                // TODO: handle lifetime
-                TypeSymbol ptr{PointerTypeSymbol{operand_symbol.get_id()}};
-                return set_type(step.out_info(), ttable->get_type_id(ptr));
+                operand_inference_ctx.constrain_dereferences(inference_ctx_parent, step.ast);
+                resolve_child(step, 0, &operand_inference_ctx);
+                inference_ctx_parent->constrain_points_to(&operand_inference_ctx, step.ast);
+                break;
             }
-
 
             default:
                 throw std::runtime_error("Unexpected .? operator type: " +
                                          std::string(step.ast->get_operator_token()->text));
             }
+
+            return set_resolved_info(step.out_info());
         }
 
         TypeId operator()(ExprTransformStep<ast::CastExpression> step) {
-            auto operand_type = middleware.transform_child<TypeId>(step, 0, *this);
-            auto casted_type = ttable->get_type(step.ast->get_type());
+            auto casted_type = ttable->get_type(step.ast->get_type()).get_id();
+            auto uncast_inference_ctx = make_child_context(step, 0);
+            inference_ctx->constrain_context_type(casted_type,
+                                                  error::Link(step.ast, "result of cast"));
+            auto operand_type = resolve_child(step, 0, &uncast_inference_ctx);
+            // TODO: check that cast is valid (e.g., cannot cast bool to struct)
 
-            // For now we do not support casts, so this is always an error.
-            return set_type(step.out_info(), casted_type.get_symbol());
+            return set_resolved_info(step.out_info());
         }
 
         TypeId operator()(ExprTransformStep<ast::MemberAccessExpression> step) {
             // For now we do not support member access, so this is always an error.
-            errors->emplace_back("Member access is not supported yet", step.ast);
-            return set_type(step.out_info(), ErrorTypeSymbol{});
+            errors->report(step.ast, "Member access is not supported yet");
+            return set_type(step.out, ErrorTypeSymbol{});
         }
 
         TypeId operator()(ExprTransformStep<ast::UnaryPrefixExpression> step) {
-            auto operand_type = middleware.transform_child<TypeId>(step, 0, *this);
             if (step.ast->get_operator() != ast::TokenType::NOT) {
                 throw std::runtime_error("Unexpected unary prefix operator: " +
                                          std::string(step.ast->get_operator_token()->text));
             }
-            // For now we do not support unary operators, so this is always an error.
-            auto bool_id = ttable->get_named_type(NamedTypeSymbol{"bool"});
-            require_type(bool_id.get_id(), operand_type, step.ast, "Negation of non-bool type");
-            return set_type(step.out_info(), ErrorTypeSymbol{});
+
+            auto bool_id = ttable->get_type_id(NamedTypeSymbol{"bool"});
+            auto operand_inference_ctx = make_child_context(step, 0);
+            operand_inference_ctx.constrain_context_type(bool_id,
+                                                         error::Link(step.ast, "operand of '!'"));
+            inference_ctx->constrain_context_type(bool_id, error::Link(step.ast, "result of '!'"));
+            resolve_child(step, 0, &operand_inference_ctx);
+            return set_resolved_info(step.out_info());
         }
 
     private:
@@ -260,15 +281,19 @@ namespace {
         const TypeTable *ttable;
         ExprTransformMiddleware middleware;
         const VariableRegistry *variables;
-        std::vector<ResolveError> *errors;
+        error::Reporter *errors;
+        InferenceContext *inference_ctx = nullptr;
     };
 
     class StatementTypeCheckTransform {
     public:
         StatementTypeCheckTransform(util::Arena *arena,
                                     const VariableRegistry *registry,
-                                    TypeCheckTransform *expr_typecheck)
-            : middleware(arena), variables(registry), expr_typecheck(expr_typecheck) {}
+                                    const TypeTable *ttable,
+                                    TypeCheckTransform *expr_typecheck,
+                                    error::Reporter *errors)
+            : middleware(arena), variables(registry), ttable(ttable),
+              expr_typecheck(expr_typecheck), errors(errors) {}
 
         ResolvedStatement *typecheck(const ResolvedStatement &stmt_in) {
             return middleware.transform_root(&stmt_in, *this);
@@ -288,26 +313,28 @@ namespace {
         }
 
         void operator()(StmtTransformStep<ResolvedLetStatement> step) {
-            if (step.original->initializer) {
-                auto ast = step.original->initializer->original;
-                step.out->variable_id = step.original->variable_id;
-                auto initializer = expr_typecheck->typecheck_root(step.original->initializer);
-                step.out->initializer = initializer;
-
-                auto variable = variables->resolve_variable(step.out->variable_id);
-                if (auto type = std::get_if<ResolvedTypeInfo>(&initializer->info)) {
-                    variable->inferred_type_id = variable->inferred_type_id.value_or(type->type_id);
-                    auto variable_type =
-                        variable->explicit_type_id.value_or(variable->inferred_type_id.value());
-                    expr_typecheck
-                        ->require_type(variable_type,
-                                       type->type_id,
-                                       ast,
-                                       "Type of initializer does not match explicit type");
-                } else {
-                    throw std::runtime_error("Initializer did not have a type after typechecking");
-                }
+            step.out->variable_id = step.original->variable_id;
+            if (!step.original->initializer) {
+                return;
             }
+
+            InferenceContext inference_ctx(variables,
+                                           ttable,
+                                           step.original->initializer->original,
+                                           errors);
+
+            auto variable = variables->resolve_variable(step.out->variable_id);
+            if (variable->has_type()) {
+                inference_ctx.constrain_context_type(step.out->variable_id);
+            }
+
+            auto ast = step.original->initializer->original;
+            auto initializer =
+                expr_typecheck->typecheck_root(step.original->initializer, &inference_ctx);
+            step.out->initializer = initializer;
+
+            // We must do this to check for errors, and/or to infer the variable type.
+            inference_ctx.constrain_context_type(step.out->variable_id);
         }
 
         void operator()(StmtTransformStep<ResolvedReturnStatement> step) {
@@ -322,6 +349,8 @@ namespace {
         StmtTransformMiddleware middleware;
         TypeCheckTransform *expr_typecheck;
         const VariableRegistry *variables;
+        const TypeTable *ttable;
+        error::Reporter *errors;
     };
 
 } // namespace
@@ -330,10 +359,10 @@ ResolvedExpressionsResult TypeChecker::type_check(
     const std::vector<const ResolvedDeclaration *> &decls, const VariableRegistry *variables) {
     util::Arena arena;
     std::vector<ResolvedDeclaration *> resolved_decls;
-    std::vector<ResolveError> errors;
+    error::Reporter errors;
 
     TypeCheckTransform typecheck(&arena, ftable, ttable, variables, &errors);
-    StatementTypeCheckTransform stmt_typecheck(&arena, variables, &typecheck);
+    StatementTypeCheckTransform stmt_typecheck(&arena, variables, ttable, &typecheck, &errors);
 
     for (auto decl : decls) {
         if (!decl->resolved_stmt) {
@@ -349,7 +378,7 @@ ResolvedExpressionsResult TypeChecker::type_check(
 
     return ResolvedExpressionsResult(std::move(arena),
                                      std::move(resolved_decls),
-                                     std::move(errors),
+                                     errors.get_errors(),
                                      *variables // intentionally copied.
     );
 }

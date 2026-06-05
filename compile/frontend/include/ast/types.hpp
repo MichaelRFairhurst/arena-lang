@@ -1,6 +1,7 @@
 #ifndef ARENA_INCLUDE_AST_TYPES_HPP
 #define ARENA_INCLUDE_AST_TYPES_HPP
 
+#include <vector>
 #include "ast/node.hpp"
 #include "ast/literals.hpp"
 #include "ast/visitor.hpp"
@@ -13,7 +14,7 @@ namespace arena::ast {
         virtual std::string to_string() const = 0;
 
         virtual ~Type() = default;
-        
+
         void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
@@ -24,25 +25,22 @@ namespace arena::ast {
         virtual std::string to_string() const = 0;
 
         virtual ~TypeArgument() = default;
-        
+
         void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
     class TypeArgumentType : public TypeArgument {
     public:
-        TypeArgumentType(Token *name, Type *type) : TypeArgument(name, type->end()), name(name), type(type) {}
+        TypeArgumentType(Token *name, Type *type)
+            : TypeArgument(name, type->end()), name(name), type(type) {}
 
         virtual ~TypeArgumentType() = default;
 
-        std::string to_string() const override {
-            return type->to_string();
-        }
-        
+        std::string to_string() const override { return type->to_string(); }
+
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        std::string_view get_name() const {
-            return name->text;
-        }
+        std::string_view get_name() const { return name->text; }
 
     private:
         Token *name;
@@ -51,19 +49,16 @@ namespace arena::ast {
 
     class TypeArgumentLifetime : public TypeArgument {
     public:
-        TypeArgumentLifetime(Token *star, Token *name) : TypeArgument(star, name), star(star), name(name) {}
+        TypeArgumentLifetime(Token *star, Token *name)
+            : TypeArgument(star, name), star(star), name(name) {}
 
         virtual ~TypeArgumentLifetime() = default;
 
-        std::string to_string() const override {
-            return "*" + std::string(name->text);
-        }
-        
+        std::string to_string() const override { return "*" + std::string(name->text); }
+
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        std::string_view get_name() const {
-            return name->text;
-        }
+        std::string_view get_name() const { return name->text; }
 
     private:
         Token *star;
@@ -73,7 +68,8 @@ namespace arena::ast {
 
     class NamedType : public Type {
     public:
-        NamedType(Token *name, std::vector<TypeArgument*> genericArgs) : Type(name, name), name(name), genericArgs(genericArgs) {}
+        NamedType(Token *name, std::vector<TypeArgument *> genericArgs)
+            : Type(name, name), name(name), genericArgs(genericArgs) {}
 
         virtual ~NamedType() = default;
 
@@ -91,22 +87,21 @@ namespace arena::ast {
             }
             return result;
         }
-        
+
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        std::string_view get_name() const {
-            return name->text;
-        }
+        std::string_view get_name() const { return name->text; }
 
     private:
         Token *name;
-        std::vector<TypeArgument*> genericArgs;
+        std::vector<TypeArgument *> genericArgs;
     };
 
     class PointerType : public Type {
     public:
-        PointerType(Token *asterisk, Type *pointee, Token *lifetime/*optional*/)
-            : Type(asterisk, lifetime == nullptr ? pointee->end() : lifetime), pointee(pointee), lifetime(lifetime) {}
+        PointerType(Token *asterisk, Type *pointee, Token *lifetime /*optional*/)
+            : Type(asterisk, lifetime == nullptr ? pointee->end() : lifetime), pointee(pointee),
+              lifetime(lifetime) {}
 
         virtual ~PointerType() = default;
 
@@ -119,12 +114,10 @@ namespace arena::ast {
             }
             return result;
         }
-        
+
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        const Type *get_pointee() const {
-            return pointee;
-        }
+        const Type *get_pointee() const { return pointee; }
 
         std::optional<std::string_view> get_lifetime() const {
             if (lifetime) {
@@ -145,17 +138,13 @@ namespace arena::ast {
 
         virtual ~ConstType() = default;
 
-        const Type *get_base_type() const {
-            return baseType;
-        }
+        const Type *get_base_type() const { return baseType; }
 
     private:
         Type *baseType;
 
-        std::string to_string() const override {
-            return "const " + baseType->to_string();
-        }
-        
+        std::string to_string() const override { return "const " + baseType->to_string(); }
+
         void accept(Visitor *visitor) const override { visitor->visit(this); }
     };
 
@@ -169,16 +158,12 @@ namespace arena::ast {
         std::string to_string() const override {
             return elementType->to_string() + "[" + size->to_string() + "]";
         }
-        
+
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        const Type *get_element_type() const {
-            return elementType;
-        }
+        const Type *get_element_type() const { return elementType; }
 
-        const Literal *get_size_literal() const {
-            return size;
-        }
+        const Literal *get_size_literal() const { return size; }
 
     private:
         Literal *size;

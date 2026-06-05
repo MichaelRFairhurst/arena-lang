@@ -1,6 +1,7 @@
 #ifndef ARENA_INCLUDE_AST_LITERALS_HPP
 #define ARENA_INCLUDE_AST_LITERALS_HPP
 
+#include <string>
 #include "ast/node.hpp"
 #include "ast/visitor.hpp"
 
