@@ -33,12 +33,11 @@ int main(int argc, char **argv) {
         }
         std::cout << "\n";
 
+        for (const auto &error : ast.errors) {
+            std::cout << "Parse Error: " << error.to_string() << "\n";
+        }
+
         const auto &resolved_calls = engine.execute(arena::sema::ResolvedCallsQuery{file});
-        //std::cout << "Resolved Exprs:\n";
-        //auto resolved_exprs = resolved_calls.get_resolved_decls();
-        //for (const auto &expr : resolved_exprs) {
-        //    std::cout << expr->to_string() << "\n";
-        //}
         auto rerrors = resolved_calls.get_errors();
         std::cout << "Resolve Errors:\n";
         for (const auto &error : rerrors) {
@@ -46,11 +45,6 @@ int main(int argc, char **argv) {
         }
 
         const auto &typechecked = engine.execute(arena::sema::TypecheckedFileQuery{file});
-        //std::cout << "Resolved Exprs:\n";
-        //auto resolved_exprs = resolved_calls.get_resolved_decls();
-        //for (const auto &expr : resolved_exprs) {
-        //    std::cout << expr->to_string() << "\n";
-        //}
         auto terrors = typechecked.get_errors();
         std::cout << "Type Errors:\n";
         for (const auto &error : terrors) {

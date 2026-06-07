@@ -1,5 +1,6 @@
 # Frontend library - parsing and semantic analysis
 add_library(arena-frontend
+    src/ast/token.cpp
     src/parse/parse.cpp
     src/query/engine.cpp
     src/query/queries.cpp

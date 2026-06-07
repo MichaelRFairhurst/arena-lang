@@ -58,6 +58,8 @@ namespace arena::ast {
         Token *next = nullptr;
     };
 
+    std::string_view token_type_to_string(TokenType type);
+
 } // namespace arena::ast
 
 #endif // ARENA_INCLUDE_AST_TOKEN_HPP
