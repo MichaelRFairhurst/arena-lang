@@ -43,6 +43,9 @@ namespace arena::error {
         Error(const ast::Node *node, Args &&...args)
             : chunks{std::forward<Args>(args)...}, begin(node->begin()), end(node->end()) {}
 
+        Error(std::vector<Chunk> chunks, const ast::Token *begin, const ast::Token *end)
+            : chunks(std::move(chunks)), begin(begin), end(end) {}
+
         std::string to_string() const {
             std::string result = "At " + range_string(begin, end) + ": ";
             for (const auto &chunk : chunks) {
@@ -82,6 +85,8 @@ namespace arena::error {
         void report(Args &&...args) {
             errors.emplace_back(std::forward<Args>(args)...);
         }
+
+        void report(const Error &error) { errors.push_back(error); }
 
         const std::vector<Error> &get_errors() const { return errors; }
 

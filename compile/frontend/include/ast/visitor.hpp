@@ -23,6 +23,7 @@ namespace arena::ast {
     class ReturnStatement;
     class ExpressionStatement;
     class BlockStatement;
+    class ArenaStatement;
     
     // Types
     class Type;
@@ -50,22 +51,6 @@ namespace arena::ast {
     class StringLiteral;
     class IntegerLiteral;
 
-    /**
-     * Base visitor class for traversing the AST.
-     * 
-     * Provides virtual visit methods for all node types. Derive from this
-     * class and override the methods for the nodes you want to process.
-     * 
-     * Example usage:
-     *   class MyVisitor : public Visitor {
-     *   public:
-     *       void visit(BinaryExpression *expr) override {
-     *           // Process binary expression
-     *           expr->left->accept(this);  // Visit children
-     *           expr->right->accept(this);
-     *       }
-     *   };
-     */
     class Visitor {
     public:
         virtual ~Visitor() = default;
@@ -88,6 +73,7 @@ namespace arena::ast {
         virtual void visit(const ReturnStatement *node) {}
         virtual void visit(const ExpressionStatement *node) {}
         virtual void visit(const BlockStatement *node) {}
+        virtual void visit(const ArenaStatement *node) {}
 
         // Type visitors
         virtual void visit(const Type *node) {}

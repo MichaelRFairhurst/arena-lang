@@ -1,7 +1,7 @@
 #include "resolve/symbols.hpp"
 #include "signatures/functions.hpp"
 #include "signatures/types.hpp"
-#include "signatures/types.hpp"
+#include "signatures/lifetimes.hpp"
 #include <iostream>
 
 using namespace arena::sema;
@@ -10,17 +10,11 @@ using namespace arena;
 namespace {
     class TypeSymbolResolverVisitor : public ast::Visitor {
     public:
-        TypeSymbolResolverVisitor(const TypeSymbolRegistry &registry) : registry(&registry) {}
+        TypeSymbolResolverVisitor(const TypeSymbolRegistry &registry, LifetimeTable *lifetimes)
+            : registry(&registry), lifetimes(lifetimes) {}
 
         void visit(const ast::NamedType *named_type) override {
             result = registry->get_interned(NamedTypeSymbol{named_type->get_name()});
-        }
-
-        void visit(const ast::PointerType *pointer_type) override {
-            pointer_type->get_pointee()->accept(this);
-            auto lifetime = pointer_type->get_lifetime();
-            auto pointee_id = registry->get_type_id(result);
-            result = registry->get_interned(PointerTypeSymbol{pointee_id, lifetime});
         }
 
         void visit(const ast::ArrayType *array_type) override {
@@ -35,12 +29,28 @@ namespace {
             throw std::runtime_error("Const types are not supported in type symbols yet");
         }
 
+        void visit(const ast::PointerType *pointer_type) override {
+            pointer_type->get_pointee()->accept(this);
+            auto pointee_id = registry->get_type_id(result);
+            auto explicit_lifetime = pointer_type->get_lifetime();
+            LifetimeId lifetime_id;
+            if (explicit_lifetime.has_value()) {
+                lifetime_id = lifetimes->lookup(explicit_lifetime.value(), pointer_type);
+            } else {
+                lifetime_id = lifetimes->infer_lifetime(pointer_type);
+            }
+
+            result = registry->get_interned(PointerTypeSymbol{pointee_id, lifetime_id});
+        }
+
         TypeSymbol get_result() const { return result; }
 
-    private:
+    protected:
         const TypeSymbolRegistry *registry;
         TypeSymbol result;
+        LifetimeTable *lifetimes;
     };
+
 }; // namespace
 
 FunctionSymbolSet::FunctionSymbolSet(const FunctionTable *ftable) {
@@ -167,7 +177,7 @@ bool TypeSymbolSet::operator==(const TypeSymbolSet &other) const {
 }
 
 TypeSymbol TypeSymbolResolver::resolve(const ast::Type *type) const {
-    TypeSymbolResolverVisitor visitor(*registry);
+    TypeSymbolResolverVisitor visitor(*registry, lifetimes);
     type->accept(&visitor);
     return visitor.get_result();
 }

@@ -9,7 +9,10 @@ add_library(arena-frontend
     src/resolve/expressions.cpp
     src/types/typecheck.cpp
     src/types/inference.cpp
+    src/types/lifetimes.cpp
+    src/types/substitute.cpp
     src/signatures/functions.cpp
+    src/signatures/lifetimes.cpp
     src/signatures/types.cpp
 )
 

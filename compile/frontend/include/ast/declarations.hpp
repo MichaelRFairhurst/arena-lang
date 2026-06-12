@@ -110,6 +110,8 @@ namespace arena::ast {
 
         const Token *get_name_token() const { return name; }
 
+        std::string_view get_name() const { return name->text; }
+
         const ParamList *get_params() const { return params; }
 
         void accept(Visitor *visitor) const override { visitor->visit(this); }

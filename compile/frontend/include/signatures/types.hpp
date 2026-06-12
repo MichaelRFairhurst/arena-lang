@@ -8,6 +8,7 @@
 #include "parse/parse.hpp"
 #include "ast/visitor.hpp"
 #include "resolve/symbols.hpp"
+#include "signatures/lifetimes.hpp"
 
 extern "C" {
 #include "arena.h"
@@ -33,7 +34,7 @@ namespace arena::sema {
 
     struct PointerType {
         TypeId pointee_type;
-        std::optional<std::string_view> lifetime;
+        LifetimeId lifetime;
     };
 
     struct ArrayType {
@@ -66,6 +67,10 @@ namespace arena::sema {
 
         std::string_view get_name() const { return name; }
 
+        bool is_primitive() const;
+
+        bool is_lifetime_strict() const;
+
     private:
         std::string_view name;
         TypeId id;
@@ -88,9 +93,9 @@ namespace arena::sema {
 
         std::vector<const ResolvedType *> get_types() const;
 
-        ResolvedType get_type(TypeId id) const;
+        ResolvedType get_type(TypeId id, const LifetimeGroup *lifetimes) const;
 
-        ResolvedType get_type(const ast::Type *type) const;
+        ResolvedType get_type(const ast::Type *type, LifetimeGroup *lifetimes) const;
 
         ResolvedType get_named_type(NamedTypeSymbol named) const;
 

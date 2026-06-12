@@ -3,6 +3,7 @@
 
 #include "resolve/symbols.hpp"
 #include "ast/declarations.hpp"
+#include "signatures/lifetimes.hpp"
 
 namespace arena::sema {
 
@@ -12,8 +13,10 @@ namespace arena::sema {
         ResolvedFunction(FunctionId id,
                          FunctionSymbol symbol,
                          std::vector<TypeId> param_types,
-                         std::optional<TypeId> return_type)
-            : id(id), symbol(symbol), param_types(param_types), return_type(return_type) {}
+                         std::optional<TypeId> return_type,
+                         LifetimeGroup lifetimes)
+            : id(id), symbol(symbol), param_types(param_types), return_type(return_type),
+              lifetimes(std::move(lifetimes)) {}
 
         FunctionId get_id() const { return id; }
 
@@ -21,6 +24,8 @@ namespace arena::sema {
 
         const std::vector<TypeId> *get_param_types() const { return &param_types; }
         std::optional<TypeId> get_return_type() const { return return_type; }
+
+        const LifetimeGroup &get_lifetimes() const { return lifetimes; }
 
         bool operator==(const ResolvedFunction &other) const {
             if (id != other.id) {
@@ -51,6 +56,7 @@ namespace arena::sema {
         FunctionSymbol symbol;
         std::vector<TypeId> param_types;
         std::optional<TypeId> return_type;
+        LifetimeGroup lifetimes;
     };
 
     class FunctionTable {

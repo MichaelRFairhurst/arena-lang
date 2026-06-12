@@ -4,35 +4,40 @@ namespace {
     using namespace arena::sema;
     class FunctionTableBuilderVisitor : public arena::ast::Visitor {
     public:
-        FunctionTableBuilderVisitor(const FunctionSymbolRegistry &registry,
+        FunctionTableBuilderVisitor(const FunctionSymbolRegistry &fregistry,
                                     const TypeTable &type_table,
                                     FunctionTable &ftable,
                                     const TypeSymbolRegistry &type_registry)
-            : ftable(&ftable), type_table(&type_table), registry(&registry), symbolizer(&type_registry) {}
+            : ftable(&ftable), type_table(&type_table), fregistry(&fregistry),
+              type_registry(&type_registry) {}
 
         void visit(const arena::ast::FunctionDeclaration *decl) override {
             auto symbol = FunctionSymbol{decl->get_name_token()->text};
-            auto id = registry->get_function_id(symbol);
-            symbol = registry->get_function_symbol(id); // Get interned symbol
+            LifetimeGroup lifetimes;
+            LifetimeTable lt_table{&lifetimes, true};
+            auto id = fregistry->get_function_id(symbol);
+            symbol = fregistry->get_function_symbol(id); // Get interned symbol
             std::vector<TypeId> param_types;
 
+            TypeSymbolResolver symbolizer(type_registry, &lt_table);
             auto args = decl->get_params()->get_params();
             for (auto arg : args) {
                 auto arg_type = arg->get_type();
-                auto arg_type_name = arg_type->to_string();
-                // TODO: Support more complex types
                 auto arg_type_id = type_table->get_type_id(symbolizer.resolve(arg_type));
                 param_types.push_back(arg_type_id);
             }
 
             std::optional<TypeId> return_type_id;
             if (decl->get_return_type()) {
-                auto return_type_name = decl->get_return_type()->to_string();
-                // TODO: Support more complex types
-                return_type_id = type_table->get_type_id(symbolizer.resolve(decl->get_return_type()));
+                return_type_id =
+                    type_table->get_type_id(symbolizer.resolve(decl->get_return_type()));
             }
 
-            ResolvedFunction function{id, symbol, param_types, return_type_id};
+            ResolvedFunction function{id,
+                                      symbol,
+                                      param_types,
+                                      return_type_id,
+                                      std::move(lifetimes)};
             ftable->add_function(symbol, function, decl);
         }
 
@@ -44,8 +49,8 @@ namespace {
     private:
         FunctionTable *ftable;
         const TypeTable *type_table;
-        const FunctionSymbolRegistry *registry;
-        TypeSymbolResolver symbolizer;
+        const TypeSymbolRegistry *type_registry;
+        const FunctionSymbolRegistry *fregistry;
     };
 } // namespace
 

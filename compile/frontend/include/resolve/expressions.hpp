@@ -13,7 +13,7 @@ namespace arena::sema {
         ResolvedExpressionsResult(util::Arena arena,
                                   std::vector<ResolvedDeclaration *> resolved_decls,
                                   std::vector<error::Error> errors,
-                                VariableRegistry resolved_variables)
+                                  VariableRegistry resolved_variables)
             : arena(std::move(arena)), resolved_decls(std::move(resolved_decls)),
               errors(std::move(errors)), resolved_variables(std::move(resolved_variables)) {}
 
@@ -40,6 +40,7 @@ namespace arena::sema {
     public:
         ResolvedExpressionsResult resolve(const std::vector<ast::Declaration *> &decls,
                                           const FunctionSymbolSet *functions,
+                                          const FunctionTable *my_ftable,
                                           const TypeSymbolSet *types,
                                           const TypeSymbolRegistry *registry);
     };

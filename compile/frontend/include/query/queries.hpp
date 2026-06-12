@@ -8,6 +8,7 @@
 #include "parse/parse.hpp"
 #include "resolve/symbols.hpp"
 #include "resolve/expressions.hpp"
+#include "signatures/lifetimes.hpp"
 
 namespace arena::sema {
 

@@ -23,9 +23,10 @@ namespace {
 
             auto var = variable_scope->resolve_variable_id(ident);
             if (fid && var) {
-                errors->report(id_expr, "Identifier '" + std::string(ident) +
-                                         "' is ambiguous (could refer to both a function and a "
-                                         "variable)");
+                errors->report(id_expr,
+                               "Identifier '" + std::string(ident) +
+                                   "' is ambiguous (could refer to both a function and a "
+                                   "variable)");
             } else if (var) {
                 current_expr->info = ResolvedVariableInfo{*var};
             } else if (fid) {
@@ -50,9 +51,11 @@ namespace {
                                   const TypeSymbolSet *types,
                                   error::Reporter *errors,
                                   VariableScope *variable_scope,
-                                  const TypeSymbolRegistry *registry)
+                                  const TypeSymbolRegistry *registry,
+                                  LifetimeTable *lifetimes)
             : arena(arena), functions(functions), types(types), errors(errors),
-              variable_scope(variable_scope), symbolizer(registry) {}
+              variable_scope(variable_scope), symbolizer(registry, lifetimes),
+              lifetimes(lifetimes) {}
 
         void operator()(ResolvedExpression &expr) {
             // This visitor is only used for visiting the root expression, so we can just resolve it
@@ -101,6 +104,7 @@ namespace {
 
             auto var = arena->alloc<ResolvedVariable>(name,
                                                       let_stmt.original,
+                                                      lifetimes->get_stack_lifetime(),
                                                       explicit_type_id,
                                                       std::nullopt // inferred type id will be
                                                                    // filled in during type checking
@@ -124,14 +128,24 @@ namespace {
         void operator()(ResolvedExprStatement &expr_stmt) { (*this)(*expr_stmt.expr); }
 
         void operator()(ResolvedBlockStatement &block_stmt) {
-            VariableScope *outer = variable_scope;
-            VariableScope inner{variable_scope};
-            variable_scope = &inner;
+            auto resolve_inner = [this, &block_stmt]() {
+                for (size_t i = 0; i < block_stmt.num_statements; i++) {
+                    (*this)(block_stmt.statements[i]);
+                }
+            };
 
-            for (size_t i = 0; i < block_stmt.num_statements; i++) {
-                (*this)(block_stmt.statements[i]);
+            if (!visited_root) {
+                visited_root = true;
+                resolve_inner();
+                return;
             }
 
+            VariableScope *outer = variable_scope;
+            VariableScope inner{variable_scope};
+            auto scoped_stack_lifetime = lifetimes->push_stack(block_stmt.original);
+            variable_scope = &inner;
+
+            resolve_inner();
             variable_scope = outer;
         }
 
@@ -142,6 +156,8 @@ namespace {
         const FunctionSymbolSet *functions;
         const TypeSymbolSet *types;
         const TypeSymbolResolver symbolizer;
+        LifetimeTable *lifetimes;
+        bool visited_root = false;
     };
 
     class FunctionScopeVisitor : public ast::Visitor {
@@ -149,11 +165,14 @@ namespace {
         explicit FunctionScopeVisitor(util::Arena *arena,
                                       const TypeSymbolSet *type_symbols,
                                       const TypeSymbolRegistry *registry,
-                                      VariableScope *variable_scope)
-            : arena(arena), type_symbols(type_symbols), symbolizer(registry),
-              variable_scope(variable_scope) {}
+                                      VariableScope *variable_scope,
+                                      LifetimeTable *lifetimes)
+            : arena(arena), type_symbols(type_symbols), symbolizer(registry, lifetimes),
+              variable_scope(variable_scope), lifetimes(lifetimes) {}
 
         void visit(const ast::FunctionDefinition *func_def) override {
+            auto scoped_stack_lifetime = lifetimes->push_stack(func_def->get_body());
+
             auto param_list = func_def->get_params()->get_params();
             for (const auto &param : param_list) {
 
@@ -168,6 +187,7 @@ namespace {
                     ->add_variable(param->get_name(),
                                    arena->alloc<ResolvedVariable>(param->get_name(),
                                                                   param,
+                                                                  lifetimes->get_stack_lifetime(),
                                                                   param_type,
                                                                   std::nullopt // No inferred type
                                                                                // for parameters
@@ -178,8 +198,10 @@ namespace {
     private:
         util::Arena *arena;
         VariableScope *variable_scope;
+        const FunctionTable *my_ftable;
         const TypeSymbolSet *type_symbols;
         TypeSymbolResolver symbolizer;
+        LifetimeTable *lifetimes;
     };
 
 } // namespace
@@ -211,6 +233,7 @@ bool ResolvedExpressionsResult::operator==(const ResolvedExpressionsResult &othe
 
 ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Declaration *> &decls,
                                                       const FunctionSymbolSet *functions,
+                                                      const FunctionTable *my_ftable,
                                                       const TypeSymbolSet *types,
                                                       const TypeSymbolRegistry *registry) {
     util::Arena arena;
@@ -219,27 +242,39 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
     std::vector<ResolvedDeclaration *> resolved_decls;
     VariableRegistry variable_registry;
     for (auto decl : decls) {
-        ResolvedDeclarationBuilder builder{arena};
+        ResolvedDeclarationBuilder builder{arena, *my_ftable};
         decl->accept(&builder);
         auto tree = builder.get_resolved_decl();
 
-        if (tree) {
+        if (tree && tree->resolved_stmt) {
             resolved_decls.push_back(tree);
             VariableScope variable_scope{&variable_registry};
 
             // Resolve parameters into the scope
-            FunctionScopeVisitor func_scope_visitor{&arena, types, registry, &variable_scope};
+            LifetimeTable public_lifetimes(&tree->lifetimes, true);
+            FunctionScopeVisitor func_scope_visitor{&arena,
+                                                    types,
+                                                    registry,
+                                                    &variable_scope,
+                                                    &public_lifetimes};
+
             decl->accept(&func_scope_visitor);
 
             // Resolve expressions in the function body
+            LifetimeTable local_lifetimes(&tree->lifetimes, false);
             ExpressionResolverVisitor expr_resolver{&arena,
                                                     functions,
                                                     types,
                                                     &errors,
                                                     &variable_scope,
-                                                    registry};
+                                                    registry,
+                                                    &local_lifetimes};
+
             expr_resolver(*tree->resolved_stmt);
         }
     }
-    return ResolvedExpressionsResult{std::move(arena), resolved_decls, errors.get_errors(), std::move(variable_registry)};
+    return ResolvedExpressionsResult{std::move(arena),
+                                     resolved_decls,
+                                     errors.get_errors(),
+                                     std::move(variable_registry)};
 }

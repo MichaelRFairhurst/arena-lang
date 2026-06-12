@@ -6,6 +6,7 @@
 #include "ast/declarations.hpp"
 #include "resolve/functions.hpp"
 #include "resolve/variables.hpp"
+#include "signatures/lifetimes.hpp"
 #include "util/arena.hpp"
 #include "util/concat.hpp"
 
@@ -15,8 +16,17 @@ namespace arena::sema {
         FunctionId function_id;
     };
 
+    struct ResolvedLValue {
+        LifetimeId lifetime;
+    };
+
+    struct ResolvedRValue {};
+
+    using ResolvedValueCategory = std::variant<ResolvedLValue, ResolvedRValue>;
+
     struct ResolvedTypeInfo {
         TypeId type_id;
+        ResolvedValueCategory value_category;
     };
 
     struct ResolvedVariableInfo {
@@ -73,6 +83,7 @@ namespace arena::sema {
     struct ResolvedDeclaration {
         const ast::Declaration *original = nullptr;
         ResolvedStatement *resolved_stmt = nullptr;
+        LifetimeGroup lifetimes;
     };
 
     struct ResolvedExpression {
@@ -273,7 +284,7 @@ namespace arena::sema {
 
     class ResolvedDeclarationBuilder : public ast::Visitor {
     public:
-        ResolvedDeclarationBuilder(util::Arena &arena) : arena(&arena) {}
+        ResolvedDeclarationBuilder(util::Arena &arena, const FunctionTable &ftable) : arena(&arena), ftable(&ftable) {}
 
         void visit(const ast::FunctionDeclaration *func_decl) override {
             result = arena->alloc<ResolvedDeclaration>();
@@ -285,6 +296,9 @@ namespace arena::sema {
             result = arena->alloc<ResolvedDeclaration>();
             result->original = func_def;
 
+            auto resolved_func = ftable->resolve(func_def->get_name());
+            result->lifetimes = resolved_func->get_lifetimes();
+
             ResolvedStatementBuilder stmt_builder(*arena);
             result->resolved_stmt = stmt_builder.get_resolved_stmt(func_def->get_body());
         }
@@ -294,6 +308,7 @@ namespace arena::sema {
     private:
         ResolvedDeclaration *result = nullptr;
         util::Arena *arena;
+        const FunctionTable *ftable;
     };
 } // namespace arena::sema
 

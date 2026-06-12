@@ -6,27 +6,25 @@
 #include "errors/errors.hpp"
 
 namespace arena::sema {
+    class TypecheckOperations;
+
     class InferenceContext {
     public:
-        InferenceContext(const VariableRegistry *registry,
-                         const TypeTable *ttable,
-                         const ast::Node *context_node,
-                         error::Reporter *errors)
-            : registry(registry), ttable(ttable), context_node(context_node), errors(errors) {}
+        InferenceContext(const ast::Node *context_node, TypecheckOperations *ops) : context_node(context_node), ops(ops) {}
 
         ~InferenceContext() = default;
         void constrain_context_type(sema::VariableId id);
         void constrain_context_type(sema::TypeId id, error::Link why);
         void constrain_dereferences(InferenceContext *other, const ast::Node *origin);
-        void constrain_points_to(InferenceContext *other, const ast::Node *origin);
+        void constrain_points_to(InferenceContext *other,
+                                 LifetimeId lifetime,
+                                 const ast::Node *origin);
         sema::TypeId get_inferred_context_type();
 
     private:
         std::optional<TypeId> context_type;
         const ast::Node *context_node = nullptr;
-        const VariableRegistry *registry;
-        const TypeTable *ttable;
-        error::Reporter *errors;
+        TypecheckOperations *ops;
     };
 } // namespace arena::sema
 

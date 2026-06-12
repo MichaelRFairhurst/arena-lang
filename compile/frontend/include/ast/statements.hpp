@@ -1,6 +1,8 @@
 #ifndef ARENA_INCLUDE_AST_STATEMENTS_HPP
 #define ARENA_INCLUDE_AST_STATEMENTS_HPP
 
+#include <string>
+#include <vector>
 #include "ast/node.hpp"
 #include "ast/types.hpp"
 #include "ast/expressions.hpp"
@@ -160,6 +162,23 @@ namespace arena::ast {
 
     private:
         std::vector<Statement *> statements;
+    };
+
+    class ArenaStatement : public Statement {
+    public:
+        ArenaStatement(Token *arenaToken, BlockStatement *block)
+            : Statement(arenaToken, block->end()), block(block) {}
+
+        virtual ~ArenaStatement() = default;
+        
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        const BlockStatement *get_block() const {
+            return block;
+        }
+
+    private:
+        BlockStatement *block;
     };
 
 } // namespace arena::ast

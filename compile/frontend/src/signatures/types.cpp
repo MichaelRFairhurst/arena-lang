@@ -7,8 +7,10 @@ using namespace arena;
 namespace {
     class TypeMaterializer {
     public:
-        TypeMaterializer(const TypeTable *type_table, const TypeSymbolRegistry *registry)
-            : type_table(type_table), registry(registry) {}
+        TypeMaterializer(const TypeTable *type_table,
+                         const TypeSymbolRegistry *registry,
+                         const LifetimeGroup *lifetimes)
+            : type_table(type_table), registry(registry), lifetimes(lifetimes) {}
 
         ResolvedType operator()(const NamedTypeSymbol &symbol) {
             return type_table->get_named_type(symbol);
@@ -17,7 +19,7 @@ namespace {
         ResolvedType operator()(const ArrayTypeSymbol &symbol) {
             auto type_id = registry->get_type_id(symbol);
             auto element_id = symbol.element_type;
-            auto element_type = type_table->get_type(element_id);
+            auto element_type = type_table->get_type(element_id, lifetimes);
 
             // absolute royal freaking hack to intern the name into the type symbol
             std::string name = element_type.get_name().empty()
@@ -33,20 +35,21 @@ namespace {
         ResolvedType operator()(const PointerTypeSymbol &symbol) {
             auto type_id = registry->get_type_id(symbol);
             auto pointee_id = symbol.pointee_type;
-            auto pointee_type = type_table->get_type(pointee_id);
+            auto pointee_type = type_table->get_type(pointee_id, lifetimes);
 
             std::string name = pointee_type.get_name().empty()
                                    ? "<unknown>"
                                    : std::string(pointee_type.get_name());
-            name += "*";
-            if (symbol.lifetime.has_value()) {
-                name += " " + std::string(symbol.lifetime.value());
-            }
+
+            auto lifetime = lifetimes->get_lifetime_by_id(symbol.lifetime);
+            name += "*" + lifetime->get_debug_name();
+
+            // TODO fix this absolute royal hack to intern the name into the type symbol
             auto tmp_symbol = registry->get_interned(NamedTypeSymbol{name});
             std::string_view interned_name = std::get<NamedTypeSymbol>(tmp_symbol).name;
 
             return ResolvedType{type_id,
-                                PointerType{pointee_id, symbol.lifetime},
+                                PointerType{pointee_id, lifetime->group_lifetime_id},
                                 symbol,
                                 interned_name};
         }
@@ -64,6 +67,7 @@ namespace {
     private:
         const TypeTable *type_table;
         const TypeSymbolRegistry *registry;
+        const LifetimeGroup *lifetimes;
     };
 
     class TypeTableBuilderVisitor : public ast::Visitor {
@@ -80,6 +84,7 @@ namespace {
             auto name = std::get<NamedTypeSymbol>(symbol).name;
 
             StructType struct_type{name};
+            current_struct_type = &struct_type;
             ResolvedType resolved(id, struct_type, symbol, name);
             table->add_type(resolved);
         }
@@ -89,6 +94,7 @@ namespace {
         }
 
         TypeTable *table;
+        StructType *current_struct_type;
         const TypeSymbolRegistry *registry;
     };
 
@@ -130,6 +136,21 @@ TypeTable TypeTable::builtin_type_table(const TypeSymbolRegistry &registry) {
     return table;
 }
 
+bool ResolvedType::is_primitive() const {
+    return std::holds_alternative<IntegralType>(program_type) ||
+           std::holds_alternative<FloatingType>(program_type);
+}
+
+bool ResolvedType::is_lifetime_strict() const {
+    if (is_primitive() || is_void() || is_error()) {
+        return false;
+    }
+
+    // TODO: Handle const types
+    // TODO: Handle lifetime strictness for complex types.
+    return true;
+}
+
 void TypeTable::add_type(ResolvedType type) {
     auto symbol = type.get_symbol();
 
@@ -159,15 +180,18 @@ std::vector<const ResolvedType *> TypeTable::get_types() const {
     return result;
 }
 
-ResolvedType TypeTable::get_type(TypeId id) const {
-    TypeMaterializer materializer{this, registry};
+ResolvedType TypeTable::get_type(TypeId id, const LifetimeGroup *lifetimes) const {
+    TypeMaterializer materializer{this, registry, lifetimes};
     return std::visit(materializer, registry->get_type_symbol(id));
 }
 
-ResolvedType TypeTable::get_type(const ast::Type *type) const {
-    TypeSymbolResolver symbol_resolver(registry);
+ResolvedType TypeTable::get_type(const ast::Type *type, LifetimeGroup *lifetimes) const {
+    // TODO: This won't handle '*stack' or '*arena' lifetimes correctly. We need to resolve those
+    // in the expression resolver.
+    LifetimeTable lt_table{lifetimes, false};
+    TypeSymbolResolver symbol_resolver(registry, &lt_table);
     auto symbol = symbol_resolver.resolve(type);
-    TypeMaterializer materializer{this, registry};
+    TypeMaterializer materializer{this, registry, lifetimes};
     return std::visit(materializer, symbol);
 }
 

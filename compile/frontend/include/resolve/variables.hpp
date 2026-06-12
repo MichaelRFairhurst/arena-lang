@@ -4,6 +4,7 @@
 #include <string_view>
 #include "ast/statements.hpp"
 #include "signatures/types.hpp"
+#include "signatures/lifetimes.hpp"
 
 namespace arena::sema {
 
@@ -18,6 +19,7 @@ namespace arena::sema {
     struct ResolvedVariable {
         std::string_view name;
         const ast::Node *declaration;
+        LifetimeId lifetime;
 
         std::optional<TypeId> explicit_type_id;
         std::optional<TypeId> inferred_type_id;
@@ -73,7 +75,8 @@ namespace arena::sema {
 
     class VariableScope {
     public:
-        VariableScope(VariableRegistry *variable_registry) : variable_registry(variable_registry) {}
+        VariableScope(VariableRegistry *variable_registry)
+            : variable_registry(variable_registry) {}
         VariableScope(VariableScope *parent)
             : parent(parent), variable_registry(parent->variable_registry) {}
 

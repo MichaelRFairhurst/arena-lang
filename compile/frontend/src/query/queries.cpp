@@ -135,6 +135,7 @@ TypeTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
 arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
     const QueryEngineContext &ctx, ResolvedCallsQuery query) {
     const auto &path = query.input;
+    auto my_ftable = ctx.run_query(FunctionTableQuery{path}); // For lifetime information
     auto all_fsymbols = ctx.run_query(AvailableFunctionIdsQuery{path});
     auto all_tsymbols = ctx.run_query(AvailableTypeIdsQuery{path});
 
@@ -142,6 +143,7 @@ arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
     ExpressionResolver resolver;
     return resolver.resolve(ast.declarations,
                             &all_fsymbols,
+                            &my_ftable,
                             &all_tsymbols,
                             &ctx.get_type_registry());
 }

@@ -42,6 +42,8 @@ namespace arena::ast {
 
         std::string_view get_name() const { return name->text; }
 
+        const Type* get_type() const { return type; }
+
     private:
         Token *name;
         Type *type;
@@ -91,6 +93,8 @@ namespace arena::ast {
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
         std::string_view get_name() const { return name->text; }
+
+        const std::vector<TypeArgument *>& get_generic_args() const { return genericArgs; }
 
     private:
         Token *name;
