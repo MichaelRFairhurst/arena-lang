@@ -12,7 +12,7 @@ namespace {
     class TypeCheckTransform {
     public:
         TypeCheckTransform(util::Arena *arena, TypecheckOperations ops)
-            : middleware(arena), ops(ops) {}
+            : middleware(arena), ops(ops), current_arena_lifetime(ops.get_lifetimes().get_ctx_lifetime()) {}
 
         ResolvedExpression *typecheck_root(const ResolvedExpression *expr_in,
                                            InferenceContext *inference_ctx = nullptr) {
@@ -174,6 +174,7 @@ namespace {
 
             auto func_lifetimes = func->get_lifetimes();
             auto substitution_map = ops.get_lifetimes().import(func_lifetimes);
+            substitution_map[func_lifetimes.get_ctx_lifetime()] = current_arena_lifetime;
 
             for (size_t i = 1; i < step.original->num_children; ++i) {
                 std::cout << "Original param type: " << ops.get_type_name(params->at(i - 1), func_lifetimes) << std::endl;
@@ -285,6 +286,7 @@ namespace {
             return set_resolved_info(step.out_info(), ResolvedRValue{});
         }
 
+        LifetimeId current_arena_lifetime;
     private:
         TypecheckOperations ops;
         ExprTransformMiddleware middleware;
@@ -310,8 +312,11 @@ namespace {
         }
 
         void operator()(StmtTransformStep<ResolvedArenaStatement> step) {
-            // By default, just copy the expression and recursively transform children
+            // By default, just copy the block and recursively transform children
+            auto old_arena_lifetime = expr_typecheck->current_arena_lifetime;
+            expr_typecheck->current_arena_lifetime = step.out->arena_lifetime;
             middleware.transform_arena_block(step, *this);
+            expr_typecheck->current_arena_lifetime = old_arena_lifetime;
         }
 
         void operator()(StmtTransformStep<ResolvedIfStatement> step) {

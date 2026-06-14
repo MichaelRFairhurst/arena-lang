@@ -76,6 +76,7 @@ namespace {
             auto node = &get_node(id);
             node->lowlink = node->tarjan_id;
             node->reached_by_constraint = reached_by_constraint;
+            node->on_stack = true;
             tarjan_stack.push(node);
 
             union_equal_successors(id, group);
@@ -97,7 +98,7 @@ namespace {
                 std::cout << "Already indexed lifetime has root " << queued_root->lifetime.lt_id
                           << std::endl;
                 if (!queued_root->on_stack) {
-                    std::cout << "On stack, skipping\n";
+                    std::cout << "Not on stack, skipping\n";
                     continue;
                 }
 
@@ -168,7 +169,7 @@ namespace {
                 std::cout << "Union find of outlived lifetime " << less_id.lt_id << " is "
                           << less_root.lifetime.lt_id << std::endl;
                 if (!less_root.on_stack) {
-                    std::cout << "On stack, skipping\n";
+                    std::cout << "Not on stack, skipping\n";
                     continue;
                 }
 
