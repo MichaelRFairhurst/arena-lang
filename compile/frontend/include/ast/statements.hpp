@@ -173,6 +173,10 @@ namespace arena::ast {
         
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
+        std::string to_string() const override {
+            return "arena " + block->to_string();
+        }
+
         const BlockStatement *get_block() const {
             return block;
         }

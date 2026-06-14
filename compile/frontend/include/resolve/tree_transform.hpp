@@ -176,6 +176,17 @@ namespace arena::sema {
         }
 
         template <typename Return = void, typename Func>
+        Return transform_arena_block(StmtTransformStep<ResolvedArenaStatement> arena_step,
+                                 Func &transform_func) {
+            ResolvedStatement *child_in = arena_step.original->block;
+            ResolvedStatement *child_out = arena_step.out->block;
+            return transform_pair(StmtTransformStep<
+                                      ResolvedStatement>{.original = child_in,
+                                                         .out = child_out},
+                                  transform_func);
+        }
+
+        template <typename Return = void, typename Func>
         Return transform_if_then(StmtTransformStep<ResolvedIfStatement> if_step,
                                  Func &transform_func) {
             return transform_pair(StmtTransformStep<
@@ -222,6 +233,16 @@ namespace arena::sema {
 
             resolved.num_statements = block_in.num_statements;
             resolved.statements = arena->alloc_array<ResolvedStatement>(block_in.num_statements);
+            resolved.block_lifetime = block_in.block_lifetime;
+            return resolved;
+        }
+
+        ResolvedArenaStatement &copy(const ResolvedArenaStatement &arena_stmt, ResolvedStatement *out) {
+            out->info = ResolvedArenaStatement{};
+            auto &resolved = std::get<ResolvedArenaStatement>(out->info);
+            resolved.original = arena_stmt.original;
+            resolved.block = arena->alloc<ResolvedStatement>();
+            resolved.arena_lifetime = arena_stmt.arena_lifetime;
             return resolved;
         }
 
@@ -271,6 +292,10 @@ namespace arena::sema {
             for (size_t i = 0; i < step.original->num_statements; ++i) {
                 middleware.transform_block_child(step, i, *this);
             }
+        }
+
+        void operator()(StmtTransformStep<ResolvedArenaStatement> step) {
+            middleware.transform_arena_block(step, *this);
         }
 
         void operator()(StmtTransformStep<ResolvedIfStatement> step) {

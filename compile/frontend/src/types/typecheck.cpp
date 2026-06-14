@@ -309,6 +309,11 @@ namespace {
             }
         }
 
+        void operator()(StmtTransformStep<ResolvedArenaStatement> step) {
+            // By default, just copy the expression and recursively transform children
+            middleware.transform_arena_block(step, *this);
+        }
+
         void operator()(StmtTransformStep<ResolvedIfStatement> step) {
             step.out->condition = expr_typecheck->typecheck_root(step.original->condition);
             middleware.transform_if_then(step, *this);

@@ -534,6 +534,13 @@ namespace arena::parse {
             return arena->alloc<BlockStatement>(openBrace, statements, closeBrace);
         }
 
+        ArenaStatement *parse_arena_statement() {
+            Token *arenaToken = require_take_token(TokenType::IDENTIFIER, "to start arena statement");
+            assert(arenaToken->text == "arena");
+            BlockStatement *block = parse_block_statement();
+            return arena->alloc<ArenaStatement>(arenaToken, block);
+        }
+
         Statement *parse_statement() {
             // todo: while, for, switch, etc
             if (tokens.peek()->type == TokenType::IF) {
@@ -544,6 +551,8 @@ namespace arena::parse {
                 return parse_return_statement();
             } else if (tokens.peek()->type == TokenType::OPEN_BRACE) {
                 return parse_block_statement();
+            } else if (tokens.peek()->type == TokenType::IDENTIFIER && tokens.peek()->text == "arena") {
+                return parse_arena_statement();
             } else {
                 // default to expression statement
                 Expression *expr = parse_expression();

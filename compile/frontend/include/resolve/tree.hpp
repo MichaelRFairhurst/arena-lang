@@ -46,6 +46,13 @@ namespace arena::sema {
         const ast::BlockStatement *original = nullptr;
         ResolvedStatement *statements = nullptr;
         size_t num_statements = 0;
+        LifetimeId block_lifetime;
+    };
+
+    struct ResolvedArenaStatement {
+        const ast::ArenaStatement *original = nullptr;
+        ResolvedStatement *block = nullptr;
+        LifetimeId arena_lifetime;
     };
 
     struct ResolvedLetStatement {
@@ -75,6 +82,7 @@ namespace arena::sema {
                                                ResolvedLetStatement,
                                                ResolvedReturnStatement,
                                                ResolvedBlockStatement,
+                                               ResolvedArenaStatement,
                                                ResolvedExprStatement>;
     struct ResolvedStatement {
         ResolvedStatementType info;
@@ -256,6 +264,15 @@ namespace arena::sema {
                 ast_stmts[i]->accept(this);
                 stmt_stack.pop();
             }
+        }
+
+        void visit(const ast::ArenaStatement *arena_stmt) override {
+            auto *resolved = resolve_as<ResolvedArenaStatement>(arena_stmt);
+
+            resolved->block = arena->alloc<ResolvedStatement>();
+            stmt_stack.push(resolved->block);
+            arena_stmt->get_block()->accept(this);
+            stmt_stack.pop();
         }
 
         void visit(const ast::LetStatement *let_stmt) override {

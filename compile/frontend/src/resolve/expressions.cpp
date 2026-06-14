@@ -136,6 +136,7 @@ namespace {
 
             if (!visited_root) {
                 visited_root = true;
+                block_stmt.block_lifetime = lifetimes->get_stack_lifetime();
                 resolve_inner();
                 return;
             }
@@ -143,10 +144,17 @@ namespace {
             VariableScope *outer = variable_scope;
             VariableScope inner{variable_scope};
             auto scoped_stack_lifetime = lifetimes->push_stack(block_stmt.original);
+            block_stmt.block_lifetime = lifetimes->get_stack_lifetime();
             variable_scope = &inner;
 
             resolve_inner();
             variable_scope = outer;
+        }
+        
+        void operator()(ResolvedArenaStatement &arena_stmt) {
+            auto scoped_arena_lifetime = lifetimes->push_arena(arena_stmt.original);
+            arena_stmt.arena_lifetime = lifetimes->get_arena_lifetime();
+            (*this)(*arena_stmt.block);
         }
 
     private:
