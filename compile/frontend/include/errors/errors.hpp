@@ -165,11 +165,11 @@ namespace arena::error {
     class Reporter {
     public:
         // Parse errors
-        static Error E_P_UNEXP(Location l, std::string_view expected, std::string_view actual) {
-            return {"E-P_UNEXP",
+        Error &E_P_UNEXP(Location l, std::string_view expected, std::string_view actual) {
+            return report({"E-P_UNEXP",
                     l,
                     "Unexpected token",
-                    std::vector<Chunk>{"Expected ", expected, " but found ", actual}};
+                    std::vector<Chunk>{"Expected ", expected, " but found ", actual}});
         }
 
         // static constexpr ErrorCode E_P_MIS_RET = {"E-P_MIS_RET", "Expected a return type in
