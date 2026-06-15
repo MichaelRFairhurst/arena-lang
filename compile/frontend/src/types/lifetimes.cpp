@@ -9,7 +9,7 @@ namespace {
         LifetimeId lifetime;
         size_t tarjan_id = 0;
         LifetimeNode *parent = nullptr;
-        const error::Link *parent_link = nullptr;
+        const error::Cause *parent_link = nullptr;
         const LifetimeConstraint *reached_by_constraint = nullptr;
         size_t lowlink = std::numeric_limits<size_t>::max();
         size_t order = 0;
@@ -182,7 +182,7 @@ namespace {
         void unify(LifetimeNode &left,
                    LifetimeNode &right,
                    const LifetimeConstraint *constraint = nullptr) {
-            const error::Link *origin = nullptr;
+            const error::Cause *origin = nullptr;
             if (constraint != nullptr && constraint->origin.has_value()) {
                 origin = &constraint->origin.value();
             }
@@ -221,8 +221,8 @@ namespace {
             return union_find(*node.parent);
         }
 
-        std::vector<error::Link> get_union_path(const LifetimeNode &node) const {
-            std::vector<error::Link> path;
+        std::vector<error::Cause> get_union_path(const LifetimeNode &node) const {
+            std::vector<error::Cause> path;
             auto current = &node;
             while (current->parent != nullptr) {
                 if (current->parent_link != nullptr) {
@@ -256,40 +256,37 @@ namespace {
                                       const LifetimeConstraint &constraint,
                                       const LifetimeGroup *lifetimes,
                                       error::Reporter *errors) {
-            std::vector<error::Link> path;
+            std::vector<error::Cause> path;
             if (constraint.origin.has_value()) {
                 path.push_back(constraint.origin.value());
             }
-            std::cout << "Left has parent_link " << (lifetime->parent_link != nullptr ? lifetime->parent_link->message : "none")
+            std::cout << "Left has parent_link " << (lifetime->parent_link != nullptr ? lifetime->parent_link->description : "none")
                       << " and right has parent_link "
-                      << (outlives->parent_link != nullptr ? outlives->parent_link->message : "none")
+                      << (outlives->parent_link != nullptr ? outlives->parent_link->description : "none")
                       << std::endl;
             auto union_path_left = get_union_path(*lifetime);
             auto union_path_right = get_union_path(*outlives);
             path.insert(path.end(), union_path_left.begin(), union_path_left.end());
             path.insert(path.end(), union_path_right.rbegin(), union_path_right.rend());
 
-            if (path.empty()) {
-                std::cout << "No path found between conflicting lifetimes " << lifetime->lifetime.lt_id
-                          << " and " << outlives->lifetime.lt_id << std::endl;
-                return;
-            }
-            auto origin = path.front();
-
             auto name_left = lifetimes->get_lifetime_by_id(lifetime->lifetime)->get_debug_name();
             auto name_right = lifetimes->get_lifetime_by_id(outlives->lifetime)->get_debug_name();
 
-            std::vector<error::Chunk> chunks = {"Lifetime violation: *" + name_left +
-                                                " must outlive *" + name_right +
-                                                "; found conflict "};
-            for (const auto &link : path) {
-                if (chunks.size() > 1) {
-                    chunks.push_back("\n  caused by ");
+            std::optional<error::Location> l = std::nullopt;
+
+            for (const auto &p : path) {
+                if (p.location.has_value()) {
+                    l = p.location.value();
+                    break;
                 }
-                chunks.push_back(link);
             }
 
-            errors->report(error::Error(chunks, origin.begin, origin.end));
+            if (l.has_value()) {
+                errors->E_L_OUTLV_VIOL(l.value(), name_left, name_right, path);
+            } else {
+                std::cout << "No location found for conflict between " << name_left << " and " << name_right
+                          << ", reporting without location\n";
+            }
         }
 
         const LifetimeGraph &get_graph() const { return graph; }
@@ -312,7 +309,7 @@ void LifetimeSolver::solve(const LifetimeGroup &group) {
         std::cout << "Lifetime " << node.lifetime.lt_id << ": tarjan_id " << node.tarjan_id
                   << ", order " << node.order << ", parent tarjan_id: " << node.parent
                   << ", parent relation: "
-                  << (node.parent_link != nullptr ? node.parent_link->message : "none")
+                  << (node.parent_link != nullptr ? node.parent_link->description : "none")
                   << std::endl;
         auto lifetime = group.get_lifetime_by_id(node.lifetime);
     }

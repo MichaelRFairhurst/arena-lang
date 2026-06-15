@@ -23,16 +23,13 @@ namespace {
 
             auto var = variable_scope->resolve_variable_id(ident);
             if (fid && var) {
-                errors->report(id_expr,
-                               "Identifier '" + std::string(ident) +
-                                   "' is ambiguous (could refer to both a function and a "
-                                   "variable)");
+                errors->E_R_VAR_AMBG(id_expr, ident);
             } else if (var) {
                 current_expr->info = ResolvedVariableInfo{*var};
             } else if (fid) {
                 current_expr->info = ResolvedFunctionInfo{*fid};
             } else {
-                errors->report(id_expr, "Unresolved identifier: " + std::string(ident));
+                errors->E_R_ID_UNKN(id_expr, ident);
             }
         }
 

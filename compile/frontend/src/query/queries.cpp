@@ -1,3 +1,4 @@
+#include "errors/renderer.hpp"
 #include "query/queries.hpp"
 #include "query/engine.hpp"
 #include "resolve/imports.hpp"
@@ -5,6 +6,7 @@
 #include <fstream>
 
 using namespace arena::sema;
+using namespace arena;
 
 std::string arena::sema::compute_query_result(const QueryEngineContext &ctx,
                                               SourceContentsQuery query) {
@@ -18,6 +20,13 @@ std::string arena::sema::compute_query_result(const QueryEngineContext &ctx,
     }
     return std::string((std::istreambuf_iterator<char>(input_file)),
                        std::istreambuf_iterator<char>());
+}
+
+error::LineEndings arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                                     LineEndingsQuery query) {
+    const auto &path = query.input;
+    auto &source_contents = ctx.run_query(SourceContentsQuery{path});
+    return error::LineEndings(source_contents);
 }
 
 arena::parse::ParseResult arena::sema::compute_query_result(const QueryEngineContext &ctx,
@@ -160,4 +169,27 @@ arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
 
     return typechecker.type_check(resolved_calls.get_resolved_decls(),
                                   resolved_calls.get_resolved_variables());
+}
+
+std::vector<error::Error> arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                                            ErrorsQuery query) {
+    const auto &path = query.input;
+    auto &typechecked_file = ctx.run_query(TypecheckedFileQuery{path});
+    auto &ast = ctx.run_query(ParseQuery{path});
+
+    std::vector<error::Error> all_errors = ast.errors;
+    all_errors.insert(all_errors.end(),
+                      typechecked_file.get_errors().begin(),
+                      typechecked_file.get_errors().end());
+
+    return all_errors;
+}
+
+std::string arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                              RenderedErrorsQuery query) {
+    const auto &path = query.input;
+    auto &errors = ctx.run_query(ErrorsQuery{path});
+    error::CliRenderer renderer;
+
+    return renderer.render(path, errors, ctx);
 }

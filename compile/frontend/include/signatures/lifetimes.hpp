@@ -130,7 +130,7 @@ namespace arena::sema {
         LifetimeId left_id;
         LifetimeRelation relation;
         LifetimeId right_id;
-        std::optional<error::Link> origin;
+        std::optional<error::Cause> origin;
 
         bool operator==(const LifetimeConstraint &other) const {
             return left_id.lt_id == other.left_id.lt_id && relation == other.relation &&
@@ -170,11 +170,11 @@ namespace arena::sema {
         void add_constraint(Lifetime &left,
                             LifetimeRelation relation,
                             Lifetime &right,
-                            const error::Link &origin);
+                            const error::Cause &origin);
         void add_constraint(LifetimeId left,
                             LifetimeRelation relation,
                             LifetimeId right,
-                            const error::Link &origin);
+                            const error::Cause &origin);
         void set_context(FunctionId function_id) { context = function_id; }
         void set_context(TypeId type_id) { context = type_id; }
         LifetimeId get_max_lifetime_id() const { return lifetimes.back().group_lifetime_id; }

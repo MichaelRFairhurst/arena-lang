@@ -55,11 +55,11 @@ namespace arena::sema {
                                 const ast::Node *node,
                                 std::string message);
 
-        void require_assignable(TypeId lhs,
-                                TypeId rhs,
-                                const ast::Node *node,
-                                std::string message,
-                                bool force_strict = false);
+        error::Error* require_assignable(TypeId lhs,
+                                                       TypeId rhs,
+                                                       const ast::Node *node,
+                                                       std::string message,
+                                                       bool force_strict = false);
 
         void require_type(TypeId expected,
                           TypeId actual,

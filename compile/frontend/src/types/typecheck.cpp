@@ -12,7 +12,8 @@ namespace {
     class TypeCheckTransform {
     public:
         TypeCheckTransform(util::Arena *arena, TypecheckOperations ops)
-            : middleware(arena), ops(ops), current_arena_lifetime(ops.get_lifetimes().get_ctx_lifetime()) {}
+            : middleware(arena), ops(ops),
+              current_arena_lifetime(ops.get_lifetimes().get_ctx_lifetime()) {}
 
         ResolvedExpression *typecheck_root(const ResolvedExpression *expr_in,
                                            InferenceContext *inference_ctx = nullptr) {
@@ -37,7 +38,8 @@ namespace {
                         TypeId type_id,
                         ResolvedValueCategory value_category) {
             expr->info = ResolvedTypeInfo{type_id, value_category};
-            inference_ctx->constrain_context_type(type_id, error::Link(expr->original));
+            inference_ctx->constrain_context_type(type_id,
+                                                  error::LocatedText(expr->original, "here"));
             return type_id;
         }
 
@@ -70,8 +72,8 @@ namespace {
             if (!var_info) {
                 inference_ctx->constrain_context_type(ops.get_types().get_type_id(
                                                           ErrorTypeSymbol{}),
-                                                      error::Link{step.original->original,
-                                                                  "unknown identifier"});
+                                                      error::LocatedText{step.original->original,
+                                                                         "unknown identifier"});
             }
 
             auto variable = ops.get_variables().resolve_variable(var_info->variable_id);
@@ -100,14 +102,10 @@ namespace {
             if (!ops.types_equal(left_type_id, right_type_id)) {
                 auto type_left = ops.get_type_name(left_type_id);
                 auto type_right = ops.get_type_name(right_type_id);
-                auto link_left = error::Link{step.ast->get_left(), std::string(type_left)};
-                auto link_right = error::Link{step.ast->get_right(), std::string(type_right)};
-                ops.get_errors()
-                    .report(step.ast,
-                            "Expected both binary operands to have matching types, but got ",
-                            link_left,
-                            " and ",
-                            link_right);
+                auto link_left = error::LocatedText{step.ast->get_left(), std::string(type_left)};
+                auto link_right =
+                    error::LocatedText{step.ast->get_right(), std::string(type_right)};
+                ops.get_errors().E_T_BIN_MIS(step.ast, link_left, link_right);
             }
 
             switch (step.ast->get_operator()) {
@@ -128,21 +126,18 @@ namespace {
             auto left_type_id = resolve_child(step, 0, &left_inference_ctx);
             auto left_info = std::get<ResolvedTypeInfo>(step.out->children[0].info);
             if (!std::holds_alternative<ResolvedLValue>(left_info.value_category)) {
-                ops.get_errors().report(step.ast, "Left-hand side of assignment must be an lvalue");
+                ops.get_errors().E_T_ASGN_RV(step.ast, step.ast->get_left());
             }
 
             auto right_inference_ctx = make_child_context(step, 1);
             right_inference_ctx.constrain_context_type(left_type_id,
-                                                       error::Link{step.ast, "assignment"});
+                                                       error::LocatedText{step.ast, "lvalue in assignment here"});
             auto right_type_id = resolve_child(step, 1, &right_inference_ctx);
 
-            ops.require_assignable(left_type_id,
-                                   right_type_id,
-                                   step.ast,
-                                   "Type mismatch in assignment");
+            ops.require_assignable(left_type_id, right_type_id, step.ast, "assignment");
 
             inference_ctx->constrain_context_type(left_type_id,
-                                                  error::Link{step.ast, "assignment"});
+                                                  error::LocatedText{step.ast, "assignment"});
             return set_resolved_info(step.out_info(), ResolvedRValue{});
         }
 
@@ -151,13 +146,13 @@ namespace {
             auto finfo = std::get_if<ResolvedFunctionInfo>(&callee.info);
             if (!finfo) {
                 // For now, the callee must be a function. Soon we'll add function types.
-                ops.get_errors().report(callee.original, "Expected a function in call expression");
+                ops.get_errors().E_R_UNKN_FUNC(step.ast, callee.original);
                 return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
             }
 
             auto func = ops.get_functions().get_function(finfo->function_id);
             if (!func) {
-                ops.get_errors().report(callee.original, "Unknown function in call expression");
+                ops.get_errors().E_R_UNKN_FUNC(step.ast, callee.original);
                 return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
             }
 
@@ -165,10 +160,10 @@ namespace {
             auto return_type = func->get_return_type();
 
             if (params->size() != step.original->num_children - 1) {
-                ops.add_error_expected(params->size(),
-                                       step.original->num_children - 1,
-                                       step.ast,
-                                       "Argument count mismatch in call expression");
+                ops.get_errors().E_T_CALL_WRG_ARGC(step.ast,
+                                                   func->get_symbol().name,
+                                                   params->size(),
+                                                   step.original->num_children - 1);
                 return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
             }
 
@@ -177,27 +172,33 @@ namespace {
             substitution_map[func_lifetimes.get_ctx_lifetime()] = current_arena_lifetime;
 
             for (size_t i = 1; i < step.original->num_children; ++i) {
-                std::cout << "Original param type: " << ops.get_type_name(params->at(i - 1), func_lifetimes) << std::endl;
-                auto param_type = ops.substitute_lifetimes(params->at(i - 1), func_lifetimes, substitution_map);
-                std::cout << "Substituted param type: " << ops.get_type_name(param_type) << std::endl;
+                std::cout << "Original param type: "
+                          << ops.get_type_name(params->at(i - 1), func_lifetimes) << std::endl;
+                auto param_type =
+                    ops.substitute_lifetimes(params->at(i - 1), func_lifetimes, substitution_map);
+                std::cout << "Substituted param type: " << ops.get_type_name(param_type)
+                          << std::endl;
                 auto arg_inference_ctx = make_child_context(step, i);
                 // TODO: Check assignability rather than exact type equality.
                 arg_inference_ctx.constrain_context_type(param_type,
-                                                         error::Link(step.ast,
-                                                                     "argument " +
-                                                                         std::to_string(i)));
+                                                         error::LocatedText(step.ast,
+                                                                            "argument " +
+                                                                                std::to_string(i)));
                 auto arg_id = resolve_child(step, i, &arg_inference_ctx);
             }
 
             if (return_type) {
-                std::cout << "Original return type: " << ops.get_type_name(*return_type, func_lifetimes) << std::endl;
-                auto substituted_return_type = ops.substitute_lifetimes(*return_type, func_lifetimes, substitution_map);
-                std::cout << "Substituted return type: " << ops.get_type_name(substituted_return_type) << std::endl;
+                std::cout << "Original return type: "
+                          << ops.get_type_name(*return_type, func_lifetimes) << std::endl;
+                auto substituted_return_type =
+                    ops.substitute_lifetimes(*return_type, func_lifetimes, substitution_map);
+                std::cout << "Substituted return type: "
+                          << ops.get_type_name(substituted_return_type) << std::endl;
                 inference_ctx->constrain_context_type(substituted_return_type,
-                                                      error::Link(step.ast, "return type"));
+                                                      error::LocatedText(step.ast, "return type"));
             } else {
                 inference_ctx->constrain_context_type(ops.get_types().get_type_id(VoidTypeSymbol{}),
-                                                      error::Link(step.ast, "return type"));
+                                                      error::LocatedText(step.ast, "return type"));
             }
 
             return set_resolved_info(step.out_info(), ResolvedRValue{});
@@ -235,7 +236,7 @@ namespace {
                 if (auto lvalue_info = std::get_if<ResolvedLValue>(&child_info.value_category)) {
                     lifetime = lvalue_info->lifetime;
                 } else {
-                    ops.get_errors().report(step.ast, "Cannot take reference of an rvalue");
+                    ops.get_errors().E_T_RV_CANT_ADDR(step.ast, step.ast->get_operand());
                 }
 
                 inference_ctx_parent->constrain_points_to(&operand_inference_ctx,
@@ -258,7 +259,7 @@ namespace {
                 ops.get_types().get_type(step.ast->get_type(), &ops.get_lifetimes()).get_id();
             auto uncast_inference_ctx = make_child_context(step, 0);
             inference_ctx->constrain_context_type(casted_type,
-                                                  error::Link(step.ast, "result of cast"));
+                                                  error::LocatedText(step.ast, "result of cast"));
             auto operand_type = resolve_child(step, 0, &uncast_inference_ctx);
             // TODO: check that cast is valid (e.g., cannot cast bool to struct)
 
@@ -267,7 +268,7 @@ namespace {
 
         TypeId operator()(ExprTransformStep<ast::MemberAccessExpression> step) {
             // For now we do not support member access, so this is always an error.
-            ops.get_errors().report(step.ast, "Member access is not supported yet");
+            // ops.get_errors().report(step.ast, "here", "Member access is not supported yet");
             return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
         }
 
@@ -280,13 +281,16 @@ namespace {
             auto bool_id = ops.get_types().get_type_id(NamedTypeSymbol{"bool"});
             auto operand_inference_ctx = make_child_context(step, 0);
             operand_inference_ctx.constrain_context_type(bool_id,
-                                                         error::Link(step.ast, "operand of '!'"));
-            inference_ctx->constrain_context_type(bool_id, error::Link(step.ast, "result of '!'"));
+                                                         error::LocatedText(step.ast,
+                                                                            "operand of '!'"));
+            inference_ctx->constrain_context_type(bool_id,
+                                                  error::LocatedText(step.ast, "result of '!'"));
             resolve_child(step, 0, &operand_inference_ctx);
             return set_resolved_info(step.out_info(), ResolvedRValue{});
         }
 
         LifetimeId current_arena_lifetime;
+
     private:
         TypecheckOperations ops;
         ExprTransformMiddleware middleware;
@@ -371,7 +375,8 @@ std::string TypecheckOperations::get_type_name(TypeId id) const {
     return std::string(get_type(id).get_name());
 }
 
-std::string TypecheckOperations::get_type_name(TypeId id, const LifetimeGroup &type_lifetimes) const {
+std::string TypecheckOperations::get_type_name(TypeId id,
+                                               const LifetimeGroup &type_lifetimes) const {
     return std::string(ttable->get_type(id, &type_lifetimes).get_name());
 }
 
@@ -382,101 +387,88 @@ TypeId TypecheckOperations::substitute_lifetimes(
     return arena::sema::substitute_lifetimes(type_id, type_lifetimes, ttable, substitutions);
 }
 
-void TypecheckOperations::add_error_expected(TypeId expected,
-                                             TypeId actual,
-                                             const ast::Node *node,
-                                             std::string message) {
-    errors->report(node,
-                   message + ": expected '" + get_type_name(expected) + "', got '" +
-                       get_type_name(actual) + "'");
-}
-
-void TypecheckOperations::add_error_expected(std::string_view expected,
-                                             TypeId actual,
-                                             const ast::Node *node,
-                                             std::string message) {
-    errors->report(node,
-                   message + ": expected " + std::string(expected) + ", got '" +
-                       get_type_name(actual) + "'");
-}
-
-void TypecheckOperations::add_error_expected(size_t num_expected,
-                                             size_t num_actual,
-                                             const ast::Node *node,
-                                             std::string message) {
-    errors->report(node,
-                   message + ": expected '" + std::to_string(num_expected) + "', got '" +
-                       std::to_string(num_actual) + "'");
-}
-
-void TypecheckOperations::require_assignable(
+error::Error *TypecheckOperations::require_assignable(
     TypeId lhs, TypeId rhs, const ast::Node *node, std::string message, bool force_strict) {
     if (lhs == rhs) {
-        return;
+        return nullptr;
     }
 
     auto lhs_type = get_type(lhs);
     auto rhs_type = get_type(rhs);
     if (lhs_type.is_error() || rhs_type.is_error()) {
         // Don't report spurious errors if one of the types is already an error
-        return;
+        return nullptr;
     }
 
     if (auto lhs_array = std::get_if<ArrayType>(&lhs_type.get_program_type())) {
         auto rhs_array = std::get_if<ArrayType>(&rhs_type.get_program_type());
         if (!rhs_array) {
-            add_error_expected("a compatible array type", rhs, node, message);
+            return &errors->E_T_ARR_NONARR(node, message, get_type_name(rhs));
         }
 
         if (rhs_array->size < lhs_array->size) {
-            add_error_expected("an array of size at least " + std::to_string(lhs_array->size),
-                               rhs,
-                               node,
-                               message);
+            return &errors->E_T_ARR_SZ_MIS(node, message, lhs_array->size, rhs_array->size);
         }
 
-        require_assignable(lhs_type.get_id(), rhs_type.get_id(), node, message);
+        auto err = require_assignable(lhs_type.get_id(), rhs_type.get_id(), node, message);
+        if (err != nullptr) {
+            err->add_cause("Array elements of " + get_type_name(lhs) + " must be compatible with " +
+                           get_type_name(rhs));
+            return err;
+        }
     } else if (auto left_ptr = std::get_if<PointerType>(&lhs_type.get_program_type())) {
         auto lhs_pointee_id = left_ptr->pointee_type;
         auto right_ptr = std::get_if<PointerType>(&rhs_type.get_program_type());
         if (!right_ptr) {
-            add_error_expected("a pointer type in assignment", rhs, node, message);
-            return;
+            return &errors->E_T_PTR_NONPTR(node, message, get_type_name(rhs));
         }
         auto rhs_pointee_id = right_ptr->pointee_type;
         auto rhs_pointee = get_type(rhs_pointee_id);
         auto constraint = rhs_pointee.is_lifetime_strict() || force_strict
                               ? LifetimeRelation::Equals
                               : LifetimeRelation::LessEqual;
+        std::vector<error::Supplement> supplements;
+        if (rhs_pointee.is_lifetime_strict()) {
+            supplements.push_back(
+                error::Supplement{error::SupplementKind::Note,
+                                  "Pointee '" + get_type_name(rhs_pointee_id) +
+                                      "' is lifetime-strict and requires exact lifetime match"});
+            supplements.push_back(
+                error::Supplement{error::SupplementKind::Help,
+                                  "Consider making the pointee type const to allow using a "
+                                  "longer-lived value in place of a shorter-lived one."});
+        } else if (force_strict) {
+            supplements.push_back(
+                error::Supplement{error::SupplementKind::Note,
+                                  "Assignment context is lifetime-strict and require exact "
+                                  "lifetime match (likely due to nested pointers)"});
+            supplements.push_back(
+                error::Supplement{error::SupplementKind::Help,
+                                  "Consider making the pointee type const to allow using a "
+                                  "longer-lived value in place of a shorter-lived one."});
+        } else {
+            supplements.push_back(
+                error::Supplement{error::SupplementKind::Note,
+                                  "Pointee '" + get_type_name(rhs_pointee_id) +
+                                      "' is lifetime-permissive, and a longer-lived value can be "
+                                      "used in place of a shorter-lived one"});
+        }
 
         lifetimes->add_constraint(left_ptr->lifetime,
                                   constraint,
                                   right_ptr->lifetime,
-                                  error::Link(node, "pointer assignment"));
+                                  error::Cause{"pointer assignment", node, std::move(supplements)});
 
-        require_assignable(lhs_pointee_id, rhs_pointee_id, node, message, true);
+        auto err = require_assignable(lhs_pointee_id, rhs_pointee_id, node, message, true);
+        if (err != nullptr) {
+            err->add_cause("Pointee type of " + get_type_name(lhs) +
+                           " must be compatible with pointee type of " + get_type_name(rhs));
+        }
 
-        return;
+        return err;
     }
 
-    add_error_expected(lhs, rhs, node, message);
-}
-
-
-void TypecheckOperations::require_type(TypeId expected,
-                                       TypeId actual,
-                                       const ast::Node *node,
-                                       std::string message) {
-    auto expected_type = get_type(expected);
-    auto actual_type = get_type(actual);
-    if (expected_type.is_error() || actual_type.is_error()) {
-        // Don't report spurious errors if one of the types is already an error
-        return;
-    }
-
-    if (expected != actual) {
-        add_error_expected(expected, actual, node, message);
-    }
+    return &errors->E_T_ASGN_NOREL(node, message, get_type_name(lhs), get_type_name(rhs));
 }
 
 bool TypecheckOperations::types_equal(TypeId a, TypeId b) {
@@ -489,7 +481,6 @@ bool TypecheckOperations::types_equal(TypeId a, TypeId b) {
 
     return a == b;
 }
-
 
 ResolvedExpressionsResult TypeChecker::type_check(
     const std::vector<const ResolvedDeclaration *> &decls, const VariableRegistry *variables) {

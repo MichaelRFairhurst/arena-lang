@@ -14,7 +14,7 @@ namespace arena::sema {
 
         ~InferenceContext() = default;
         void constrain_context_type(sema::VariableId id);
-        void constrain_context_type(sema::TypeId id, error::Link why);
+        void constrain_context_type(sema::TypeId id, error::LocatedText why);
         void constrain_dereferences(InferenceContext *other, const ast::Node *origin);
         void constrain_points_to(InferenceContext *other,
                                  LifetimeId lifetime,
@@ -24,6 +24,7 @@ namespace arena::sema {
     private:
         std::optional<TypeId> context_type;
         const ast::Node *context_node = nullptr;
+        error::LocatedText why_constraint;
         TypecheckOperations *ops;
     };
 } // namespace arena::sema

@@ -113,14 +113,14 @@ void LifetimeGroup::add_constraint(LifetimeConstraint constraint) {
 void LifetimeGroup::add_constraint(Lifetime &left,
                                    LifetimeRelation relation,
                                    Lifetime &right,
-                                   const error::Link &origin) {
+                                   const error::Cause &origin) {
     add_constraint(left.group_lifetime_id, relation, right.group_lifetime_id, origin);
 }
 
 void LifetimeGroup::add_constraint(LifetimeId left,
                                    LifetimeRelation relation,
                                    LifetimeId right,
-                                   const error::Link &origin) {
+                                   const error::Cause &origin) {
     add_constraint(LifetimeConstraint{left, relation, right, origin});
 }
 
@@ -229,9 +229,9 @@ std::string LifetimeGroup::to_string() const {
         }
         result += " " + right_name;
         if (constraint.origin.has_value()) {
-            result += " (origin: " + constraint.origin->message + " at " +
-                      std::string(constraint.origin->begin->text) + "..." +
-                      std::string(constraint.origin->end->text) + ")";
+            result += " (origin: " + std::string(constraint.origin->description) + " at " +
+                      std::string(constraint.origin->location->begin->text) + "..." +
+                      std::string(constraint.origin->location->end->text) + ")";
         }
         result += "\n";
     }
@@ -279,12 +279,12 @@ LifetimeTable::ArenaLifetimeGuard LifetimeTable::push_arena(const ast::ArenaStat
     group->add_constraint(current_arena_id,
                           LifetimeRelation::Less,
                           group->get_ctx_lifetime(),
-                          error::Link{arena_stmt, "Outer *arena outlives nested *arena lifetime"});
+                          error::Cause{"Outer *arena outlives nested *arena lifetime", arena_stmt});
 
     group->add_constraint(current_arena_id,
                           LifetimeRelation::Greater,
                           group->get_any_lifetime(),
-                          error::Link{arena_stmt, "'Any' lifetime is defined to be smaller"});
+                          error::Cause{"'Any' lifetime is defined to be smaller", arena_stmt});
 
     return ArenaLifetimeGuard(this, old_id);
 }
@@ -297,22 +297,21 @@ LifetimeTable::StackLifetimeGuard LifetimeTable::push_stack(const ast::BlockStat
         group->add_constraint(current_stack_id,
                               LifetimeRelation::Less,
                               group->get_ctx_lifetime(),
-                              error::Link{block_stmt,
-                                          "Outer function *arena outlives all function "
-                                          "*<stack> lifetimes"});
+                              error::Cause{ "Outer function *arena outlives all function "
+                                            "*<stack> lifetimes", block_stmt});
     } else {
         group->add_constraint(current_stack_id,
                               LifetimeRelation::Less,
                               old_id,
-                              error::Link{block_stmt,
+                              error::Cause{
                                           "Outer block *<stack> outlives inner block "
-                                          "*<stack> lifetime"});
+                                          "*<stack> lifetime", block_stmt});
     }
 
     group->add_constraint(current_arena_id,
                           LifetimeRelation::Greater,
                           group->get_any_lifetime(),
-                          error::Link{block_stmt, "'Any' lifetime is defined to be smaller"});
+                          error::Cause{"'Any' lifetime is defined to be smaller", block_stmt});
 
     return StackLifetimeGuard(this, old_id);
 }

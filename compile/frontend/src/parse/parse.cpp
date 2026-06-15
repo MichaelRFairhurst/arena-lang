@@ -251,18 +251,16 @@ namespace arena::parse {
                 if (tokens.peek()->type == TokenType::GREATER) {
                     auto closeToken = tokens.take(); // consume '>'
                     if (generic_args.empty()) {
-                        errors.report(closeToken,
-                                      closeToken,
-                                      "Generic parameter list cannot be empty");
+                        errors.E_P_UNEXP(closeToken,
+                                          "non-empty generic parameter list", "empty");
                     }
 
                     break;
                 } else if (tokens.peek()->type == TokenType::OPEN_PAREN ||
                            tokens.peek()->type == TokenType::OPEN_BRACE ||
                            tokens.peek()->type == TokenType::SEMICOLON) {
-                    errors.report(tokens.peek(),
-                                  tokens.peek(),
-                                  "Expected a type argument in generic parameter list but got: " +
+                    errors.E_P_UNEXP(tokens.peek(),
+                                  "a type argument in generic parameter list",
                                       std::string(tokens.peek()->text));
                     break;
                 }
@@ -382,10 +380,9 @@ namespace arena::parse {
                 }
 
                 if (!arg_allowed) {
-                    errors.report(tokens.peek(),
-                                  tokens.peek(),
-                                  "Expected ')' or ',' but got: " +
-                                      std::string(tokens.peek()->text));
+                    errors.E_P_UNEXP(tokens.peek(),
+                                      "')' or ',' but got: " +
+                                      std::string(tokens.peek()->text), "");
 
                     if (tokens.peek()->type == TokenType::END_OF_INPUT ||
                         tokens.peek()->type == TokenType::SEMICOLON ||
@@ -708,7 +705,7 @@ namespace arena::parse {
                 std::string message = "Expected " + std::string(token_type_to_string(expected)) +
                                       context_message_spaced + " but got '" +
                                       std::string(tokens.peek()->text) + "'";
-                errors.report(tokens.peek(), tokens.peek(), message);
+                errors.E_P_UNEXP(tokens.peek(), token_type_to_string(expected), tokens.peek()->text);
                 return tokens.take_synthetic(expected);
             }
         }
@@ -733,7 +730,7 @@ namespace arena::parse {
                 }
             }
 
-            errors.report(begin, end, std::string(message));
+            errors.E_P_UNEXP(error::Location{begin, end}, "", "");
         }
 
         void parse(ParseResult &result) {

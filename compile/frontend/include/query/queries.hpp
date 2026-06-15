@@ -5,6 +5,8 @@
 #include <variant>
 #include <unordered_map>
 #include <vector>
+#include "errors/errors.hpp"
+#include "errors/line_endings.hpp"
 #include "parse/parse.hpp"
 #include "resolve/symbols.hpp"
 #include "resolve/expressions.hpp"
@@ -50,6 +52,11 @@ namespace arena::sema {
                                           // TODO: use file system listener or timestamp to
                                           // determine when source contents have changed.
                                           QueryRefreshType::AlwaysRefresh>;
+
+    using LineEndingsQuery = QueryBase<struct LineEndingsQueryTag,
+                                 std::filesystem::path,
+                                 error::LineEndings,
+                                 QueryRefreshType::RefreshOnDependentChange>;
 
     using ParseQuery = QueryBase<struct ParseQueryTag,
                                  std::filesystem::path,
@@ -111,8 +118,18 @@ namespace arena::sema {
                                            ResolvedExpressionsResult,
                                            QueryRefreshType::RefreshOnDependentChange>;
 
+    using ErrorsQuery = QueryBase<struct ErrorsQueryTag,
+                                std::filesystem::path,
+                                std::vector<error::Error>,
+                                QueryRefreshType::RefreshOnDependentChange>;
+
+    using RenderedErrorsQuery = QueryBase<struct RenderedErrorsQueryTag,
+                                std::filesystem::path,
+                                std::string,
+                                QueryRefreshType::RefreshOnDependentChange>;
 
     std::string compute_query_result(const QueryEngineContext &ctx, SourceContentsQuery query);
+    error::LineEndings compute_query_result(const QueryEngineContext &ctx, LineEndingsQuery query);
     arena::parse::ParseResult compute_query_result(const QueryEngineContext &ctx, ParseQuery query);
     std::vector<std::filesystem::path> compute_query_result(const QueryEngineContext &ctx,
                                                             ImportedPathsQuery query);
@@ -131,9 +148,12 @@ namespace arena::sema {
                                                                 ResolvedCallsQuery query);
     arena::sema::ResolvedExpressionsResult compute_query_result(const QueryEngineContext &ctx,
                                                                 TypecheckedFileQuery query);
+    std::vector<error::Error> compute_query_result(const QueryEngineContext &ctx, ErrorsQuery query);
+    std::string compute_query_result(const QueryEngineContext &ctx, RenderedErrorsQuery query);
 
     struct QueryCache {
         SourceContentsQuery::CacheType source_contents_cache;
+        LineEndingsQuery::CacheType line_endings_cache;
         ParseQuery::CacheType parse_cache;
         ImportedPathsQuery::CacheType imported_paths_cache;
         FunctionTableQuery::CacheType function_table_cache;
@@ -146,11 +166,14 @@ namespace arena::sema {
         AvailableTypesTableQuery::CacheType available_types_table_cache;
         ResolvedCallsQuery::CacheType resolved_calls_cache;
         TypecheckedFileQuery::CacheType typechecked_file_cache;
-
+        ErrorsQuery::CacheType errors_cache;
+        RenderedErrorsQuery::CacheType rendered_errors_cache;
         template <typename QueryType>
         typename QueryType::CacheType &get_cache() {
             if constexpr (std::is_same_v<QueryType, SourceContentsQuery>) {
                 return source_contents_cache;
+            } else if constexpr (std::is_same_v<QueryType, LineEndingsQuery>) {
+                return line_endings_cache;
             } else if constexpr (std::is_same_v<QueryType, ParseQuery>) {
                 return parse_cache;
             } else if constexpr (std::is_same_v<QueryType, ImportedPathsQuery>) {
@@ -175,6 +198,10 @@ namespace arena::sema {
                 return resolved_calls_cache;
             } else if constexpr (std::is_same_v<QueryType, TypecheckedFileQuery>) {
                 return typechecked_file_cache;
+            } else if constexpr (std::is_same_v<QueryType, ErrorsQuery>) {
+                return errors_cache;
+            } else if constexpr (std::is_same_v<QueryType, RenderedErrorsQuery>) {
+                return rendered_errors_cache;
             } else {
                 static_assert(false && sizeof(QueryType), "Unsupported query type");
             }
@@ -199,6 +226,7 @@ namespace arena::sema {
     };
 
     using Query = std::variant<SourceContentsQuery,
+                               LineEndingsQuery,
                                ParseQuery,
                                ImportedPathsQuery,
                                FunctionTableQuery,
@@ -210,7 +238,9 @@ namespace arena::sema {
                                TypeIdsQuery,
                                AvailableTypeIdsQuery,
                                ResolvedCallsQuery,
-                               TypecheckedFileQuery>;
+                               TypecheckedFileQuery,
+                               ErrorsQuery,
+                               RenderedErrorsQuery>;
 
     template <typename QueryType>
     struct QueryHashBase {
@@ -223,6 +253,10 @@ namespace arena::sema {
 template <>
 struct std::hash<arena::sema::SourceContentsQuery>
     : arena::sema::QueryHashBase<arena::sema::SourceContentsQuery> {};
+
+template <>
+struct std::hash<arena::sema::LineEndingsQuery>
+    : arena::sema::QueryHashBase<arena::sema::LineEndingsQuery> {};
 
 template <>
 struct std::hash<arena::sema::ParseQuery> : arena::sema::QueryHashBase<arena::sema::ParseQuery> {};
@@ -270,5 +304,13 @@ struct std::hash<arena::sema::ResolvedCallsQuery>
 template <>
 struct std::hash<arena::sema::TypecheckedFileQuery>
     : arena::sema::QueryHashBase<arena::sema::TypecheckedFileQuery> {};
+
+template <>
+struct std::hash<arena::sema::ErrorsQuery>
+    : arena::sema::QueryHashBase<arena::sema::ErrorsQuery> {};
+
+template <>
+struct std::hash<arena::sema::RenderedErrorsQuery>
+    : arena::sema::QueryHashBase<arena::sema::RenderedErrorsQuery> {};
 
 #endif // ARENA_INCLUDE_QUERY_QUERIES_HPP

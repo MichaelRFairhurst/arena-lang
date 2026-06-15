@@ -9,31 +9,40 @@ void InferenceContext::constrain_context_type(VariableId id) {
 
     if (variable->explicit_type_id.has_value()) {
         constrain_context_type(variable->explicit_type_id.value(),
-                               error::Link{variable->declaration,
-                                           "variable '" + std::string(variable->name) + "'"});
+                               error::LocatedText{variable->declaration,
+                                                  "variable '" + std::string(variable->name) +
+                                                      "'"});
     } else if (variable->inferred_type_id.has_value()) {
         constrain_context_type(variable->inferred_type_id.value(),
-                               error::Link{variable->declaration,
-                                           "variable '" + std::string(variable->name) + "'"});
+                               error::LocatedText{variable->declaration,
+                                                  "variable '" + std::string(variable->name) +
+                                                      "'"});
     } else if (context_type.has_value()) {
         variable->inferred_type_id = *context_type;
     } else {
-        ops->get_errors().report(variable->declaration,
-                                 "Cannot infer type for variable '" + std::string(variable->name) +
-                                     "': no constraints on variable and context type is unknown");
+        ops->get_errors().E_T_CANT_INFER_V(variable->declaration, variable->name);
     }
 }
 
-void InferenceContext::constrain_context_type(TypeId id, error::Link why) {
+void InferenceContext::constrain_context_type(TypeId id, error::LocatedText why) {
     if (!context_type.has_value()) {
         context_type = id;
+        why_constraint = why;
         return;
     }
 
-    ops->require_assignable(*context_type,
-                            id,
-                            context_node,
-                            "Provided type does not match expected");
+    auto err = ops->require_assignable(*context_type, id, context_node, why.second);
+
+    if (err != nullptr) {
+        err->add_supplement(error::SupplementKind::Note,
+                            "expected type " + ops->get_type_name(*context_type) + " based on " +
+                                why_constraint.second,
+                            why_constraint.first);
+        err->add_supplement(error::SupplementKind::Note,
+                            "got conflicting type " + ops->get_type_name(id) + " for " +
+                                why.second,
+                            why.first);
+    }
 }
 
 void InferenceContext::constrain_dereferences(InferenceContext *other, const ast::Node *origin) {
@@ -49,19 +58,19 @@ void InferenceContext::constrain_dereferences(InferenceContext *other, const ast
     auto type = ops->get_type(*other_context_type);
     if (auto ptr = std::get_if<PointerType>(&type.get_program_type())) {
         auto pointee_id = ptr->pointee_type;
-        constrain_context_type(pointee_id, error::Link{origin, "dereferenced type"});
+        constrain_context_type(pointee_id, error::LocatedText{origin, "dereferenced type"});
         return;
     }
 
     auto error_type = ops->get_types().get_type_id(ErrorTypeSymbol{});
-    constrain_context_type(error_type, error::Link{origin, "dereferenced type"});
+    constrain_context_type(error_type, error::LocatedText{origin, "dereferenced type"});
     if (other_context_type == error_type) {
         return;
     }
 
-    ops->get_errors().report(origin,
-                             "Expected a dereferenceable type, but got '" +
-                                 ops->get_type_name(*other_context_type) + "'");
+    ops->get_errors().E_T_CANT_DEREF(origin,
+                                     {other->context_node,
+                                      ops->get_type_name(*other_context_type)});
 }
 
 void InferenceContext::constrain_points_to(InferenceContext *other,
@@ -78,7 +87,7 @@ void InferenceContext::constrain_points_to(InferenceContext *other,
 
     auto pointer_to_other =
         ops->get_types().get_type_id(PointerTypeSymbol{*other_context_type, lifetime});
-    auto link = error::Link{origin};
+    auto link = error::LocatedText{origin, "here"};
     constrain_context_type(pointer_to_other, link);
 }
 
@@ -87,7 +96,6 @@ TypeId InferenceContext::get_inferred_context_type() {
         return *context_type;
     }
 
-    ops->get_errors().report(context_node,
-                             "Could not infer type of expression: insufficient type information");
+    ops->get_errors().E_T_CANT_INFER_EX(context_node);
     return ops->get_types().get_type_id(ErrorTypeSymbol{});
 }
