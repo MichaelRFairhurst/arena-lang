@@ -1,0 +1,43 @@
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
+at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:6:9:9:2
+  :         v
+  : fun g() {
+  :  ... (2 more lines) ...
+  : }
+  : ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:6:9
+  :         v
+  : fun g() {
+  :  ... (2 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:6:9
+  :         v
+  : fun g() {
+  :  ... (2 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<stack> must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:29:41:29:50
+  :         let invalid_inner: int *arena = i_inner.&;
+  :                                         ^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:29:41
+  :         let invalid_inner: int *arena = i_inner.&;
+  :                                         ^^^^^^^^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:27:5
+  :     v
+  :     {
+  :  ... (2 more lines) ...
+  :     }
+  : ^^^^^ Outer block *<stack> outlives inner block *<stack> lifetime

@@ -1,0 +1,15 @@
+fun f() {
+    let i_stack: int;
+    let p = i_stack.&;
+
+    let bad: int *static = p;
+}
+
+fun g() {
+    let i_stack1: int;
+    let i_stack2: int;
+    let p_stack1 = i_stack1.&;
+    let p_stack2 = i_stack2.&;
+
+    p_stack1 = p_stack2;
+}

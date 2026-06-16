@@ -1,0 +1,101 @@
+fun identity_int(x: int *a) -> int *a;
+
+struct SomeStruct;
+
+fun identity_struct(x: SomeStruct *a) -> SomeStruct *a;
+
+fun use_int_identity_ok() {
+    let pstack: int *stack;
+    let parena: int *arena;
+    let pstatic: int *static;
+    let pfree: int *free;
+
+    let pstack = identity_int(pstack);
+    let pstack = identity_int(parena);
+    let pstack = identity_int(pstatic);
+
+    let parena = identity_int(parena);
+    let parena = identity_int(pstatic);
+
+    let pstack = identity_int(pstatic);
+
+    let pfree = identity_int(pstack);
+    let pfree = identity_int(parena);
+    let pfree = identity_int(pstatic);
+    let pfree = identity_int(pfree);
+}
+
+fun use_int_identity_bad1() {
+    let p1: int *stack;
+    let p2: int *arena;
+
+    p2 = identity_int(p1);
+}
+
+fun use_int_identity_bad2() {
+    let p1: int *stack;
+    let p2: int *static;
+
+    p2 = identity_int(p1);
+}
+
+fun use_int_identity_bad3() {
+    let p1: int *arena;
+    let p2: int *static;
+
+    p2 = identity_int(p1);
+}
+
+fun use_struct_identity_good() {
+    let pstack : SomeStruct *stack;
+    let parena : SomeStruct *arena;
+    let pstatic : SomeStruct *static;
+    let pfree : SomeStruct *;
+
+    pstack = identity_struct(pstack);
+    parena = identity_struct(parena);
+    pstatic = identity_struct(pstatic);
+    pfree = identity_struct(pfree);
+}
+
+fun use_struct_identity_bad1() {
+    let p1 : SomeStruct *stack;
+    let p2 : SomeStruct *arena;
+
+    p1 = identity_struct(p2);
+}
+
+fun use_struct_identity_bad2() {
+    let p1 : SomeStruct *arena;
+    let p2 : SomeStruct *stack;
+
+    p1 = identity_struct(p2);
+}
+
+fun use_struct_identity_bad3() {
+    let p1 : SomeStruct *stack;
+    let p2 : SomeStruct *static;
+
+    p1 = identity_struct(p2);
+}
+
+fun use_struct_identity_bad4() {
+    let p1 : SomeStruct *static;
+    let p2 : SomeStruct *stack;
+
+    p1 = identity_struct(p2);
+}
+
+fun use_struct_identity_bad5() {
+    let p1 : SomeStruct *arena;
+    let p2 : SomeStruct *static;
+
+    p1 = identity_struct(p2);
+}
+
+fun use_struct_identity_bad6() {
+    let p1 : SomeStruct *static;
+    let p2 : SomeStruct *arena;
+
+    p1 = identity_struct(p2);
+}

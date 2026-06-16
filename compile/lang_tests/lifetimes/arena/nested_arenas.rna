@@ -1,0 +1,29 @@
+fun f() {
+    let p_outer: int *arena;
+
+    arena {
+        let p_inner: int *arena;
+
+        p_outer = p_inner;
+    }
+}
+
+fun g() {
+    let p_outer: int *arena;
+
+    arena {
+        let p_inner: int *arena;
+
+        p_inner = p_outer;
+    }
+}
+
+fun h() {
+    let p_outer: int *arena;
+
+    {
+        let p_inner: int *arena;
+
+        p_outer = p_inner;
+    }
+}

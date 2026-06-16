@@ -1,0 +1,14 @@
+fun take_static(p: int *static);
+fun ret_static() -> int *static;
+
+fun call_funcs_ok() {
+    let p1: int *static = ret_static();
+
+    take_static(p1);
+}
+
+fun call_funcs_bad() {
+    let p1: int *stack;
+
+    take_static(p1);
+}

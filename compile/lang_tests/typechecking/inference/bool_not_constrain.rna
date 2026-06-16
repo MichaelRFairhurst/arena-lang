@@ -1,0 +1,5 @@
+fun f(i: int) {
+    let x = !x;
+
+    x + i;
+}

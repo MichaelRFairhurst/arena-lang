@@ -1,0 +1,14 @@
+fun f(x: int**, y: int**) {
+    x = y;
+}
+
+fun g(x: bool***, y: bool***) {
+    x = y;
+}
+
+struct SomeStruct;
+fun h() {
+    let x: SomeStruct *a *b *c *d;
+    let y: SomeStruct *e *f *g *h;
+    x = y;
+}

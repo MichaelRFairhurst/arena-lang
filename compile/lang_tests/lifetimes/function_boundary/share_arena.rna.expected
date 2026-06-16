@@ -1,0 +1,71 @@
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:14:23:17:2
+  :                       v
+  : fun call_funcs_bad2() {
+  :  ... (2 more lines) ...
+  : }
+  : ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:14:23
+  :                       v
+  : fun call_funcs_bad2() {
+  :  ... (2 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:14:23
+  :                       v
+  : fun call_funcs_bad2() {
+  :  ... (2 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<arena>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:28:5:30:6
+  :     vvvvvvv
+  :     arena {
+  :  ... (1 more lines) ...
+  :     }
+  : ^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:28:5
+  :     vvvvvvv
+  :     arena {
+  :  ... (1 more lines) ...
+  :     }
+  : ^^^^^ Outer *arena outlives nested *arena lifetime
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:28:5
+  :     vvvvvvv
+  :     arena {
+  :  ... (1 more lines) ...
+  :     }
+  : ^^^^^ Outer *arena outlives nested *arena lifetime
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<arena>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:46:5:48:6
+  :     vvvvvvv
+  :     arena {
+  :  ... (1 more lines) ...
+  :     }
+  : ^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:46:5
+  :     vvvvvvv
+  :     arena {
+  :  ... (1 more lines) ...
+  :     }
+  : ^^^^^ Outer *arena outlives nested *arena lifetime
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:47:27
+  :         take_arena_struct(p1);
+  :                           ^^ pointer assignment

@@ -1,0 +1,17 @@
+struct SomeStruct;
+
+fun get_int() -> int;
+fun get_bool() -> bool;
+fun get_struct() -> SomeStruct;
+fun get_intptr() -> int*;
+fun get_boolptr() -> bool*;
+fun get_structptr() -> SomeStruct*;
+
+fun f() {
+    let i: int = get_int();
+    let b: bool = get_bool();
+    let s: SomeStruct = get_struct();
+    let ip: int* = get_intptr();
+    let bp: bool* = get_boolptr();
+    let sp: SomeStruct* = get_structptr();
+}

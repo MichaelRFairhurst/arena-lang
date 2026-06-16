@@ -1,0 +1,17 @@
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<stack> must outlive *static, but found conflict
+at compile/lang_tests/lifetimes/free/long_chain.rna:18:27:18:29
+  :     let p5: int *static = p4;
+  :                           ^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/free/long_chain.rna:18:27
+  :     let p5: int *static = p4;
+  :                           ^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/free/long_chain.rna:11:9
+  :         v
+  : fun g() {
+  :  ... (7 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes

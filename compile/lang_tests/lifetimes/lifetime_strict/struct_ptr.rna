@@ -1,0 +1,12 @@
+struct SomeStruct;
+
+fun f(p1: SomeStruct *arena) {
+    let p2: SomeStruct *stack;
+
+    p2 = p1;
+}
+
+fun g(p1: SomeStruct *arena, p2: SomeStruct *arena) {
+    p2 = p1;
+    p1 = p2;
+}

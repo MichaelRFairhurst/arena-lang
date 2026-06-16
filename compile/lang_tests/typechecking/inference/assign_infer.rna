@@ -1,0 +1,5 @@
+fun f(i: int, b: bool) {
+    let x = (i = x);
+
+    x + b;
+}

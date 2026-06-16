@@ -1,0 +1,20 @@
+fun f1(x: int);
+fun f2(x: int, y: int);
+fun f3(x: int, y: int, z: int);
+fun f4(x: int, y: int, z: int, a: int);
+
+fun g(x: int) {
+    f1();
+
+    f2();
+    f2(x);
+
+    f3();
+    f3(x);
+    f3(x, x);
+
+    f4();
+    f4(x);
+    f4(x, x);
+    f4(x, x, x);
+}

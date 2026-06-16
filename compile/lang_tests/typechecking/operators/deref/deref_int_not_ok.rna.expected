@@ -1,0 +1,8 @@
+
+Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got int
+at compile/lang_tests/typechecking/operators/deref/deref_int_not_ok.rna:2:5:2:8
+  :     x.*;
+  :     ^^^ Pointer dereference with '.*'
+compile/lang_tests/typechecking/operators/deref/deref_int_not_ok.rna:2:5
+  :     x.*;
+  :     ^ expression has type int

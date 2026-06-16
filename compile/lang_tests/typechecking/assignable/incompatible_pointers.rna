@@ -1,0 +1,11 @@
+fun f(x: int*, y: char*) {
+    x = y;
+    y = x;
+}
+
+struct SomeStruct;
+
+fun f(x: SomeStruct*, y: bool*) {
+    x = y;
+    y = x;
+}

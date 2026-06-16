@@ -1,0 +1,27 @@
+fun f() {
+    let x = x;
+}
+
+fun g() {
+    let x = x.as(bool);
+}
+
+fun h() {
+    let x = x.&;
+}
+
+fun i() {
+    let x = x.*;
+}
+
+fun j() {
+    let x = x + x;
+}
+
+fun k() {
+    let x = (x = x);
+}
+
+fun l() {
+    let x;
+}

@@ -1,0 +1,27 @@
+fun isolated_bad() {
+    let outer: int *stack;
+    {
+        let inner: int *stack;
+
+        outer = inner;
+    }
+}
+
+fun isolated_ok() {
+    let outer: int *stack;
+    {
+        let inner: int *stack;
+
+        inner = outer;
+    }
+}
+
+fun mixed() {
+    let outer: int *stack;
+    {
+        let inner: int *stack;
+
+        outer = inner;
+        inner = outer;
+    }
+}

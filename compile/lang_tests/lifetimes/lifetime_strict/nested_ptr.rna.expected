@@ -1,0 +1,76 @@
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:6:9:6:10
+  :     x = y;
+  :         ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:6:9
+  :     x = y;
+  :         ^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:10:9:10:10
+  :     y = x;
+  :         ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:10:9
+  :     y = x;
+  :         ^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:14:9:14:10
+  :     x = y;
+  :         ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:14:9
+  :     x = y;
+  :         ^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:28:9:28:10
+  :     x = y;
+  :         ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:28:9
+  :     x = y;
+  :         ^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:32:9:32:10
+  :     y = x;
+  :         ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:32:9
+  :     y = x;
+  :         ^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:36:9:36:10
+  :     x = y;
+  :         ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:36:9
+  :     x = y;
+  :         ^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:40:9:40:10
+  :     y = x;
+  :         ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:40:9
+  :     y = x;
+  :         ^ pointer assignment

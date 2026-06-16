@@ -1,0 +1,218 @@
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *a must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:10:111:26
+  :     p2 = identity_int(p1);
+  :          ^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:10
+  :     p2 = identity_int(p1);
+  :          ^^^^^^^^^^^^^^^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:23
+  :     p2 = identity_int(p1);
+  :                       ^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *a must outlive *static, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:10:118:26
+  :     p2 = identity_int(p1);
+  :          ^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:10
+  :     p2 = identity_int(p1);
+  :          ^^^^^^^^^^^^^^^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:23
+  :     p2 = identity_int(p1);
+  :                       ^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *a must outlive *static, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:10:125:26
+  :     p2 = identity_int(p1);
+  :          ^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:10
+  :     p2 = identity_int(p1);
+  :          ^^^^^^^^^^^^^^^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:23
+  :     p2 = identity_int(p1);
+  :                       ^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:140:32:145:2
+  :                                v
+  : fun use_struct_identity_bad1() {
+  :  ... (4 more lines) ...
+  : }
+  : ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:140:32
+  :                                v
+  : fun use_struct_identity_bad1() {
+  :  ... (4 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:144:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:144:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:147:32:152:2
+  :                                v
+  : fun use_struct_identity_bad2() {
+  :  ... (4 more lines) ...
+  : }
+  : ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:147:32
+  :                                v
+  : fun use_struct_identity_bad2() {
+  :  ... (4 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:151:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:151:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:154:32:159:2
+  :                                v
+  : fun use_struct_identity_bad3() {
+  :  ... (4 more lines) ...
+  : }
+  : ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:154:32
+  :                                v
+  : fun use_struct_identity_bad3() {
+  :  ... (4 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:161:32:166:2
+  :                                v
+  : fun use_struct_identity_bad4() {
+  :  ... (4 more lines) ...
+  : }
+  : ^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:161:32
+  :                                v
+  : fun use_struct_identity_bad4() {
+  :  ... (4 more lines) ...
+  : }
+  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:26:172:28
+  :     p1 = identity_struct(p2);
+  :                          ^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:26:172:28
+  :     p1 = identity_struct(p2);
+  :                          ^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:10:179:29
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:10:179:29
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment

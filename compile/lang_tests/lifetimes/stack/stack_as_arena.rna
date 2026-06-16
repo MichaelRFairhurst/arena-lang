@@ -1,0 +1,5 @@
+fun f(p1: int *arena) {
+    let p2: int *stack;
+
+    p1 = p2;
+}

@@ -2,40 +2,63 @@
 #include <filesystem>
 #include <chrono>
 #include <thread>
+#include <vector>
 #include "query/engine.hpp"
 
 int main(int argc, char **argv) {
-    if (argc == 1) {
-        std::cerr << "Usage: " << argv[0] << " <source-file>\n";
-        return 1;
-    } else if (argc > 2) {
-        std::cerr << "Error: Only one file at a time is currently supported.\n";
-        return 1;
+    std::vector<std::filesystem::path> files;
+    bool keep_alive = false;
+    bool verbose = false;
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        if (arg == "--keep-alive") {
+            keep_alive = true;
+            continue;
+        }
+        if (arg == "--verbose") {
+            verbose = true;
+            continue;
+        }
+
+        std::filesystem::path file(argv[i]);
+        files.push_back(file);
     }
 
-    // create a filesystem path
-    std::filesystem::path file(argv[1]);
-
+    bool has_errors = false;
     arena::sema::QueryEngine engine;
-    while (true) {
-        const auto &ast = engine.execute(arena::sema::ParseQuery{file});
-        auto decl = ast.declarations.at(0);
-        std::cout << "Parsed AST:\n";
-        for (const auto &decl : ast.declarations) {
-            std::cout << decl->to_string() << "\n";
+    do {
+        for (const auto &file : files) {
+            if (verbose) {
+                const auto &ast = engine.execute(arena::sema::ParseQuery{file});
+                auto decl = ast.declarations.at(0);
+                std::cout << "Parsed AST:\n";
+                for (const auto &decl : ast.declarations) {
+                    std::cout << decl->to_string() << "\n";
+                }
+
+                arena::ast::Token *current = decl->begin();
+                std::cout << "Tokens: ";
+                while (current != nullptr) {
+                    std::cout << current->text;
+                    current = current->next;
+                }
+                std::cout << "\n";
+            }
+
+            const auto errors = engine.execute(arena::sema::RenderedErrorsQuery{file});
+
+            if (errors.empty()) {
+                std::cout << file << ": no errors. \n";
+            } else {
+                std::cout << errors << "\n";
+                has_errors = true;
+            }
         }
 
-        arena::ast::Token *current = decl->begin();
-        std::cout << "Tokens: ";
-        while (current != nullptr) {
-            std::cout << current->text;
-            current = current->next;
+        if (keep_alive) {
+            std::this_thread::sleep_for(std::chrono::seconds(5));
         }
-        std::cout << "\n";
+    } while (keep_alive);
 
-        const auto errors = engine.execute(arena::sema::RenderedErrorsQuery{file});
-        std::cout << errors << "\n";
-
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-    }
+    return has_errors ? 1 : 0;
 }

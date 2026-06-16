@@ -1,0 +1,7 @@
+struct Display;
+
+fun take_display(d: Display) -> int;
+
+fun f() {
+    let d = take_display(d.*);
+}

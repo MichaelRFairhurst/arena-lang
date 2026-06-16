@@ -1,0 +1,49 @@
+fun ret_arena() -> int *arena;
+fun take_arena(p: int *arena);
+
+fun call_funcs_ok() {
+    let p1: int *arena = ret_arena();
+
+    take_arena(p1);
+}
+
+fun call_funcs_bad1() {
+    let p1: int *static = ret_arena();
+}
+
+fun call_funcs_bad2() {
+    let i : int;
+    take_arena(i.&);
+}
+
+fun share_nested() {
+    arena {
+        let p1: int *arena = ret_arena();
+        take_arena(p1);
+    }
+}
+
+fun share_wrong_arena1() {
+    let p1: int *arena;
+    arena {
+        p1 = ret_arena();
+    }
+}
+
+fun share_wrong_arena2() {
+    let p1: int *arena;
+    arena {
+        take_arena(p1);
+    }
+}
+
+struct SomeStruct;
+
+fun take_arena_struct(p: SomeStruct *arena);
+
+fun share_wrong_arena3() {
+    let p1: SomeStruct *arena;
+    arena {
+        take_arena_struct(p1);
+    }
+}

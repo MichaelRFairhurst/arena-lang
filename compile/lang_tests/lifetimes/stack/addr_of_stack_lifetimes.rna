@@ -1,0 +1,31 @@
+fun f() {
+    let i_outer: int;
+    let p_outer: int *stack = i_outer.&;
+}
+
+fun g() {
+    let i_outer: int;
+    let invalid_outer: int *arena = i_outer.&;
+}
+
+fun h() {
+    {
+        let i_inner: int;
+        let p_inner: int *stack = i_inner.&;
+    }
+}
+
+fun i() {
+    let i_outer: int;
+
+    {
+        let p_inner: int *stack = i_outer.&;
+    }
+}
+
+fun j() {
+    {
+        let i_inner: int;
+        let invalid_inner: int *arena = i_inner.&;
+    }
+}

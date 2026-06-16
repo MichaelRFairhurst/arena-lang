@@ -1,0 +1,41 @@
+fun f(x: int *arena *arena, y: int *arena *arena) {
+    x = y;
+}
+
+fun g(x: int *static *arena, y: int *arena *arena) {
+    x = y;
+}
+
+fun h(x: int *static *arena, y: int *arena *arena) {
+    y = x;
+}
+
+fun i(x: int *arena *static, y: int *arena *arena) {
+    x = y;
+}
+
+fun j(x: int *arena *static, y: int *arena *arena) {
+    y = x;
+}
+
+struct SomeStruct;
+
+fun k(x: SomeStruct *arena *arena, y: SomeStruct *arena *arena) {
+    x = y;
+}
+
+fun l(x: SomeStruct *static *arena, y: SomeStruct *arena *arena) {
+    x = y;
+}
+
+fun m(x: SomeStruct *static *arena, y: SomeStruct *arena *arena) {
+    y = x;
+}
+
+fun n(x: SomeStruct *arena *static, y: SomeStruct *arena *arena) {
+    x = y;
+}
+
+fun n(x: SomeStruct *arena *static, y: SomeStruct *arena *arena) {
+    y = x;
+}

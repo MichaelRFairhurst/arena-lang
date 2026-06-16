@@ -1,0 +1,24 @@
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation: *<stack> must outlive *<stack>, but found conflict
+at compile/lang_tests/lifetimes/stack/stack_nesting.rna:3:5:7:6
+  :     v
+  :     {
+  :  ... (3 more lines) ...
+  :     }
+  : ^^^^^ Conflict root
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/stack/stack_nesting.rna:3:5
+  :     v
+  :     {
+  :  ... (3 more lines) ...
+  :     }
+  : ^^^^^ Outer block *<stack> outlives inner block *<stack> lifetime
+  .
+ ... caused by
+  -> compile/lang_tests/lifetimes/stack/stack_nesting.rna:3:5
+  :     v
+  :     {
+  :  ... (3 more lines) ...
+  :     }
+  : ^^^^^ Outer block *<stack> outlives inner block *<stack> lifetime

@@ -1,0 +1,59 @@
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f0', expected 0 but got 1
+at compile/lang_tests/typechecking/calls/call_toomany.rna:7:5:7:10
+  :     f0(x);
+  :     ^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f0', expected 0 but got 2
+at compile/lang_tests/typechecking/calls/call_toomany.rna:8:5:8:13
+  :     f0(x, x);
+  :     ^^^^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f0', expected 0 but got 3
+at compile/lang_tests/typechecking/calls/call_toomany.rna:9:5:9:16
+  :     f0(x, x, x);
+  :     ^^^^^^^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f0', expected 0 but got 4
+at compile/lang_tests/typechecking/calls/call_toomany.rna:10:5:10:19
+  :     f0(x, x, x, x);
+  :     ^^^^^^^^^^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f1', expected 1 but got 2
+at compile/lang_tests/typechecking/calls/call_toomany.rna:12:5:12:13
+  :     f1(x, x);
+  :     ^^^^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f1', expected 1 but got 3
+at compile/lang_tests/typechecking/calls/call_toomany.rna:13:5:13:16
+  :     f1(x, x, x);
+  :     ^^^^^^^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f1', expected 1 but got 4
+at compile/lang_tests/typechecking/calls/call_toomany.rna:14:5:14:19
+  :     f1(x, x, x, x);
+  :     ^^^^^^^^^^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f2', expected 2 but got 3
+at compile/lang_tests/typechecking/calls/call_toomany.rna:16:5:16:16
+  :     f2(x, x, x);
+  :     ^^^^^^^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f2', expected 2 but got 4
+at compile/lang_tests/typechecking/calls/call_toomany.rna:17:5:17:19
+  :     f2(x, x, x, x);
+  :     ^^^^^^^^^^^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'f3', expected 3 but got 4
+at compile/lang_tests/typechecking/calls/call_toomany.rna:19:5:19:19
+  :     f3(x, x, x, x);
+  :     ^^^^^^^^^^^^^^ In function call expression here

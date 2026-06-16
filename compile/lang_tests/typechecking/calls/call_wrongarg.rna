@@ -1,0 +1,56 @@
+struct SomeStruct;
+
+fun take_int(x: int);
+fun take_bool(x: bool);
+fun take_struct(x: SomeStruct);
+
+fun take_intptr(x: int*);
+fun take_boolptr(x: bool*);
+fun take_structptr(x: SomeStruct*);
+
+fun take_all(a: int, b: bool, c: SomeStruct, d: int*, e: bool*, f: SomeStruct*);
+
+fun f(i: int, b: bool, s: SomeStruct) {
+    take_int(b);
+    take_int(s);
+    take_int(i.&);
+    take_int(b.&);
+    take_int(s.&);
+
+    take_bool(i);
+    take_bool(s);
+    take_bool(i.&);
+    take_bool(b.&);
+    take_bool(s.&);
+
+    take_struct(i);
+    take_struct(b);
+    take_struct(i.&);
+    take_struct(b.&);
+    take_struct(s.&);
+    
+    take_intptr(i);
+    take_intptr(b);
+    take_intptr(s);
+    take_intptr(b.&);
+    take_intptr(s.&);
+
+    take_boolptr(b);
+    take_boolptr(i);
+    take_boolptr(s);
+    take_boolptr(i.&);
+    take_boolptr(s.&);
+
+    take_structptr(i);
+    take_structptr(b);
+    take_structptr(s);
+    take_structptr(i.&);
+    take_structptr(b.&);
+
+    take_all(b, b, s, i.&, b.&, s.&);
+    take_all(i, i, s, i.&, b.&, s.&);
+    take_all(i, b, b, i.&, b.&, s.&);
+    take_all(i, b, s, s, b.&, s.&);
+    take_all(i, b, s, i.&, i.&, s.&);
+    take_all(i, b, s, i.&, b.&, b.&);
+}

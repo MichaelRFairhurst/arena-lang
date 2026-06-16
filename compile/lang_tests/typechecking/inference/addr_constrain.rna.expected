@@ -1,0 +1,13 @@
+
+Error[E-T_ASGN_NOREL]: Expected int but got Display in variable 'd'
+at compile/lang_tests/typechecking/inference/addr_constrain.rna:6:13:6:34
+  :     let d = take_display_ptr(d.&);
+  :             ^^^^^^^^^^^^^^^^^^^^^ type mismatch
+  .
+ == Note: expected type int based on return type
+  :     let d = take_display_ptr(d.&);
+  :             ^^^^^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/inference/addr_constrain.rna:6:13
+  .
+ == Note: got conflicting type Display for variable 'd'
+  :     let d = take_display_ptr(d.&);
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/inference/addr_constrain.rna:6:5

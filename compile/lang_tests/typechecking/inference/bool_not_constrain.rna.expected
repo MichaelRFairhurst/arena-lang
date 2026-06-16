@@ -1,0 +1,11 @@
+
+Error[E-T_BIN_MIS]: Expected both binary operands to have matching types, but got bool and int
+at compile/lang_tests/typechecking/inference/bool_not_constrain.rna:4:5:4:10
+  :     x + i;
+  :     ^^^^^ In this binary expression
+compile/lang_tests/typechecking/inference/bool_not_constrain.rna:4:5
+  :     x + i;
+  :     ^ left operand type is bool
+compile/lang_tests/typechecking/inference/bool_not_constrain.rna:4:9
+  :     x + i;
+  :         ^ right operand type is int

@@ -1,0 +1,20 @@
+fun f(x: int*, y: int*) {
+    x = y;
+}
+
+fun g(x: char*, y: char*) {
+    x = y;
+}
+
+struct SomeStruct;
+
+fun h(x: SomeStruct*, y: SomeStruct*) {
+    x = y;
+}
+
+fun different_lifetimes_ok() {
+    let x: int *a;
+    let y: int *b;
+    x = y;
+    y = x;
+}

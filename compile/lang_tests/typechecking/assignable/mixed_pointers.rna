@@ -1,0 +1,20 @@
+fun f(x: int, y: int*) {
+    x = y;
+    y = x;
+}
+
+fun g(x: bool, y: bool*) {
+    x = y;
+    y = x;
+}
+
+fun h(x: int[1], y: int*) {
+    x = y;
+    y = x;
+}
+
+struct SomeStruct;
+fun i(x: SomeStruct, y: SomeStruct*) {
+    x = y;
+    y = x;
+}
