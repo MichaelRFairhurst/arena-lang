@@ -6,8 +6,7 @@ at compile/lang_tests/typechecking/inference/addr_constrain.rna:6:13:6:34
   .
  == Note: expected type int based on return type
   :     let d = take_display_ptr(d.&);
-  :             ^^^^^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/inference/addr_constrain.rna:6:13
-  .
+  :             ^^^^^^^^^^^^^^^^^^^^^  --- addr_constrain.rna:6:13
  == Note: got conflicting type Display for variable 'd'
   :     let d = take_display_ptr(d.&);
-  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/inference/addr_constrain.rna:6:5
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- addr_constrain.rna:6:5

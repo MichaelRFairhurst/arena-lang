@@ -6,14 +6,13 @@ at compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:2:9:2:10
   .
  == Note: expected type int*<free> based on lvalue in assignment here
   :     x = y;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:2:5
-  .
+  :     ^^^^^  --- incompatible_pointers.rna:2:5
  == Note: got conflicting type char*<free> for variable 'y'
   : fun f(x: int*, y: char*) {
-  :                ^^^^^^^  --- compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:1:16
+  :                ^^^^^^^  --- incompatible_pointers.rna:1:16
   .
  ... caused by
-  ->   : Pointee type of int*<free> must be compatible with pointee type of char*<free>
+  -> Pointee type of int*<free> must be compatible with pointee type of char*<free>
 
 
 Error[E-T_ASGN_NOREL]: Expected char but got int in variable 'x'
@@ -23,14 +22,13 @@ at compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:3:9:3:10
   .
  == Note: expected type char*<free> based on lvalue in assignment here
   :     y = x;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:3:5
-  .
+  :     ^^^^^  --- incompatible_pointers.rna:3:5
  == Note: got conflicting type int*<free> for variable 'x'
   : fun f(x: int*, y: char*) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:1:7
+  :       ^^^^^^  --- incompatible_pointers.rna:1:7
   .
  ... caused by
-  ->   : Pointee type of char*<free> must be compatible with pointee type of int*<free>
+  -> Pointee type of char*<free> must be compatible with pointee type of int*<free>
 
 
 Error[E-T_ASGN_NOREL]: Expected SomeStruct but got bool in variable 'y'
@@ -40,14 +38,13 @@ at compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:9:9:9:10
   .
  == Note: expected type SomeStruct*<free> based on lvalue in assignment here
   :     x = y;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:9:5
-  .
+  :     ^^^^^  --- incompatible_pointers.rna:9:5
  == Note: got conflicting type bool*<free> for variable 'y'
   : fun f(x: SomeStruct*, y: bool*) {
-  :                       ^^^^^^^  --- compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:8:23
+  :                       ^^^^^^^  --- incompatible_pointers.rna:8:23
   .
  ... caused by
-  ->   : Pointee type of SomeStruct*<free> must be compatible with pointee type of bool*<free>
+  -> Pointee type of SomeStruct*<free> must be compatible with pointee type of bool*<free>
 
 
 Error[E-T_ASGN_NOREL]: Expected bool but got SomeStruct in variable 'x'
@@ -57,11 +54,10 @@ at compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:10:9:10:
   .
  == Note: expected type bool*<free> based on lvalue in assignment here
   :     y = x;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:10:5
-  .
+  :     ^^^^^  --- incompatible_pointers.rna:10:5
  == Note: got conflicting type SomeStruct*<free> for variable 'x'
   : fun f(x: SomeStruct*, y: bool*) {
-  :       ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/assignable/incompatible_pointers.rna:8:7
+  :       ^^^^^^^^^^^^^  --- incompatible_pointers.rna:8:7
   .
  ... caused by
-  ->   : Pointee type of bool*<free> must be compatible with pointee type of SomeStruct*<free>
+  -> Pointee type of bool*<free> must be compatible with pointee type of SomeStruct*<free>

@@ -1,24 +1,22 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<arena>, but found conflict
-at compile/lang_tests/lifetimes/arena/nested_arenas.rna:4:5:8:6
-  :     vvvvvvv
-  :     arena {
-  :  ... (3 more lines) ...
-  :     }
-  : ^^^^^ Conflict root
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<arena>
+at compile/lang_tests/lifetimes/arena/nested_arenas.rna:7:19:7:26
+  :         p_outer = p_inner;
+  :                   ^^^^^^^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/arena/nested_arenas.rna:4:5
+  -> Outer *arena outlives nested *arena lifetime
+  :
+ == Note: Nested '*arena' defined here
   :     vvvvvvv
   :     arena {
   :  ... (3 more lines) ...
   :     }
-  : ^^^^^ Outer *arena outlives nested *arena lifetime
+  : ^^^^^  --- nested_arenas.rna:4:5
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/arena/nested_arenas.rna:4:5
-  :     vvvvvvv
-  :     arena {
-  :  ... (3 more lines) ...
-  :     }
-  : ^^^^^ Outer *arena outlives nested *arena lifetime
+  -> nested_arenas.rna:7:19
+  :         p_outer = p_inner;
+  :                   ^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.

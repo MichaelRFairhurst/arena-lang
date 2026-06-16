@@ -6,11 +6,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:14:14:14:15
   .
  == Note: expected type int based on argument 1
   :     take_int(b);
-  :     ^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:14:5
-  .
+  :     ^^^^^^^^^^^  --- call_wrongarg.rna:14:5
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_ASGN_NOREL]: Expected int but got SomeStruct in variable 's'
@@ -20,18 +19,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:15:14:15:15
   .
  == Note: expected type int based on argument 1
   :     take_int(s);
-  :     ^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:15:5
-  .
+  :     ^^^^^^^^^^^  --- call_wrongarg.rna:15:5
  == Note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :                        ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:24
+  :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got int
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:16:14:16:17
   :     take_int(i.&);
   :              ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:16:14
+call_wrongarg.rna:16:14
   :     take_int(i.&);
   :              ^^^ expression has type int
 
@@ -43,18 +41,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:16:14:16:17
   .
  == Note: expected type int based on argument 1
   :     take_int(i.&);
-  :     ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:16:5
-  .
+  :     ^^^^^^^^^^^^^  --- call_wrongarg.rna:16:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_int(i.&);
-  :              ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:16:14
+  :              ^^^  --- call_wrongarg.rna:16:14
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got int
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:17:14:17:17
   :     take_int(b.&);
   :              ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:17:14
+call_wrongarg.rna:17:14
   :     take_int(b.&);
   :              ^^^ expression has type int
 
@@ -66,18 +63,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:17:14:17:17
   .
  == Note: expected type int based on argument 1
   :     take_int(b.&);
-  :     ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:17:5
-  .
+  :     ^^^^^^^^^^^^^  --- call_wrongarg.rna:17:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_int(b.&);
-  :              ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:17:14
+  :              ^^^  --- call_wrongarg.rna:17:14
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got int
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:18:14:18:17
   :     take_int(s.&);
   :              ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:18:14
+call_wrongarg.rna:18:14
   :     take_int(s.&);
   :              ^^^ expression has type int
 
@@ -89,11 +85,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:18:14:18:17
   .
  == Note: expected type int based on argument 1
   :     take_int(s.&);
-  :     ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:18:5
-  .
+  :     ^^^^^^^^^^^^^  --- call_wrongarg.rna:18:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_int(s.&);
-  :              ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:18:14
+  :              ^^^  --- call_wrongarg.rna:18:14
 
 
 Error[E-T_ASGN_NOREL]: Expected bool but got int in variable 'i'
@@ -103,11 +98,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:20:15:20:16
   .
  == Note: expected type bool based on argument 1
   :     take_bool(i);
-  :     ^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:20:5
-  .
+  :     ^^^^^^^^^^^^  --- call_wrongarg.rna:20:5
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_ASGN_NOREL]: Expected bool but got SomeStruct in variable 's'
@@ -117,18 +111,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:21:15:21:16
   .
  == Note: expected type bool based on argument 1
   :     take_bool(s);
-  :     ^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:21:5
-  .
+  :     ^^^^^^^^^^^^  --- call_wrongarg.rna:21:5
  == Note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :                        ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:24
+  :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got bool
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:22:15:22:18
   :     take_bool(i.&);
   :               ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:22:15
+call_wrongarg.rna:22:15
   :     take_bool(i.&);
   :               ^^^ expression has type bool
 
@@ -140,18 +133,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:22:15:22:18
   .
  == Note: expected type bool based on argument 1
   :     take_bool(i.&);
-  :     ^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:22:5
-  .
+  :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:22:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_bool(i.&);
-  :               ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:22:15
+  :               ^^^  --- call_wrongarg.rna:22:15
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got bool
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:23:15:23:18
   :     take_bool(b.&);
   :               ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:23:15
+call_wrongarg.rna:23:15
   :     take_bool(b.&);
   :               ^^^ expression has type bool
 
@@ -163,18 +155,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:23:15:23:18
   .
  == Note: expected type bool based on argument 1
   :     take_bool(b.&);
-  :     ^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:23:5
-  .
+  :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:23:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_bool(b.&);
-  :               ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:23:15
+  :               ^^^  --- call_wrongarg.rna:23:15
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got bool
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:24:15:24:18
   :     take_bool(s.&);
   :               ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:24:15
+call_wrongarg.rna:24:15
   :     take_bool(s.&);
   :               ^^^ expression has type bool
 
@@ -186,11 +177,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:24:15:24:18
   .
  == Note: expected type bool based on argument 1
   :     take_bool(s.&);
-  :     ^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:24:5
-  .
+  :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:24:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_bool(s.&);
-  :               ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:24:15
+  :               ^^^  --- call_wrongarg.rna:24:15
 
 
 Error[E-T_ASGN_NOREL]: Expected SomeStruct but got int in variable 'i'
@@ -200,11 +190,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:26:17:26:18
   .
  == Note: expected type SomeStruct based on argument 1
   :     take_struct(i);
-  :     ^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:26:5
-  .
+  :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:26:5
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_ASGN_NOREL]: Expected SomeStruct but got bool in variable 'b'
@@ -214,18 +203,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:27:17:27:18
   .
  == Note: expected type SomeStruct based on argument 1
   :     take_struct(b);
-  :     ^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:27:5
-  .
+  :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:27:5
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got SomeStruct
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:28:17:28:20
   :     take_struct(i.&);
   :                 ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:28:17
+call_wrongarg.rna:28:17
   :     take_struct(i.&);
   :                 ^^^ expression has type SomeStruct
 
@@ -237,18 +225,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:28:17:28:20
   .
  == Note: expected type SomeStruct based on argument 1
   :     take_struct(i.&);
-  :     ^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:28:5
-  .
+  :     ^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:28:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_struct(i.&);
-  :                 ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:28:17
+  :                 ^^^  --- call_wrongarg.rna:28:17
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got SomeStruct
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:29:17:29:20
   :     take_struct(b.&);
   :                 ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:29:17
+call_wrongarg.rna:29:17
   :     take_struct(b.&);
   :                 ^^^ expression has type SomeStruct
 
@@ -260,18 +247,17 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:29:17:29:20
   .
  == Note: expected type SomeStruct based on argument 1
   :     take_struct(b.&);
-  :     ^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:29:5
-  .
+  :     ^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:29:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_struct(b.&);
-  :                 ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:29:17
+  :                 ^^^  --- call_wrongarg.rna:29:17
 
 
 Error[E-T_CANT_DEREF]: Expected a dereferenceable type, but got SomeStruct
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:30:17:30:20
   :     take_struct(s.&);
   :                 ^^^ Pointer dereference with '.*'
-compile/lang_tests/typechecking/calls/call_wrongarg.rna:30:17
+call_wrongarg.rna:30:17
   :     take_struct(s.&);
   :                 ^^^ expression has type SomeStruct
 
@@ -283,11 +269,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:30:17:30:20
   .
  == Note: expected type SomeStruct based on argument 1
   :     take_struct(s.&);
-  :     ^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:30:5
-  .
+  :     ^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:30:5
  == Note: got conflicting type <error>*<stack> for here
   :     take_struct(s.&);
-  :                 ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:30:17
+  :                 ^^^  --- call_wrongarg.rna:30:17
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int in variable 'i'
@@ -297,11 +282,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:32:17:32:18
   .
  == Note: expected type int*<free> based on argument 1
   :     take_intptr(i);
-  :     ^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:32:5
-  .
+  :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:32:5
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got bool in variable 'b'
@@ -311,11 +295,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:33:17:33:18
   .
  == Note: expected type int*<free> based on argument 1
   :     take_intptr(b);
-  :     ^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:33:5
-  .
+  :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:33:5
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got SomeStruct in variable 's'
@@ -325,11 +308,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:34:17:34:18
   .
  == Note: expected type int*<free> based on argument 1
   :     take_intptr(s);
-  :     ^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:34:5
-  .
+  :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:34:5
  == Note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :                        ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:24
+  :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
 
 Error[E-T_ASGN_NOREL]: Expected int but got bool in variable 'b'
@@ -339,11 +321,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:35:17:35:18
   .
  == Note: expected type int based on dereferenced type
   :     take_intptr(b.&);
-  :                 ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:35:17
-  .
+  :                 ^^^  --- call_wrongarg.rna:35:17
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_ASGN_NOREL]: Expected int but got SomeStruct in variable 's'
@@ -353,11 +334,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:36:17:36:18
   .
  == Note: expected type int based on dereferenced type
   :     take_intptr(s.&);
-  :                 ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:36:17
-  .
+  :                 ^^^  --- call_wrongarg.rna:36:17
  == Note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :                        ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:24
+  :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got bool in variable 'b'
@@ -367,11 +347,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:38:18:38:19
   .
  == Note: expected type bool*<free> based on argument 1
   :     take_boolptr(b);
-  :     ^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:38:5
-  .
+  :     ^^^^^^^^^^^^^^^  --- call_wrongarg.rna:38:5
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int in variable 'i'
@@ -381,11 +360,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:39:18:39:19
   .
  == Note: expected type bool*<free> based on argument 1
   :     take_boolptr(i);
-  :     ^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:39:5
-  .
+  :     ^^^^^^^^^^^^^^^  --- call_wrongarg.rna:39:5
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got SomeStruct in variable 's'
@@ -395,11 +373,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:40:18:40:19
   .
  == Note: expected type bool*<free> based on argument 1
   :     take_boolptr(s);
-  :     ^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:40:5
-  .
+  :     ^^^^^^^^^^^^^^^  --- call_wrongarg.rna:40:5
  == Note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :                        ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:24
+  :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
 
 Error[E-T_ASGN_NOREL]: Expected bool but got int in variable 'i'
@@ -409,11 +386,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:41:18:41:19
   .
  == Note: expected type bool based on dereferenced type
   :     take_boolptr(i.&);
-  :                  ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:41:18
-  .
+  :                  ^^^  --- call_wrongarg.rna:41:18
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_ASGN_NOREL]: Expected bool but got SomeStruct in variable 's'
@@ -423,11 +399,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:42:18:42:19
   .
  == Note: expected type bool based on dereferenced type
   :     take_boolptr(s.&);
-  :                  ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:42:18
-  .
+  :                  ^^^  --- call_wrongarg.rna:42:18
  == Note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :                        ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:24
+  :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int in variable 'i'
@@ -437,11 +412,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:44:20:44:21
   .
  == Note: expected type SomeStruct*<free> based on argument 1
   :     take_structptr(i);
-  :     ^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:44:5
-  .
+  :     ^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:44:5
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got bool in variable 'b'
@@ -451,11 +425,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:45:20:45:21
   .
  == Note: expected type SomeStruct*<free> based on argument 1
   :     take_structptr(b);
-  :     ^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:45:5
-  .
+  :     ^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:45:5
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got SomeStruct in variable 's'
@@ -465,11 +438,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:46:20:46:21
   .
  == Note: expected type SomeStruct*<free> based on argument 1
   :     take_structptr(s);
-  :     ^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:46:5
-  .
+  :     ^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:46:5
  == Note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :                        ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:24
+  :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
 
 Error[E-T_ASGN_NOREL]: Expected SomeStruct but got int in variable 'i'
@@ -479,11 +451,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:47:20:47:21
   .
  == Note: expected type SomeStruct based on dereferenced type
   :     take_structptr(i.&);
-  :                    ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:47:20
-  .
+  :                    ^^^  --- call_wrongarg.rna:47:20
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_ASGN_NOREL]: Expected SomeStruct but got bool in variable 'b'
@@ -493,11 +464,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:48:20:48:21
   .
  == Note: expected type SomeStruct based on dereferenced type
   :     take_structptr(b.&);
-  :                    ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:48:20
-  .
+  :                    ^^^  --- call_wrongarg.rna:48:20
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_ASGN_NOREL]: Expected int but got bool in variable 'b'
@@ -507,11 +477,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:50:14:50:15
   .
  == Note: expected type int based on argument 1
   :     take_all(b, b, s, i.&, b.&, s.&);
-  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:50:5
-  .
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:50:5
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_ASGN_NOREL]: Expected bool but got int in variable 'i'
@@ -521,11 +490,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:51:17:51:18
   .
  == Note: expected type bool based on argument 2
   :     take_all(i, i, s, i.&, b.&, s.&);
-  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:51:5
-  .
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:51:5
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_ASGN_NOREL]: Expected SomeStruct but got bool in variable 'b'
@@ -535,11 +503,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:52:20:52:21
   .
  == Note: expected type SomeStruct based on argument 3
   :     take_all(i, b, b, i.&, b.&, s.&);
-  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:52:5
-  .
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:52:5
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got SomeStruct in variable 's'
@@ -549,11 +516,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:53:23:53:24
   .
  == Note: expected type int*<free> based on argument 4
   :     take_all(i, b, s, s, b.&, s.&);
-  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:53:5
-  .
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:53:5
  == Note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :                        ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:24
+  :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
 
 Error[E-T_ASGN_NOREL]: Expected bool but got int in variable 'i'
@@ -563,11 +529,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:54:28:54:29
   .
  == Note: expected type bool based on dereferenced type
   :     take_all(i, b, s, i.&, i.&, s.&);
-  :                            ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:54:28
-  .
+  :                            ^^^  --- call_wrongarg.rna:54:28
  == Note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:7
+  :       ^^^^^^  --- call_wrongarg.rna:13:7
 
 
 Error[E-T_ASGN_NOREL]: Expected SomeStruct but got bool in variable 'b'
@@ -577,8 +542,7 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:55:33:55:34
   .
  == Note: expected type SomeStruct based on dereferenced type
   :     take_all(i, b, s, i.&, b.&, b.&);
-  :                                 ^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:55:33
-  .
+  :                                 ^^^  --- call_wrongarg.rna:55:33
  == Note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
-  :               ^^^^^^^  --- compile/lang_tests/typechecking/calls/call_wrongarg.rna:13:15
+  :               ^^^^^^^  --- call_wrongarg.rna:13:15

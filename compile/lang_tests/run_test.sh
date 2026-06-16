@@ -3,7 +3,6 @@ TEST_FILE=$1
 EXPECTED_FILE=$1.expected
 COMPILER=$2
 
-pwd
 EXPECTED=$(cat "$EXPECTED_FILE")
 ACTUAL=$($COMPILER "$TEST_FILE" 2>&1)
 DIFF=$(echo "$ACTUAL" | diff -u "$EXPECTED_FILE" -)

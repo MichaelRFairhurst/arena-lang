@@ -89,12 +89,21 @@ namespace arena::error {
         SupplementKind kind;
         std::string message;
         std::optional<Location> location;
+
+        bool operator==(const Supplement &other) const {
+            return kind == other.kind && message == other.message && location == other.location;
+        }
     };
 
     struct Cause {
         std::string description;
         std::optional<Location> location;
         std::vector<Supplement> supplements;
+
+        bool operator==(const Cause &other) const {
+            return description == other.description && location == other.location &&
+                   supplements == other.supplements;
+        }
     };
 
     using LocatedText = std::pair<Location, std::string>;
@@ -141,7 +150,9 @@ namespace arena::error {
             causes.push_back({description, location, supplements});
         }
 
-        void add_supplement(SupplementKind kind, std::string message, std::optional<Location> location = std::nullopt) {
+        void add_supplement(SupplementKind kind,
+                            std::string message,
+                            std::optional<Location> location = std::nullopt) {
             supplements.push_back({kind, message, location});
         }
 
@@ -167,9 +178,9 @@ namespace arena::error {
         // Parse errors
         Error &E_P_UNEXP(Location l, std::string_view expected, std::string_view actual) {
             return report({"E-P_UNEXP",
-                    l,
-                    "Unexpected token",
-                    std::vector<Chunk>{"Expected ", expected, " but found ", actual}});
+                           l,
+                           "Unexpected token",
+                           std::vector<Chunk>{"Expected ", expected, " but found ", actual}});
         }
 
         // static constexpr ErrorCode E_P_MIS_RET = {"E-P_MIS_RET", "Expected a return type in
@@ -235,15 +246,16 @@ namespace arena::error {
             });
         }
 
-        Error &E_T_ASGN_NOREL(Location l, std::string message, std::string expected, std::string actual_type) {
+        Error &E_T_ASGN_NOREL(Location l,
+                              std::string message,
+                              std::string expected,
+                              std::string actual_type) {
             return report({
                 "E-T_ASGN_NOREL",
                 l,
                 "type mismatch",
-                std::vector<Chunk>{"Expected ", expected, " but got ",
-                                   actual_type,
-                                   " in ",
-                                   message},
+                std::vector<
+                    Chunk>{"Expected ", expected, " but got ", actual_type, " in ", message},
             });
         }
 
@@ -367,18 +379,20 @@ namespace arena::error {
             });
         }
 
-        Error &E_L_OUTLV_VIOL(Location l, std::string ltshort, std::string ltlong, std::vector<Cause> causes) {
+        Error &E_L_OUTLV_VIOL(Location l,
+                              std::string ltshort,
+                              std::string ltlong,
+                              std::vector<Cause> causes) {
 
             auto &err = report({
                 "E-L_OUTLV_VIOL",
                 l,
                 "Conflict root",
                 std::vector<Chunk>{
-                    "Lifetime violation: *",
+                    "Lifetime violation between *",
                     ltshort,
-                    " must outlive *",
+                    " and *",
                     ltlong,
-                    ", but found conflict",
                 },
             });
 
@@ -393,9 +407,9 @@ namespace arena::error {
                 "E-R_VAR_AMBG",
                 l,
                 "For this identifier expression",
-                std::vector<Chunk>{
-                    "Identifier ", id, " is ambiguous as it could refer to a function or a variable"
-                },
+                std::vector<Chunk>{"Identifier ",
+                                   id,
+                                   " is ambiguous as it could refer to a function or a variable"},
             });
         }
 
@@ -405,7 +419,8 @@ namespace arena::error {
                 l,
                 "For this identifier expression",
                 std::vector<Chunk>{
-                    "Unresolved identifier ", id,
+                    "Unresolved identifier ",
+                    id,
                 },
             });
         }

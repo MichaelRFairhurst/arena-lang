@@ -1,24 +1,45 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<stack> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/stack/stack_nesting.rna:3:5:7:6
-  :     v
-  :     {
-  :  ... (3 more lines) ...
-  :     }
-  : ^^^^^ Conflict root
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<stack> and *<stack>
+at compile/lang_tests/lifetimes/stack/stack_nesting.rna:6:17:6:22
+  :         outer = inner;
+  :                 ^^^^^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/stack/stack_nesting.rna:3:5
+  -> Outer block *<stack> outlives inner block *<stack> lifetime
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
   :     v
   :     {
   :  ... (3 more lines) ...
   :     }
-  : ^^^^^ Outer block *<stack> outlives inner block *<stack> lifetime
+  : ^^^^^  --- stack_nesting.rna:3:5
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/stack/stack_nesting.rna:3:5
+  -> stack_nesting.rna:6:17
+  :         outer = inner;
+  :                 ^^^^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<stack> and *<stack>
+at compile/lang_tests/lifetimes/stack/stack_nesting.rna:24:17:24:22
+  :         outer = inner;
+  :                 ^^^^^ Conflict root
+  .
+ ... caused by
+  -> Outer block *<stack> outlives inner block *<stack> lifetime
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
   :     v
   :     {
-  :  ... (3 more lines) ...
+  :  ... (4 more lines) ...
   :     }
-  : ^^^^^ Outer block *<stack> outlives inner block *<stack> lifetime
+  : ^^^^^  --- stack_nesting.rna:21:5
+  .
+ ... caused by
+  -> stack_nesting.rna:24:17
+  :         outer = inner;
+  :                 ^^^^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.

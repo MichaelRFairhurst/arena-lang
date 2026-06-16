@@ -1,1 +1,17 @@
-"compile/lang_tests/lifetimes/arena/arena_vs_static.rna" should have errors!
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/arena/arena_vs_static.rna:2:27:2:29
+  :     let p2: int *static = p1;
+  :                           ^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> arena_vs_static.rna:2:27
+  :     let p2: int *static = p1;
+  :                           ^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.

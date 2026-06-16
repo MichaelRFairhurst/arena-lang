@@ -3,6 +3,6 @@ Error[E-R_UNKN_FUNC]: Unknown target function in call expression
 at compile/lang_tests/typechecking/calls/call_unknown.rna:2:5:2:19
   :     doesnt_exist();
   :     ^^^^^^^^^^^^^^ In function call expression here
-compile/lang_tests/typechecking/calls/call_unknown.rna:2:5
+call_unknown.rna:2:5
   :     doesnt_exist();
   :     ^^^^^^^^^^^^ target of call here

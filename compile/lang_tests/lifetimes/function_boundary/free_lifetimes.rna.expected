@@ -1,218 +1,398 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *a must outlive *<outer arena>, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *a and *<outer arena>
 at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:10:111:26
   :     p2 = identity_int(p1);
   :          ^^^^^^^^^^^^^^^^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:10
-  :     p2 = identity_int(p1);
-  :          ^^^^^^^^^^^^^^^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:23
-  :     p2 = identity_int(p1);
-  :                       ^^ pointer assignment
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *a must outlive *static, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *a and *static
 at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:10:118:26
   :     p2 = identity_int(p1);
   :          ^^^^^^^^^^^^^^^^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:10
-  :     p2 = identity_int(p1);
-  :          ^^^^^^^^^^^^^^^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:23
-  :     p2 = identity_int(p1);
-  :                       ^^ pointer assignment
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *a must outlive *static, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *a and *static
 at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:10:125:26
   :     p2 = identity_int(p1);
   :          ^^^^^^^^^^^^^^^^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:10
-  :     p2 = identity_int(p1);
-  :          ^^^^^^^^^^^^^^^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:23
-  :     p2 = identity_int(p1);
-  :                       ^^ pointer assignment
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:140:32:145:2
-  :                                v
-  : fun use_struct_identity_bad1() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:140:32
-  :                                v
-  : fun use_struct_identity_bad1() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:144:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:144:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:147:32:152:2
-  :                                v
-  : fun use_struct_identity_bad2() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:147:32
-  :                                v
-  : fun use_struct_identity_bad2() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:151:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:151:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:154:32:159:2
-  :                                v
-  : fun use_struct_identity_bad3() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:154:32
-  :                                v
-  : fun use_struct_identity_bad3() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:161:32:166:2
-  :                                v
-  : fun use_struct_identity_bad4() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:161:32
-  :                                v
-  : fun use_struct_identity_bad4() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:26:172:28
-  :     p1 = identity_struct(p2);
-  :                          ^^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:26:172:28
-  :     p1 = identity_struct(p2);
-  :                          ^^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:10:179:29
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:144:10:144:29
   :     p1 = identity_struct(p2);
   :          ^^^^^^^^^^^^^^^^^^^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
+  :                                v
+  : fun use_struct_identity_bad1() {
+  :  ... (4 more lines) ...
+  : }
+  : ^  --- free_lifetimes.rna:140:32
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:26
+  -> free_lifetimes.rna:144:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:144:26
   :     p1 = identity_struct(p2);
   :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:10:179:29
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:151:26:151:28
+  :     p1 = identity_struct(p2);
+  :                          ^^ Conflict root
+  .
+ ... caused by
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
+  :                                v
+  : fun use_struct_identity_bad2() {
+  :  ... (4 more lines) ...
+  : }
+  : ^  --- free_lifetimes.rna:147:32
+  .
+ ... caused by
+  -> free_lifetimes.rna:151:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:151:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:10:158:29
   :     p1 = identity_struct(p2);
   :          ^^^^^^^^^^^^^^^^^^^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:26
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
+  :                                v
+  : fun use_struct_identity_bad3() {
+  :  ... (4 more lines) ...
+  : }
+  : ^  --- free_lifetimes.rna:154:32
+  .
+ ... caused by
+  -> free_lifetimes.rna:158:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:158:26
   :     p1 = identity_struct(p2);
   :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:10:158:29
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
+  :                                v
+  : fun use_struct_identity_bad3() {
+  :  ... (4 more lines) ...
+  : }
+  : ^  --- free_lifetimes.rna:154:32
+  .
+ ... caused by
+  -> free_lifetimes.rna:158:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:158:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:10:158:29
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
+  :                                v
+  : fun use_struct_identity_bad3() {
+  :  ... (4 more lines) ...
+  : }
+  : ^  --- free_lifetimes.rna:154:32
+  .
+ ... caused by
+  -> free_lifetimes.rna:158:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:158:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:26:165:28
+  :     p1 = identity_struct(p2);
+  :                          ^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
+  :                                v
+  : fun use_struct_identity_bad4() {
+  :  ... (4 more lines) ...
+  : }
+  : ^  --- free_lifetimes.rna:161:32
+  .
+ ... caused by
+  -> free_lifetimes.rna:165:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:165:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:26:165:28
+  :     p1 = identity_struct(p2);
+  :                          ^^ Conflict root
+  .
+ ... caused by
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
+  :                                v
+  : fun use_struct_identity_bad4() {
+  :  ... (4 more lines) ...
+  : }
+  : ^  --- free_lifetimes.rna:161:32
+  .
+ ... caused by
+  -> free_lifetimes.rna:165:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:26:165:28
+  :     p1 = identity_struct(p2);
+  :                          ^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
+  :                                v
+  : fun use_struct_identity_bad4() {
+  :  ... (4 more lines) ...
+  : }
+  : ^  --- free_lifetimes.rna:161:32
+  .
+ ... caused by
+  -> free_lifetimes.rna:165:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:165:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10:172:29
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> free_lifetimes.rna:172:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:172:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10:172:29
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> free_lifetimes.rna:172:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:172:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:26:179:28
+  :     p1 = identity_struct(p2);
+  :                          ^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> free_lifetimes.rna:179:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:179:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:26:179:28
+  :     p1 = identity_struct(p2);
+  :                          ^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> free_lifetimes.rna:179:26
+  :     p1 = identity_struct(p2);
+  :                          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+  .
+ ... caused by
+  -> free_lifetimes.rna:179:10
+  :     p1 = identity_struct(p2);
+  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.

@@ -31,8 +31,8 @@ namespace {
             return std::distance(contents_addr_start, token_addr_end);
         }
 
-        std::string location_string(const Source &source, const Cursor &cursor) const {
-            return source.path.string() + ":" + std::to_string(cursor.line + 1) + ":" +
+        std::string short_location_string(const Source &source, const Cursor &cursor) const {
+            return source.path.filename().string() + ":" + std::to_string(cursor.line + 1) + ":" +
                    std::to_string(cursor.column + 1);
         }
 
@@ -105,15 +105,27 @@ namespace {
         }
 
         std::string show_cause(const Source &source, const error::Cause &cause) const {
-            if (!cause.location.has_value()) {
-                return "  : " + std::string(cause.description) + "\n";
-            }
-            auto begin = start_offset_of(source, cause.location->begin);
-            auto end = end_offset_of(source, cause.location->end);
+            std::string result = " ... caused by\n";
 
-            auto range = source.line_endings.offset_length_to_range(begin, end - begin);
-            std::string prefix = location_string(source, range.start) + "\n";
-            return prefix + show_range(source, range, std::string(cause.description));
+            if (cause.location.has_value()) {
+                auto begin = start_offset_of(source, cause.location->begin);
+                auto end = end_offset_of(source, cause.location->end);
+
+                auto range = source.line_endings.offset_length_to_range(begin, end - begin);
+                result += "  -> " + short_location_string(source, range.start) + "\n";
+                result += show_range(source, range, std::string(cause.description));
+            } else {
+                result += "  -> " + std::string(cause.description) + "\n";
+            }
+
+            if (!cause.supplements.empty()) {
+                result += "  :\n";
+                for (const auto &supplement : cause.supplements) {
+                    result += supplement_message(source, supplement);
+                }
+            }
+
+            return result;
         }
 
         std::string show_link(const Source &source, const error::Link &link) const {
@@ -121,7 +133,7 @@ namespace {
             auto end = end_offset_of(source, link.location.end);
 
             auto range = source.line_endings.offset_length_to_range(begin, end - begin);
-            std::string prefix = location_string(source, range.start) + "\n";
+            std::string prefix = short_location_string(source, range.start) + "\n";
             return prefix + show_range(source, range, std::string(link.label_text));
         }
 
@@ -143,25 +155,26 @@ namespace {
             return result;
         }
 
-        std::string supplement_message(const Source &source, const error::Supplement &supplement) const {
-            std::string result = "  .\n";
+        std::string supplement_message(const Source &source,
+                                       const error::Supplement &supplement) const {
+            std::string result;
             switch (supplement.kind) {
             case error::SupplementKind::Note:
-                result += " == Note: ";
+                result = " == Note: ";
                 break;
             case error::SupplementKind::Help:
-                result += " == Help: ";
+                result = " == Help: ";
                 break;
             }
-            result += supplement.message;
+            result += supplement.message + "\n";
 
             if (supplement.location.has_value()) {
                 auto begin = start_offset_of(source, supplement.location->begin);
                 auto end = end_offset_of(source, supplement.location->end);
 
                 auto range = source.line_endings.offset_length_to_range(begin, end - begin);
-                std::string location = location_string(source, range.start);
-                result += "\n" + show_range(source, range, " --- " + location);
+                std::string location = short_location_string(source, range.start);
+                result += show_range(source, range, " --- " + location);
             }
             return result;
         }
@@ -196,14 +209,16 @@ std::string CliRenderer::render(std::filesystem::path path,
             }
         }
 
-        for (const auto &supplement : error.get_supplements()) {
-            rendered_error += impl.supplement_message(source, supplement);
+        if (!error.get_supplements().empty()) {
+            rendered_error += "  .\n";
+            for (const auto &supplement : error.get_supplements()) {
+                rendered_error += impl.supplement_message(source, supplement);
+            }
         }
 
         for (const auto &cause : error.get_causes()) {
             rendered_error += "  .\n";
-            rendered_error += " ... caused by\n";
-            rendered_error += "  -> " + impl.show_cause(source, cause);
+            rendered_error += impl.show_cause(source, cause);
         }
 
         result += rendered_error + "\n";

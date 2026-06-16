@@ -1,43 +1,6 @@
+No path found between <outer arena> and <stack>, cannot report error without location
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/free/assigned_stack.rna:1:9:6:2
-  :         v
-  : fun f() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/free/assigned_stack.rna:1:9
-  :         v
-  : fun f() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/free/assigned_stack.rna:1:9
-  :         v
-  : fun f() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<stack> must outlive *static, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<stack> and *static
 at compile/lang_tests/lifetimes/free/assigned_stack.rna:5:28:5:29
   :     let bad: int *static = p;
   :                            ^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/free/assigned_stack.rna:5:28
-  :     let bad: int *static = p;
-  :                            ^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/free/assigned_stack.rna:1:9
-  :         v
-  : fun f() {
-  :  ... (4 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes

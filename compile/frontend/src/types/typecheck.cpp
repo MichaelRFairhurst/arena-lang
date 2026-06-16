@@ -130,8 +130,9 @@ namespace {
             }
 
             auto right_inference_ctx = make_child_context(step, 1);
-            right_inference_ctx.constrain_context_type(left_type_id,
-                                                       error::LocatedText{step.ast, "lvalue in assignment here"});
+            right_inference_ctx
+                .constrain_context_type(left_type_id,
+                                        error::LocatedText{step.ast, "lvalue in assignment here"});
             auto right_type_id = resolve_child(step, 1, &right_inference_ctx);
 
             ops.require_assignable(left_type_id, right_type_id, step.ast, "assignment");
@@ -172,12 +173,12 @@ namespace {
             substitution_map[func_lifetimes.get_ctx_lifetime()] = current_arena_lifetime;
 
             for (size_t i = 1; i < step.original->num_children; ++i) {
-                std::cout << "Original param type: "
-                          << ops.get_type_name(params->at(i - 1), func_lifetimes) << std::endl;
+                // std::cout << "Original param type: "
+                //           << ops.get_type_name(params->at(i - 1), func_lifetimes) << std::endl;
                 auto param_type =
                     ops.substitute_lifetimes(params->at(i - 1), func_lifetimes, substitution_map);
-                std::cout << "Substituted param type: " << ops.get_type_name(param_type)
-                          << std::endl;
+                // std::cout << "Substituted param type: " << ops.get_type_name(param_type)
+                //           << std::endl;
                 auto arg_inference_ctx = make_child_context(step, i);
                 // TODO: Check assignability rather than exact type equality.
                 arg_inference_ctx.constrain_context_type(param_type,
@@ -188,12 +189,12 @@ namespace {
             }
 
             if (return_type) {
-                std::cout << "Original return type: "
-                          << ops.get_type_name(*return_type, func_lifetimes) << std::endl;
+                // std::cout << "Original return type: "
+                //           << ops.get_type_name(*return_type, func_lifetimes) << std::endl;
                 auto substituted_return_type =
                     ops.substitute_lifetimes(*return_type, func_lifetimes, substitution_map);
-                std::cout << "Substituted return type: "
-                          << ops.get_type_name(substituted_return_type) << std::endl;
+                // std::cout << "Substituted return type: "
+                //           << ops.get_type_name(substituted_return_type) << std::endl;
                 inference_ctx->constrain_context_type(substituted_return_type,
                                                       error::LocatedText(step.ast, "return type"));
             } else {
@@ -432,26 +433,22 @@ error::Error *TypecheckOperations::require_assignable(
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Note,
                                   "Pointee '" + get_type_name(rhs_pointee_id) +
-                                      "' is lifetime-strict and requires exact lifetime match"});
-            supplements.push_back(
-                error::Supplement{error::SupplementKind::Help,
-                                  "Consider making the pointee type const to allow using a "
-                                  "longer-lived value in place of a shorter-lived one."});
+                                      "' is lifetime-strict cannot have its lifetime shortened."});
+            supplements.push_back(error::Supplement{error::SupplementKind::Help,
+                                                    "Const pointer types are lifetime-prmissive."});
         } else if (force_strict) {
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Note,
-                                  "Assignment context is lifetime-strict and require exact "
-                                  "lifetime match (likely due to nested pointers)"});
+                                  "Constraint here is lifetime-strict, likely due to nested "
+                                  "pointers, and cannot have its lifetime shortened."});
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Help,
-                                  "Consider making the pointee type const to allow using a "
-                                  "longer-lived value in place of a shorter-lived one."});
+                                  "Const pointer types are lifetime-permissive."});
         } else {
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Note,
                                   "Pointee '" + get_type_name(rhs_pointee_id) +
-                                      "' is lifetime-permissive, and a longer-lived value can be "
-                                      "used in place of a shorter-lived one"});
+                                      "' is lifetime-permissive, its lifetime may be shortened."});
         }
 
         lifetimes->add_constraint(left_ptr->lifetime,
@@ -502,7 +499,7 @@ ResolvedExpressionsResult TypeChecker::type_check(
 
         auto result = stmt_typecheck.typecheck(*decl->resolved_stmt);
 
-        std::cout << lifetime_group.to_string() << std::endl;
+        // std::cout << lifetime_group.to_string() << std::endl;
 
         LifetimeSolver solver(&errors);
         solver.solve(lifetime_group);

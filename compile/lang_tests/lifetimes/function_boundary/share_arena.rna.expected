@@ -1,71 +1,105 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:14:23:17:2
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:11:27:11:38
+  :     let p1: int *static = ret_arena();
+  :                           ^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> share_arena.rna:11:27
+  :     let p1: int *static = ret_arena();
+  :                           ^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:11:27:11:38
+  :     let p1: int *static = ret_arena();
+  :                           ^^^^^^^^^^^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> share_arena.rna:11:27
+  :     let p1: int *static = ret_arena();
+  :                           ^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:16:16:16:19
+  :     take_arena(i.&);
+  :                ^^^ Conflict root
+  .
+ ... caused by
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
   :                       v
   : fun call_funcs_bad2() {
   :  ... (2 more lines) ...
   : }
-  : ^ Conflict root
+  : ^  --- share_arena.rna:14:23
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:14:23
-  :                       v
-  : fun call_funcs_bad2() {
-  :  ... (2 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:14:23
-  :                       v
-  : fun call_funcs_bad2() {
-  :  ... (2 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  -> share_arena.rna:16:16
+  :     take_arena(i.&);
+  :                ^^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<arena>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:28:5:30:6
-  :     vvvvvvv
-  :     arena {
-  :  ... (1 more lines) ...
-  :     }
-  : ^^^^^ Conflict root
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<arena>
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:29:14:29:25
+  :         p1 = ret_arena();
+  :              ^^^^^^^^^^^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:28:5
+  -> Outer *arena outlives nested *arena lifetime
+  :
+ == Note: Nested '*arena' defined here
   :     vvvvvvv
   :     arena {
   :  ... (1 more lines) ...
   :     }
-  : ^^^^^ Outer *arena outlives nested *arena lifetime
+  : ^^^^^  --- share_arena.rna:28:5
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:28:5
-  :     vvvvvvv
-  :     arena {
-  :  ... (1 more lines) ...
-  :     }
-  : ^^^^^ Outer *arena outlives nested *arena lifetime
+  -> share_arena.rna:29:14
+  :         p1 = ret_arena();
+  :              ^^^^^^^^^^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<arena>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:46:5:48:6
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<arena>
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:47:27:47:29
+  :         take_arena_struct(p1);
+  :                           ^^ Conflict root
+  .
+ ... caused by
+  -> Outer *arena outlives nested *arena lifetime
+  :
+ == Note: Nested '*arena' defined here
   :     vvvvvvv
   :     arena {
   :  ... (1 more lines) ...
   :     }
-  : ^^^^^ Conflict root
+  : ^^^^^  --- share_arena.rna:46:5
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:46:5
-  :     vvvvvvv
-  :     arena {
-  :  ... (1 more lines) ...
-  :     }
-  : ^^^^^ Outer *arena outlives nested *arena lifetime
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/share_arena.rna:47:27
+  -> share_arena.rna:47:27
   :         take_arena_struct(p1);
   :                           ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.

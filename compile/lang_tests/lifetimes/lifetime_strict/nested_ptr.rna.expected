@@ -1,76 +1,151 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
 at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:6:9:6:10
   :     x = y;
   :         ^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:6:9
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> nested_ptr.rna:6:9
   :     x = y;
   :         ^ pointer assignment
+  :
+ == Note: Constraint here is lifetime-strict, likely due to nested pointers, and cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-permissive.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
 at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:10:9:10:10
   :     y = x;
   :         ^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:10:9
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> nested_ptr.rna:10:9
   :     y = x;
   :         ^ pointer assignment
+  :
+ == Note: Constraint here is lifetime-strict, likely due to nested pointers, and cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-permissive.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
 at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:14:9:14:10
   :     x = y;
   :         ^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:14:9
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> nested_ptr.rna:14:9
   :     x = y;
   :         ^ pointer assignment
+  :
+ == Note: Pointee 'int*<outer arena>' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:18:9:18:10
+  :     y = x;
+  :         ^ Conflict root
+  .
+ ... caused by
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> nested_ptr.rna:18:9
+  :     y = x;
+  :         ^ pointer assignment
+  :
+ == Note: Pointee 'int*<outer arena>' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
+
+
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
 at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:28:9:28:10
   :     x = y;
   :         ^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:28:9
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> nested_ptr.rna:28:9
   :     x = y;
   :         ^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
 at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:32:9:32:10
   :     y = x;
   :         ^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:32:9
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> nested_ptr.rna:32:9
   :     y = x;
   :         ^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
 at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:36:9:36:10
   :     x = y;
   :         ^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:36:9
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> nested_ptr.rna:36:9
   :     x = y;
   :         ^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct*<outer arena>' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *static must outlive *<outer arena>, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
 at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:40:9:40:10
   :     y = x;
   :         ^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:40:9
+  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :
+ == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  .
+ ... caused by
+  -> nested_ptr.rna:40:9
   :     y = x;
   :         ^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct*<outer arena>' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.

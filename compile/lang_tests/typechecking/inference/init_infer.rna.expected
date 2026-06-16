@@ -3,9 +3,9 @@ Error[E-T_BIN_MIS]: Expected both binary operands to have matching types, but go
 at compile/lang_tests/typechecking/inference/init_infer.rna:4:5:4:10
   :     i + b;
   :     ^^^^^ In this binary expression
-compile/lang_tests/typechecking/inference/init_infer.rna:4:5
+init_infer.rna:4:5
   :     i + b;
   :     ^ left operand type is int
-compile/lang_tests/typechecking/inference/init_infer.rna:4:9
+init_infer.rna:4:9
   :     i + b;
   :         ^ right operand type is bool

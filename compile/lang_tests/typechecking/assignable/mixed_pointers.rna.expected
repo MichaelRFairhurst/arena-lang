@@ -6,11 +6,10 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:2:9:2:10
   .
  == Note: expected type int based on lvalue in assignment here
   :     x = y;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:2:5
-  .
+  :     ^^^^^  --- mixed_pointers.rna:2:5
  == Note: got conflicting type int*<free> for variable 'y'
   : fun f(x: int, y: int*) {
-  :               ^^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:1:15
+  :               ^^^^^^  --- mixed_pointers.rna:1:15
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int in variable 'x'
@@ -20,11 +19,10 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:3:9:3:10
   .
  == Note: expected type int*<free> based on lvalue in assignment here
   :     y = x;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:3:5
-  .
+  :     ^^^^^  --- mixed_pointers.rna:3:5
  == Note: got conflicting type int for variable 'x'
   : fun f(x: int, y: int*) {
-  :       ^^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:1:7
+  :       ^^^^^^  --- mixed_pointers.rna:1:7
 
 
 Error[E-T_ASGN_NOREL]: Expected bool but got bool*<free> in variable 'y'
@@ -34,11 +32,10 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:7:9:7:10
   .
  == Note: expected type bool based on lvalue in assignment here
   :     x = y;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:7:5
-  .
+  :     ^^^^^  --- mixed_pointers.rna:7:5
  == Note: got conflicting type bool*<free> for variable 'y'
   : fun g(x: bool, y: bool*) {
-  :                ^^^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:6:16
+  :                ^^^^^^^  --- mixed_pointers.rna:6:16
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got bool in variable 'x'
@@ -48,11 +45,10 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:8:9:8:10
   .
  == Note: expected type bool*<free> based on lvalue in assignment here
   :     y = x;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:8:5
-  .
+  :     ^^^^^  --- mixed_pointers.rna:8:5
  == Note: got conflicting type bool for variable 'x'
   : fun g(x: bool, y: bool*) {
-  :       ^^^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:6:7
+  :       ^^^^^^^  --- mixed_pointers.rna:6:7
 
 
 Error[E-T_ARR_NONARR]: Expected a compatible array type, but got int*<free> in variable 'y'
@@ -62,11 +58,10 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:12:9:12:10
   .
  == Note: expected type int[10] based on lvalue in assignment here
   :     x = y;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:12:5
-  .
+  :     ^^^^^  --- mixed_pointers.rna:12:5
  == Note: got conflicting type int*<free> for variable 'y'
   : fun h(x: int[1], y: int*) {
-  :                  ^^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:11:18
+  :                  ^^^^^^  --- mixed_pointers.rna:11:18
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int[10] in variable 'x'
@@ -76,11 +71,10 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:13:9:13:10
   .
  == Note: expected type int*<free> based on lvalue in assignment here
   :     y = x;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:13:5
-  .
+  :     ^^^^^  --- mixed_pointers.rna:13:5
  == Note: got conflicting type int[10] for variable 'x'
   : fun h(x: int[1], y: int*) {
-  :       ^^^^^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:11:7
+  :       ^^^^^^^^^  --- mixed_pointers.rna:11:7
 
 
 Error[E-T_ASGN_NOREL]: Expected SomeStruct but got SomeStruct*<free> in variable 'y'
@@ -90,11 +84,10 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:18:9:18:10
   .
  == Note: expected type SomeStruct based on lvalue in assignment here
   :     x = y;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:18:5
-  .
+  :     ^^^^^  --- mixed_pointers.rna:18:5
  == Note: got conflicting type SomeStruct*<free> for variable 'y'
   : fun i(x: SomeStruct, y: SomeStruct*) {
-  :                      ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:17:22
+  :                      ^^^^^^^^^^^^^  --- mixed_pointers.rna:17:22
 
 
 Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got SomeStruct in variable 'x'
@@ -104,8 +97,7 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:19:9:19:10
   .
  == Note: expected type SomeStruct*<free> based on lvalue in assignment here
   :     y = x;
-  :     ^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:19:5
-  .
+  :     ^^^^^  --- mixed_pointers.rna:19:5
  == Note: got conflicting type SomeStruct for variable 'x'
   : fun i(x: SomeStruct, y: SomeStruct*) {
-  :       ^^^^^^^^^^^^^  --- compile/lang_tests/typechecking/assignable/mixed_pointers.rna:17:7
+  :       ^^^^^^^^^^^^^  --- mixed_pointers.rna:17:7

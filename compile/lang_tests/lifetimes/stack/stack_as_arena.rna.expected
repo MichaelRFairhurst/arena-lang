@@ -1,24 +1,22 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/stack/stack_as_arena.rna:1:23:5:2
-  :                       v
-  : fun f(p1: int *arena) {
-  :  ... (3 more lines) ...
-  : }
-  : ^ Conflict root
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+at compile/lang_tests/lifetimes/stack/stack_as_arena.rna:4:10:4:12
+  :     p1 = p2;
+  :          ^^ Conflict root
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/stack/stack_as_arena.rna:1:23
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
   :                       v
   : fun f(p1: int *arena) {
   :  ... (3 more lines) ...
   : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  : ^  --- stack_as_arena.rna:1:23
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/stack/stack_as_arena.rna:1:23
-  :                       v
-  : fun f(p1: int *arena) {
-  :  ... (3 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
+  -> stack_as_arena.rna:4:10
+  :     p1 = p2;
+  :          ^^ pointer assignment
+  :
+ == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.

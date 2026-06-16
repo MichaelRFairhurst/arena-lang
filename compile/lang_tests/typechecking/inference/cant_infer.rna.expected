@@ -111,6 +111,3 @@ Error[E-T_CANT_INFER_EX]: Cannot infer type for expression here
 at compile/lang_tests/typechecking/inference/cant_infer.rna:22:14:22:15
   :     let x = (x = x);
   :              ^ For this expression
-
-
-Missing error on line 26

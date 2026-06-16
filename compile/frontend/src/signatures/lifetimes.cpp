@@ -46,22 +46,62 @@ LifetimeGroup::LifetimeGroup() {
     my_lifetime_id = add_lifetime(StructMyLifetime{}).group_lifetime_id;
     ctx_lifetime_id = add_lifetime(FunctionContextLifetime{}).group_lifetime_id;
 
-    add_constraint(LifetimeConstraint{global_lifetime_id,
-                                      LifetimeRelation::Greater,
-                                      any_lifetime_id,
-                                      std::nullopt});
-    add_constraint(LifetimeConstraint{global_lifetime_id,
-                                      LifetimeRelation::Greater,
-                                      my_lifetime_id,
-                                      std::nullopt});
-    add_constraint(LifetimeConstraint{global_lifetime_id,
-                                      LifetimeRelation::Greater,
-                                      ctx_lifetime_id,
-                                      std::nullopt});
     add_constraint(
-        LifetimeConstraint{any_lifetime_id, LifetimeRelation::Less, ctx_lifetime_id, std::nullopt});
+        LifetimeConstraint{global_lifetime_id,
+                           LifetimeRelation::Greater,
+                           any_lifetime_id,
+                           error::Cause{
+                               .description = "The '*static' lifetime outlives all other lifetimes",
+                           }});
+    add_constraint(LifetimeConstraint{
+        global_lifetime_id,
+        LifetimeRelation::Greater,
+        my_lifetime_id,
+        error::Cause{
+            .description = "Instances can have non-'*static' individual lifetimes (lifetime '*my')",
+            .supplements = {{
+                .kind = error::SupplementKind::Help,
+                .message = "The '*my' lifetime describes the lifetime of an individual struct "
+                           "instance, whether that is the stack or arena etc."
+            }},
+        }});
+    add_constraint(LifetimeConstraint{
+        global_lifetime_id,
+        LifetimeRelation::Greater,
+        ctx_lifetime_id,
+        error::Cause{
+            .description = "The '*static' lifetime outlives the function's outer '*arena' lifetime",
+            .supplements = {{
+                .kind = error::SupplementKind::Help,
+                .message = "The outer '*arena' lifetime represents lifetime of the caller's current arena."
+            }},
+        }});
     add_constraint(
-        LifetimeConstraint{any_lifetime_id, LifetimeRelation::Less, my_lifetime_id, std::nullopt});
+        LifetimeConstraint{any_lifetime_id,
+                           LifetimeRelation::Less,
+                           ctx_lifetime_id,
+                           error::Cause{
+                               .description =
+                                   "The '*any' lifetime represents the smallest possible lifetime.",
+                               .supplements = {{
+                                   .kind = error::SupplementKind::Help,
+                                   .message = "The '*any' lifetime is a special and restrictive "
+                                              "lifetime. Did you mean to use '*unsafe'?",
+                               }},
+                           }});
+    add_constraint(
+        LifetimeConstraint{any_lifetime_id,
+                           LifetimeRelation::Less,
+                           my_lifetime_id,
+                           error::Cause{
+                               .description =
+                                   "The '*any' lifetime represents the smallest possible lifetime.",
+                               .supplements = {{
+                                   .kind = error::SupplementKind::Help,
+                                   .message = "The '*any' lifetime is a special and restrictive "
+                                              "lifetime. Did you mean to use '*unsafe'?",
+                               }},
+                           }});
 }
 
 Lifetime &LifetimeGroup::add_lifetime(LifetimeVariant variant) {
@@ -279,12 +319,20 @@ LifetimeTable::ArenaLifetimeGuard LifetimeTable::push_arena(const ast::ArenaStat
     group->add_constraint(current_arena_id,
                           LifetimeRelation::Less,
                           group->get_ctx_lifetime(),
-                          error::Cause{"Outer *arena outlives nested *arena lifetime", arena_stmt});
+                          error::Cause{.description =
+                                           "Outer *arena outlives nested *arena lifetime",
+                                       .supplements = {{.kind = error::SupplementKind::Note,
+                                                        .location = arena_stmt,
+                                                        .message = "Nested '*arena' defined here"}}}
+
+    );
 
     group->add_constraint(current_arena_id,
                           LifetimeRelation::Greater,
                           group->get_any_lifetime(),
-                          error::Cause{"'Any' lifetime is defined to be smaller", arena_stmt});
+                          error::Cause{"'Any' lifetime is defined to be "
+                                       "smaller",
+                                       arena_stmt});
 
     return ArenaLifetimeGuard(this, old_id);
 }
@@ -297,15 +345,24 @@ LifetimeTable::StackLifetimeGuard LifetimeTable::push_stack(const ast::BlockStat
         group->add_constraint(current_stack_id,
                               LifetimeRelation::Less,
                               group->get_ctx_lifetime(),
-                              error::Cause{ "Outer function *arena outlives all function "
-                                            "*<stack> lifetimes", block_stmt});
+                              error::Cause{
+                                .description = "Outer function *arena outlives all function "
+                                           "*<stack> lifetimes",
+                                .supplements = {{.kind = error::SupplementKind::Note,
+                                                 .location = block_stmt,
+                                                 .message = "Relevant '*<stack>' lifetime is for this block"}},
+                                });
     } else {
         group->add_constraint(current_stack_id,
                               LifetimeRelation::Less,
                               old_id,
                               error::Cause{
-                                          "Outer block *<stack> outlives inner block "
-                                          "*<stack> lifetime", block_stmt});
+                                .description = "Outer block *<stack> outlives inner block "
+                                               "*<stack> lifetime",
+                                .supplements = {{.kind = error::SupplementKind::Note,
+                                                 .location = block_stmt,
+                                                 .message = "Relevant '*<stack>' lifetime is for this block"}},
+                                });
     }
 
     group->add_constraint(current_arena_id,

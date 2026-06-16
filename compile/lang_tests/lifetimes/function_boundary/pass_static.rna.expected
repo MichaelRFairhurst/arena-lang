@@ -1,43 +1,6 @@
+No path found between <outer arena> and <stack>, cannot report error without location
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/function_boundary/pass_static.rna:10:22:14:2
-  :                      v
-  : fun call_funcs_bad() {
-  :  ... (3 more lines) ...
-  : }
-  : ^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/pass_static.rna:10:22
-  :                      v
-  : fun call_funcs_bad() {
-  :  ... (3 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/pass_static.rna:10:22
-  :                      v
-  : fun call_funcs_bad() {
-  :  ... (3 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<stack> must outlive *static, but found conflict
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<stack> and *static
 at compile/lang_tests/lifetimes/function_boundary/pass_static.rna:13:17:13:19
   :     take_static(p1);
   :                 ^^ Conflict root
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/pass_static.rna:13:17
-  :     take_static(p1);
-  :                 ^^ pointer assignment
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/function_boundary/pass_static.rna:10:22
-  :                      v
-  : fun call_funcs_bad() {
-  :  ... (3 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes

@@ -1,21 +1,23 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation: *<outer arena> must outlive *<stack>, but found conflict
-at compile/lang_tests/lifetimes/lifetime_strict/struct_ptr.rna:3:30:7:2
+Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+at compile/lang_tests/lifetimes/lifetime_strict/struct_ptr.rna:6:10:6:12
+  :     p2 = p1;
+  :          ^^ Conflict root
+  .
+ ... caused by
+  -> Outer function *arena outlives all function *<stack> lifetimes
+  :
+ == Note: Relevant '*<stack>' lifetime is for this block
   :                              v
   : fun f(p1: SomeStruct *arena) {
   :  ... (3 more lines) ...
   : }
-  : ^ Conflict root
+  : ^  --- struct_ptr.rna:3:30
   .
  ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/struct_ptr.rna:3:30
-  :                              v
-  : fun f(p1: SomeStruct *arena) {
-  :  ... (3 more lines) ...
-  : }
-  : ^ Outer function *arena outlives all function *<stack> lifetimes
-  .
- ... caused by
-  -> compile/lang_tests/lifetimes/lifetime_strict/struct_ptr.rna:6:10
+  -> struct_ptr.rna:6:10
   :     p2 = p1;
   :          ^^ pointer assignment
+  :
+ == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == Help: Const pointer types are lifetime-prmissive.
