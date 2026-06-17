@@ -1,45 +1,43 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<stack> and *<stack>
+Error[E-L_ESC_BLOCK]: Pointer value to stack escapes the lifetime of its block
 at compile/lang_tests/lifetimes/stack/stack_nesting.rna:6:17:6:22
   :         outer = inner;
-  :                 ^^^^^ Conflict root
-  .
- ... caused by
-  -> Outer block *<stack> outlives inner block *<stack> lifetime
+  :                 ^^^^^ Escape occurs here
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :     v
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*stack' may not outlive '*stack'
+  : 2. Lifetime '*stack' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*stack'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*stack<outer>' lifetime is greater than '*stack<inner>'
+  :
+ == note: involving '*stack' lifetime for this inner block
   :     {
-  :  ... (3 more lines) ...
-  :     }
-  : ^^^^^  --- stack_nesting.rna:3:5
-  .
- ... caused by
-  -> stack_nesting.rna:6:17
-  :         outer = inner;
-  :                 ^^^^^ pointer assignment
-  :
- == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  :     ^  --- stack_nesting.rna:3:5
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<stack> and *<stack>
+Error[E-L_ESC_BLOCK]: Pointer value to stack escapes the lifetime of its block
 at compile/lang_tests/lifetimes/stack/stack_nesting.rna:24:17:24:22
   :         outer = inner;
-  :                 ^^^^^ Conflict root
-  .
- ... caused by
-  -> Outer block *<stack> outlives inner block *<stack> lifetime
+  :                 ^^^^^ Escape occurs here
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :     v
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*stack' may not outlive '*stack'
+  : 2. Lifetime '*stack' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*stack'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*stack<outer>' lifetime is greater than '*stack<inner>'
+  :
+ == note: involving '*stack' lifetime for this inner block
   :     {
-  :  ... (4 more lines) ...
-  :     }
-  : ^^^^^  --- stack_nesting.rna:21:5
-  .
- ... caused by
-  -> stack_nesting.rna:24:17
-  :         outer = inner;
-  :                 ^^^^^ pointer assignment
-  :
- == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  :     ^  --- stack_nesting.rna:21:5

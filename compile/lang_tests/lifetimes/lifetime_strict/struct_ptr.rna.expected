@@ -1,23 +1,22 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/lifetime_strict/struct_ptr.rna:6:10:6:12
   :     p2 = p1;
-  :          ^^ Conflict root
-  .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+  :          ^^ Escape occurs here
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                              v
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*stack' must match '*arena<ctx>'
+  : 2. Lifetime '*arena<ctx>' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct*arena<ctx>' assigned to pointer with lifetime '*stack'
+  :
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
+  .
+ ... caused by 2.
+  -> '*arena<ctx>' lifetime is greater than '*stack'
+  :
+ == note: involving '*stack' lifetime for this function block
   : fun f(p1: SomeStruct *arena) {
-  :  ... (3 more lines) ...
-  : }
-  : ^  --- struct_ptr.rna:3:30
-  .
- ... caused by
-  -> struct_ptr.rna:6:10
-  :     p2 = p1;
-  :          ^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+  :                              ^  --- struct_ptr.rna:3:30

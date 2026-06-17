@@ -413,8 +413,9 @@ error::Error *TypecheckOperations::require_assignable(
 
         auto err = require_assignable(lhs_type.get_id(), rhs_type.get_id(), node, message);
         if (err != nullptr) {
-            err->add_cause("Array elements of " + get_type_name(lhs) + " must be compatible with " +
-                           get_type_name(rhs));
+            err->add_cause("Array element type mismatch",
+                           "Array elements of " + get_type_name(lhs) + " must be compatible with " +
+                               get_type_name(rhs));
             return err;
         }
     } else if (auto left_ptr = std::get_if<PointerType>(&lhs_type.get_program_type())) {
@@ -429,37 +430,44 @@ error::Error *TypecheckOperations::require_assignable(
                               ? LifetimeRelation::Equals
                               : LifetimeRelation::LessEqual;
         std::vector<error::Supplement> supplements;
+
         if (rhs_pointee.is_lifetime_strict()) {
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Note,
-                                  "Pointee '" + get_type_name(rhs_pointee_id) +
+                                  "pointee '" + get_type_name(rhs_pointee_id) +
                                       "' is lifetime-strict cannot have its lifetime shortened."});
-            supplements.push_back(error::Supplement{error::SupplementKind::Help,
-                                                    "Const pointer types are lifetime-prmissive."});
+            supplements.push_back(
+                error::Supplement{error::SupplementKind::Help,
+                                  "try using a const pointer to make this lifetime-permissive."});
         } else if (force_strict) {
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Note,
-                                  "Constraint here is lifetime-strict, likely due to nested "
+                                  "constraint here is lifetime-strict, likely due to nested "
                                   "pointers, and cannot have its lifetime shortened."});
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Help,
-                                  "Const pointer types are lifetime-permissive."});
+                                  "try a const pointer to make this lifetime-permissive."});
         } else {
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Note,
-                                  "Pointee '" + get_type_name(rhs_pointee_id) +
+                                  "pointee '" + get_type_name(rhs_pointee_id) +
                                       "' is lifetime-permissive, its lifetime may be shortened."});
         }
+
+        std::string message =
+            "'" + get_type_name(rhs) + "' assigned to pointer with lifetime '*" +
+            lifetimes->get_lifetime_by_id(left_ptr->lifetime)->get_debug_name() + "'";
 
         lifetimes->add_constraint(left_ptr->lifetime,
                                   constraint,
                                   right_ptr->lifetime,
-                                  error::Cause{"pointer assignment", node, std::move(supplements)});
+                                  ConstraintCause{message, node, std::move(supplements)});
 
         auto err = require_assignable(lhs_pointee_id, rhs_pointee_id, node, message, true);
         if (err != nullptr) {
-            err->add_cause("Pointee type of " + get_type_name(lhs) +
-                           " must be compatible with pointee type of " + get_type_name(rhs));
+            err->add_cause("Pointee type mismatch",
+                           "Pointee type of " + get_type_name(lhs) +
+                               " must be compatible with pointee type of " + get_type_name(rhs));
         }
 
         return err;

@@ -1,29 +1,51 @@
-No path found between <stack> and <stack>, cannot report error without location
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:8:37:8:46
   :     let invalid_outer: int *arena = i_outer.&;
-  :                                     ^^^^^^^^^ Conflict root
-  .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+  :                                     ^^^^^^^^^ Escape occurs here
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :         v
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*arena<ctx>' may not outlive '*stack'
+  : 2. Lifetime '*arena<ctx>' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*arena<ctx>'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*arena<ctx>' lifetime is greater than '*stack'
+  :
+ == note: involving '*stack' lifetime for this function block
   : fun g() {
-  :  ... (2 more lines) ...
-  : }
-  : ^  --- addr_of_stack_lifetimes.rna:6:9
-  .
- ... caused by
-  -> addr_of_stack_lifetimes.rna:8:37
-  :     let invalid_outer: int *arena = i_outer.&;
-  :                                     ^^^^^^^^^ pointer assignment
-  :
- == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  :         ^  --- addr_of_stack_lifetimes.rna:6:9
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<stack> and *<outer arena>
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:29:41:29:50
   :         let invalid_inner: int *arena = i_inner.&;
-  :                                         ^^^^^^^^^ Conflict root
+  :                                         ^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*arena<ctx>' may not outlive '*stack'
+  : 2. Lifetime '*arena<ctx>' must outlive '*stack'
+  : 3. Lifetime '*stack' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*arena<ctx>'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*arena<ctx>' lifetime is greater than '*stack'
+  :
+ == note: involving '*stack' lifetime for this function block
+  : fun j() {
+  :         ^  --- addr_of_stack_lifetimes.rna:26:9
+  .
+ ... caused by 3.
+  -> '*stack<outer>' lifetime is greater than '*stack<inner>'
+  :
+ == note: involving '*stack' lifetime for this inner block
+  :     {
+  :     ^  --- addr_of_stack_lifetimes.rna:27:5

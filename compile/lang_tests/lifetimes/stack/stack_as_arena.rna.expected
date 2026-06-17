@@ -1,22 +1,21 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/stack/stack_as_arena.rna:4:10:4:12
   :     p1 = p2;
-  :          ^^ Conflict root
-  .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+  :          ^^ Escape occurs here
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                       v
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*arena<ctx>' may not outlive '*stack'
+  : 2. Lifetime '*arena<ctx>' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*arena<ctx>'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*arena<ctx>' lifetime is greater than '*stack'
+  :
+ == note: involving '*stack' lifetime for this function block
   : fun f(p1: int *arena) {
-  :  ... (3 more lines) ...
-  : }
-  : ^  --- stack_as_arena.rna:1:23
-  .
- ... caused by
-  -> stack_as_arena.rna:4:10
-  :     p1 = p2;
-  :          ^^ pointer assignment
-  :
- == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  :                       ^  --- stack_as_arena.rna:1:23

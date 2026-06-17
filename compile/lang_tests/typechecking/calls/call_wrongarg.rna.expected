@@ -4,10 +4,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:14:14:14:15
   :     take_int(b);
   :              ^ type mismatch
   .
- == Note: expected type int based on argument 1
+ == note: expected type int based on argument 1
   :     take_int(b);
   :     ^^^^^^^^^^^  --- call_wrongarg.rna:14:5
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -17,10 +17,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:15:14:15:15
   :     take_int(s);
   :              ^ type mismatch
   .
- == Note: expected type int based on argument 1
+ == note: expected type int based on argument 1
   :     take_int(s);
   :     ^^^^^^^^^^^  --- call_wrongarg.rna:15:5
- == Note: got conflicting type SomeStruct for variable 's'
+ == note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
@@ -34,15 +34,15 @@ call_wrongarg.rna:16:14
   :              ^^^ expression has type int
 
 
-Error[E-T_ASGN_NOREL]: Expected int but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected int but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:16:14:16:17
   :     take_int(i.&);
   :              ^^^ type mismatch
   .
- == Note: expected type int based on argument 1
+ == note: expected type int based on argument 1
   :     take_int(i.&);
   :     ^^^^^^^^^^^^^  --- call_wrongarg.rna:16:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_int(i.&);
   :              ^^^  --- call_wrongarg.rna:16:14
 
@@ -56,15 +56,15 @@ call_wrongarg.rna:17:14
   :              ^^^ expression has type int
 
 
-Error[E-T_ASGN_NOREL]: Expected int but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected int but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:17:14:17:17
   :     take_int(b.&);
   :              ^^^ type mismatch
   .
- == Note: expected type int based on argument 1
+ == note: expected type int based on argument 1
   :     take_int(b.&);
   :     ^^^^^^^^^^^^^  --- call_wrongarg.rna:17:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_int(b.&);
   :              ^^^  --- call_wrongarg.rna:17:14
 
@@ -78,15 +78,15 @@ call_wrongarg.rna:18:14
   :              ^^^ expression has type int
 
 
-Error[E-T_ASGN_NOREL]: Expected int but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected int but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:18:14:18:17
   :     take_int(s.&);
   :              ^^^ type mismatch
   .
- == Note: expected type int based on argument 1
+ == note: expected type int based on argument 1
   :     take_int(s.&);
   :     ^^^^^^^^^^^^^  --- call_wrongarg.rna:18:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_int(s.&);
   :              ^^^  --- call_wrongarg.rna:18:14
 
@@ -96,10 +96,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:20:15:20:16
   :     take_bool(i);
   :               ^ type mismatch
   .
- == Note: expected type bool based on argument 1
+ == note: expected type bool based on argument 1
   :     take_bool(i);
   :     ^^^^^^^^^^^^  --- call_wrongarg.rna:20:5
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -109,10 +109,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:21:15:21:16
   :     take_bool(s);
   :               ^ type mismatch
   .
- == Note: expected type bool based on argument 1
+ == note: expected type bool based on argument 1
   :     take_bool(s);
   :     ^^^^^^^^^^^^  --- call_wrongarg.rna:21:5
- == Note: got conflicting type SomeStruct for variable 's'
+ == note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
@@ -126,15 +126,15 @@ call_wrongarg.rna:22:15
   :               ^^^ expression has type bool
 
 
-Error[E-T_ASGN_NOREL]: Expected bool but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected bool but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:22:15:22:18
   :     take_bool(i.&);
   :               ^^^ type mismatch
   .
- == Note: expected type bool based on argument 1
+ == note: expected type bool based on argument 1
   :     take_bool(i.&);
   :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:22:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_bool(i.&);
   :               ^^^  --- call_wrongarg.rna:22:15
 
@@ -148,15 +148,15 @@ call_wrongarg.rna:23:15
   :               ^^^ expression has type bool
 
 
-Error[E-T_ASGN_NOREL]: Expected bool but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected bool but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:23:15:23:18
   :     take_bool(b.&);
   :               ^^^ type mismatch
   .
- == Note: expected type bool based on argument 1
+ == note: expected type bool based on argument 1
   :     take_bool(b.&);
   :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:23:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_bool(b.&);
   :               ^^^  --- call_wrongarg.rna:23:15
 
@@ -170,15 +170,15 @@ call_wrongarg.rna:24:15
   :               ^^^ expression has type bool
 
 
-Error[E-T_ASGN_NOREL]: Expected bool but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected bool but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:24:15:24:18
   :     take_bool(s.&);
   :               ^^^ type mismatch
   .
- == Note: expected type bool based on argument 1
+ == note: expected type bool based on argument 1
   :     take_bool(s.&);
   :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:24:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_bool(s.&);
   :               ^^^  --- call_wrongarg.rna:24:15
 
@@ -188,10 +188,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:26:17:26:18
   :     take_struct(i);
   :                 ^ type mismatch
   .
- == Note: expected type SomeStruct based on argument 1
+ == note: expected type SomeStruct based on argument 1
   :     take_struct(i);
   :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:26:5
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -201,10 +201,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:27:17:27:18
   :     take_struct(b);
   :                 ^ type mismatch
   .
- == Note: expected type SomeStruct based on argument 1
+ == note: expected type SomeStruct based on argument 1
   :     take_struct(b);
   :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:27:5
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -218,15 +218,15 @@ call_wrongarg.rna:28:17
   :                 ^^^ expression has type SomeStruct
 
 
-Error[E-T_ASGN_NOREL]: Expected SomeStruct but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected SomeStruct but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:28:17:28:20
   :     take_struct(i.&);
   :                 ^^^ type mismatch
   .
- == Note: expected type SomeStruct based on argument 1
+ == note: expected type SomeStruct based on argument 1
   :     take_struct(i.&);
   :     ^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:28:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_struct(i.&);
   :                 ^^^  --- call_wrongarg.rna:28:17
 
@@ -240,15 +240,15 @@ call_wrongarg.rna:29:17
   :                 ^^^ expression has type SomeStruct
 
 
-Error[E-T_ASGN_NOREL]: Expected SomeStruct but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected SomeStruct but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:29:17:29:20
   :     take_struct(b.&);
   :                 ^^^ type mismatch
   .
- == Note: expected type SomeStruct based on argument 1
+ == note: expected type SomeStruct based on argument 1
   :     take_struct(b.&);
   :     ^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:29:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_struct(b.&);
   :                 ^^^  --- call_wrongarg.rna:29:17
 
@@ -262,15 +262,15 @@ call_wrongarg.rna:30:17
   :                 ^^^ expression has type SomeStruct
 
 
-Error[E-T_ASGN_NOREL]: Expected SomeStruct but got <error>*<stack> in here
+Error[E-T_ASGN_NOREL]: Expected SomeStruct but got <error>*stack in here
 at compile/lang_tests/typechecking/calls/call_wrongarg.rna:30:17:30:20
   :     take_struct(s.&);
   :                 ^^^ type mismatch
   .
- == Note: expected type SomeStruct based on argument 1
+ == note: expected type SomeStruct based on argument 1
   :     take_struct(s.&);
   :     ^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:30:5
- == Note: got conflicting type <error>*<stack> for here
+ == note: got conflicting type <error>*stack for here
   :     take_struct(s.&);
   :                 ^^^  --- call_wrongarg.rna:30:17
 
@@ -280,10 +280,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:32:17:32:18
   :     take_intptr(i);
   :                 ^ pointer type mismatch
   .
- == Note: expected type int*<free> based on argument 1
+ == note: expected type int*<free> based on argument 1
   :     take_intptr(i);
   :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:32:5
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -293,10 +293,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:33:17:33:18
   :     take_intptr(b);
   :                 ^ pointer type mismatch
   .
- == Note: expected type int*<free> based on argument 1
+ == note: expected type int*<free> based on argument 1
   :     take_intptr(b);
   :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:33:5
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -306,10 +306,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:34:17:34:18
   :     take_intptr(s);
   :                 ^ pointer type mismatch
   .
- == Note: expected type int*<free> based on argument 1
+ == note: expected type int*<free> based on argument 1
   :     take_intptr(s);
   :     ^^^^^^^^^^^^^^  --- call_wrongarg.rna:34:5
- == Note: got conflicting type SomeStruct for variable 's'
+ == note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
@@ -319,10 +319,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:35:17:35:18
   :     take_intptr(b.&);
   :                 ^ type mismatch
   .
- == Note: expected type int based on dereferenced type
+ == note: expected type int based on dereferenced type
   :     take_intptr(b.&);
   :                 ^^^  --- call_wrongarg.rna:35:17
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -332,10 +332,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:36:17:36:18
   :     take_intptr(s.&);
   :                 ^ type mismatch
   .
- == Note: expected type int based on dereferenced type
+ == note: expected type int based on dereferenced type
   :     take_intptr(s.&);
   :                 ^^^  --- call_wrongarg.rna:36:17
- == Note: got conflicting type SomeStruct for variable 's'
+ == note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
@@ -345,10 +345,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:38:18:38:19
   :     take_boolptr(b);
   :                  ^ pointer type mismatch
   .
- == Note: expected type bool*<free> based on argument 1
+ == note: expected type bool*<free> based on argument 1
   :     take_boolptr(b);
   :     ^^^^^^^^^^^^^^^  --- call_wrongarg.rna:38:5
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -358,10 +358,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:39:18:39:19
   :     take_boolptr(i);
   :                  ^ pointer type mismatch
   .
- == Note: expected type bool*<free> based on argument 1
+ == note: expected type bool*<free> based on argument 1
   :     take_boolptr(i);
   :     ^^^^^^^^^^^^^^^  --- call_wrongarg.rna:39:5
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -371,10 +371,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:40:18:40:19
   :     take_boolptr(s);
   :                  ^ pointer type mismatch
   .
- == Note: expected type bool*<free> based on argument 1
+ == note: expected type bool*<free> based on argument 1
   :     take_boolptr(s);
   :     ^^^^^^^^^^^^^^^  --- call_wrongarg.rna:40:5
- == Note: got conflicting type SomeStruct for variable 's'
+ == note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
@@ -384,10 +384,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:41:18:41:19
   :     take_boolptr(i.&);
   :                  ^ type mismatch
   .
- == Note: expected type bool based on dereferenced type
+ == note: expected type bool based on dereferenced type
   :     take_boolptr(i.&);
   :                  ^^^  --- call_wrongarg.rna:41:18
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -397,10 +397,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:42:18:42:19
   :     take_boolptr(s.&);
   :                  ^ type mismatch
   .
- == Note: expected type bool based on dereferenced type
+ == note: expected type bool based on dereferenced type
   :     take_boolptr(s.&);
   :                  ^^^  --- call_wrongarg.rna:42:18
- == Note: got conflicting type SomeStruct for variable 's'
+ == note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
@@ -410,10 +410,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:44:20:44:21
   :     take_structptr(i);
   :                    ^ pointer type mismatch
   .
- == Note: expected type SomeStruct*<free> based on argument 1
+ == note: expected type SomeStruct*<free> based on argument 1
   :     take_structptr(i);
   :     ^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:44:5
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -423,10 +423,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:45:20:45:21
   :     take_structptr(b);
   :                    ^ pointer type mismatch
   .
- == Note: expected type SomeStruct*<free> based on argument 1
+ == note: expected type SomeStruct*<free> based on argument 1
   :     take_structptr(b);
   :     ^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:45:5
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -436,10 +436,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:46:20:46:21
   :     take_structptr(s);
   :                    ^ pointer type mismatch
   .
- == Note: expected type SomeStruct*<free> based on argument 1
+ == note: expected type SomeStruct*<free> based on argument 1
   :     take_structptr(s);
   :     ^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:46:5
- == Note: got conflicting type SomeStruct for variable 's'
+ == note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
@@ -449,10 +449,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:47:20:47:21
   :     take_structptr(i.&);
   :                    ^ type mismatch
   .
- == Note: expected type SomeStruct based on dereferenced type
+ == note: expected type SomeStruct based on dereferenced type
   :     take_structptr(i.&);
   :                    ^^^  --- call_wrongarg.rna:47:20
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -462,10 +462,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:48:20:48:21
   :     take_structptr(b.&);
   :                    ^ type mismatch
   .
- == Note: expected type SomeStruct based on dereferenced type
+ == note: expected type SomeStruct based on dereferenced type
   :     take_structptr(b.&);
   :                    ^^^  --- call_wrongarg.rna:48:20
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -475,10 +475,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:50:14:50:15
   :     take_all(b, b, s, i.&, b.&, s.&);
   :              ^ type mismatch
   .
- == Note: expected type int based on argument 1
+ == note: expected type int based on argument 1
   :     take_all(b, b, s, i.&, b.&, s.&);
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:50:5
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -488,10 +488,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:51:17:51:18
   :     take_all(i, i, s, i.&, b.&, s.&);
   :                 ^ type mismatch
   .
- == Note: expected type bool based on argument 2
+ == note: expected type bool based on argument 2
   :     take_all(i, i, s, i.&, b.&, s.&);
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:51:5
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -501,10 +501,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:52:20:52:21
   :     take_all(i, b, b, i.&, b.&, s.&);
   :                    ^ type mismatch
   .
- == Note: expected type SomeStruct based on argument 3
+ == note: expected type SomeStruct based on argument 3
   :     take_all(i, b, b, i.&, b.&, s.&);
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:52:5
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15
 
@@ -514,10 +514,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:53:23:53:24
   :     take_all(i, b, s, s, b.&, s.&);
   :                       ^ pointer type mismatch
   .
- == Note: expected type int*<free> based on argument 4
+ == note: expected type int*<free> based on argument 4
   :     take_all(i, b, s, s, b.&, s.&);
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- call_wrongarg.rna:53:5
- == Note: got conflicting type SomeStruct for variable 's'
+ == note: got conflicting type SomeStruct for variable 's'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :                        ^^^^^^^^^^^^^  --- call_wrongarg.rna:13:24
 
@@ -527,10 +527,10 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:54:28:54:29
   :     take_all(i, b, s, i.&, i.&, s.&);
   :                            ^ type mismatch
   .
- == Note: expected type bool based on dereferenced type
+ == note: expected type bool based on dereferenced type
   :     take_all(i, b, s, i.&, i.&, s.&);
   :                            ^^^  --- call_wrongarg.rna:54:28
- == Note: got conflicting type int for variable 'i'
+ == note: got conflicting type int for variable 'i'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :       ^^^^^^  --- call_wrongarg.rna:13:7
 
@@ -540,9 +540,9 @@ at compile/lang_tests/typechecking/calls/call_wrongarg.rna:55:33:55:34
   :     take_all(i, b, s, i.&, b.&, b.&);
   :                                 ^ type mismatch
   .
- == Note: expected type SomeStruct based on dereferenced type
+ == note: expected type SomeStruct based on dereferenced type
   :     take_all(i, b, s, i.&, b.&, b.&);
   :                                 ^^^  --- call_wrongarg.rna:55:33
- == Note: got conflicting type bool for variable 'b'
+ == note: got conflicting type bool for variable 'b'
   : fun f(i: int, b: bool, s: SomeStruct) {
   :               ^^^^^^^  --- call_wrongarg.rna:13:15

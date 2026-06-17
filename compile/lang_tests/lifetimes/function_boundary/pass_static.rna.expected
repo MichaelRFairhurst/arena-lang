@@ -1,6 +1,22 @@
-No path found between <outer arena> and <stack>, cannot report error without location
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<stack> and *static
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/function_boundary/pass_static.rna:13:17:13:19
   :     take_static(p1);
-  :                 ^^ Conflict root
+  :                 ^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun call_funcs_bad() {
+  :                      ^  --- pass_static.rna:10:22

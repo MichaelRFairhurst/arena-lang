@@ -4,9 +4,9 @@ at compile/lang_tests/typechecking/inference/deref_constrain.rna:6:13:6:30
   :     let d = take_display(d.*);
   :             ^^^^^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type int based on return type
+ == note: expected type int based on return type
   :     let d = take_display(d.*);
   :             ^^^^^^^^^^^^^^^^^  --- deref_constrain.rna:6:13
- == Note: got conflicting type Display*unsafe for variable 'd'
+ == note: got conflicting type Display*unsafe for variable 'd'
   :     let d = take_display(d.*);
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^^  --- deref_constrain.rna:6:5

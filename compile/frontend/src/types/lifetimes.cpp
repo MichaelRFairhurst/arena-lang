@@ -9,8 +9,6 @@ namespace {
         LifetimeId lifetime;
         size_t tarjan_id = 0;
         LifetimeNode *parent = nullptr;
-        const error::Cause *parent_link = nullptr;
-        const LifetimeConstraint *reached_by_constraint = nullptr;
         size_t lowlink = std::numeric_limits<size_t>::max();
         size_t order = 0;
         bool on_stack = false;
@@ -52,6 +50,13 @@ namespace {
      * A djikstra search to find the shortest possible causal chain that violated a given lifetime
      * constraint.
      *
+     * A causal chain is a set of constraints that form a counterexample to the given constraint. If
+     * the violated constraint is `A < B`, then a counterexample may simply be a single constraint
+     * `A = B`, or such a constraint might exist through traversing some equalities (e.g. `A < B`,
+     * `A = C`, `C = B`). Alternatively, the violation might be due to a cycle of constraints (e.g.
+     * `A < B`, `B < A`). Roughly speaking, for a violated constraint `A < B`, we search for the
+     * shortest path from B to A through `=` and `<` edges.
+     *
      * The search is driven by the `Target` class, which determines whether we search nodes with
      * greater, less, or equal lifetimes and what the upper/lower bound on those lifetimes are.
      *
@@ -62,53 +67,39 @@ namespace {
      * best path is the shortest detected cycle from root to target back to itself. See
      * `CandidatePath::State` for more.
      */
-    class DjikstraPathFinder {
+    class OutlivesCounterexample {
 
         /**
          * To find the shortest causal chain from A to B, we only need to search in a certain
          * direction and in a certain range of `order`s.
          *
-         * For example, if the root has `order` 2, and was supposed to be greater than the target
-         * which has `order` 5, then we only need to search edges that have `order` between 2 and 5
-         * inclusive, and we only need to search in the direction of greater lifetimes.
+         * Our solver always prefers to assign equality when necessary, so all violated constraints
+         * are of the form `A > B` or `A < B`. These get normalized to
+         * `expected_greater > expected_lesser`.
+         *
+         * Therefore, our search is for a counterexample of the form `EG = EL` (a direct
+         * contradiction) or `EL > EG` (an unsatisfiable cycle), possibly over some chain of
+         * intermediate `=`/`>` constraints, e.g. `EL = ... = EG` or `EL > ... > EG`.
+         *
+         * Since our solver assigns equality whenever necessary, both of the above cases will only
+         * involve nodes with the same `order` values.
          *
          * This class manages the logic of determining the subset of edges that need to be
          * considered for a given search target.
          */
         struct Target {
-            enum class Direction {
-                Greater,
-                Less,
-            };
-
-            Target(LifetimeNode begin, LifetimeNode end) : begin(begin), end(end) {
-                min_order = std::min(begin.order, end.order);
-                max_order = std::max(begin.order, end.order);
-                if (begin.order < end.order) {
-                    direction = Direction::Greater;
-                } else {
-                    direction = Direction::Less;
+            Target(LifetimeNode expected_greater, LifetimeNode expected_lesser)
+                : begin(expected_lesser), end(expected_greater) {
+                if (expected_greater.order != expected_lesser.order) {
+                    throw std::runtime_error("Expected solver to only produce violated constraints "
+                                             "between nodes of the same order");
                 }
+
+                required_order = expected_greater.order;
             }
 
-            bool should_traverse(LifetimeNode prev,
-                                 LifetimeNode next,
-                                 LifetimeConstraint constraint) const {
-                if (next.order < min_order || next.order > max_order) {
-                    return false;
-                }
 
-                switch (direction) {
-                case Direction::Greater:
-                    return next.order >= prev.order;
-                case Direction::Less:
-                    return next.order <= prev.order;
-                }
-            }
-
-            size_t min_order;
-            size_t max_order;
-            Direction direction;
+            size_t required_order;
             LifetimeNode begin;
             LifetimeNode end;
         };
@@ -128,46 +119,78 @@ namespace {
             enum class State : uint8_t {
                 Initial = 0,
                 HasLocation = 1,
-                HasOrderChange = 2,
-                PassesTarget = 4,
+                // HasOrderChange = 2,
+                // PassesTarget = 4,
             };
 
+            CandidatePath() = default;
+            CandidatePath(LifetimeNode location,
+                          LifetimeConstraint violated_constraint,
+                          std::string summary)
+                : location(location) {
+                if (violated_constraint.origin.has_value()) {
+                    path.push_back({summary,
+                                    violated_constraint.origin->description,
+                                    violated_constraint.origin->location,
+                                    violated_constraint.origin->supplements});
+
+                    if (violated_constraint.origin->location.has_value()) {
+                        state |= static_cast<uint8_t>(State::HasLocation);
+                    }
+                }
+
+                visited_node_ids.push_back(location.tarjan_id);
+            }
+
+            CandidatePath(std::vector<error::Cause> path,
+                          std::vector<size_t> visited_node_ids,
+                          LifetimeNode location,
+                          size_t distance,
+                          uint8_t state)
+                : path(path), visited_node_ids(visited_node_ids), location(location),
+                  distance(distance), state(state) {}
+
             std::vector<error::Cause> path;
+            std::vector<size_t> visited_node_ids;
             LifetimeNode location;
-            size_t distance;
+            size_t distance = 0;
             uint8_t state = static_cast<uint8_t>(State::Initial);
 
             CandidatePath with_step(const LifetimeConstraint &constraint,
                                     LifetimeNode next_location,
-                                    bool reaches_target) const {
+                                    bool reaches_target,
+                                    std::string summary) const {
+                std::vector<size_t> new_visited_node_ids = visited_node_ids;
+                new_visited_node_ids.push_back(location.tarjan_id);
+
                 std::vector<error::Cause> new_path = path;
                 auto new_state = state;
                 if (constraint.origin.has_value()) {
-                    new_path.push_back(constraint.origin.value());
+                    new_path.push_back({
+                        summary,
+                        constraint.origin->description,
+                        constraint.origin->location,
+                        constraint.origin->supplements,
+                    });
+
                     if (constraint.origin->location.has_value()) {
                         new_state |= static_cast<uint8_t>(State::HasLocation);
                     }
                 }
 
-                if (next_location.order != location.order) {
-                    new_state |= static_cast<uint8_t>(State::HasOrderChange);
-                }
-
-                if (reaches_target) {
-                    new_state |= static_cast<uint8_t>(State::PassesTarget);
-                }
-
-                return CandidatePath{new_path, next_location, distance + 1, new_state};
+                return CandidatePath{new_path,
+                                     new_visited_node_ids,
+                                     next_location,
+                                     distance + 1,
+                                     new_state};
             }
 
-            bool complete_at_target() {
-                return ((state & static_cast<uint8_t>(State::HasLocation)) != 0) &&
-                       ((state & static_cast<uint8_t>(State::HasOrderChange)) != 0);
-            }
+            bool completable() { return ((state & static_cast<uint8_t>(State::HasLocation)) != 0); }
 
-            bool complete_at_root() {
-                return ((state & static_cast<uint8_t>(State::HasLocation)) != 0) &&
-                       ((state & static_cast<uint8_t>(State::PassesTarget)) != 0);
+            bool has_visited(const LifetimeNode &node) const {
+                return std::find(visited_node_ids.begin(),
+                                 visited_node_ids.end(),
+                                 node.tarjan_id) != visited_node_ids.end();
             }
         };
 
@@ -193,17 +216,19 @@ namespace {
         };
 
     public:
-        DjikstraPathFinder(const LifetimeGraph *graph,
-                           const LifetimeGroup *lifetimes,
-                           LifetimeNode begin,
-                           LifetimeNode end)
-            : graph(graph), lifetimes(lifetimes), target(begin, end),
-              distances(graph->nodes_by_tjid.size()) {}
+        OutlivesCounterexample(const LifetimeGraph *graph,
+                               const LifetimeGroup *lifetimes,
+                               LifetimeNode expected_greater,
+                               LifetimeNode expected_lesser,
+                               LifetimeConstraint violated_constraint)
+            : graph(graph), lifetimes(lifetimes), target(expected_greater, expected_lesser),
+              distances(graph->nodes_by_tjid.size()) {
+            candidate_paths.emplace(target.begin,
+                                    violated_constraint,
+                                    get_summary(violated_constraint));
+        }
 
         std::vector<error::Cause> find_path() {
-            auto base_path = CandidatePath{{}, target.begin, 0};
-            candidate_paths.push(base_path);
-
             while (!candidate_paths.empty() && !best_path.has_value()) {
                 auto candidate = candidate_paths.front();
                 candidate_paths.pop();
@@ -212,11 +237,28 @@ namespace {
 
             if (best_path.has_value()) {
                 // TODO: We shouldn't have to do a dedupe stage, and this may break the causal
-                // chain. 
-                return dedupe(best_path->path);
+                // chain.
+                // return dedupe(best_path->path);
+                return rotate(best_path->path);
+                return best_path->path;
             } else {
                 return {};
             }
+        }
+
+        /**
+         * Ensures that the path cycle starts with a node that has a source location, while
+         * maintaining the relative ordering.
+         */
+        std::vector<error::Cause> rotate(const std::vector<error::Cause> &input) {
+            auto pivot = std::find_if(input.begin(), input.end(), [&](const error::Cause &cause) {
+                return cause.location.has_value();
+            });
+
+            std::vector<error::Cause> result;
+            std::copy(pivot, input.end(), std::back_inserter(result));
+            std::copy(input.begin(), pivot, std::back_inserter(result));
+            return result;
         }
 
         std::vector<error::Cause> dedupe(std::vector<error::Cause> input) {
@@ -236,12 +278,11 @@ namespace {
         void continue_path(CandidatePath &candidate) {
             auto node = graph->get_node(candidate.location.lifetime);
             auto lifetime = lifetimes->get_lifetime_by_id(node.lifetime);
+
+            // See `Target` for an explanation of why we only consider `>` and `=` edges, and not
+            // `<` edges.
             for (const auto &[less_id, constraint] : lifetime->outlives) {
                 explore_edge(candidate, less_id, constraint);
-            }
-
-            for (const auto &[greater_id, constraint] : lifetime->outlived_by) {
-                explore_edge(candidate, greater_id, constraint);
             }
 
             for (const auto &[equal_id, constraint] : lifetime->equals) {
@@ -249,21 +290,53 @@ namespace {
             }
         }
 
+        std::string get_summary(LifetimeConstraint constraint) {
+            auto name_left = lifetimes->get_lifetime_by_id(constraint.left_id)->get_debug_name();
+            auto name_right = lifetimes->get_lifetime_by_id(constraint.right_id)->get_debug_name();
+            std::string summary;
+            switch (constraint.relation) {
+            case LifetimeRelation::Greater:
+                summary =
+                    "Lifetime '*" + name_left + "' must outlive '*" + name_right + "'";
+                break;
+            case LifetimeRelation::GreaterEqual:
+                summary = "Lifetime '*" + name_left + "' may outlive '*" +
+                          name_right + "'";
+                break;
+            case LifetimeRelation::Equals:
+                summary = "Lifetime '*" + name_left + "' must match '*" + name_right + "'";
+                break;
+            case LifetimeRelation::LessEqual:
+                summary = "Lifetime '*" + name_left + "' may not outlive '*" +
+                          name_right + "'";
+                break;
+            case LifetimeRelation::Less:
+                summary = "Lifetime '*" + name_left + "' must be outlived by '*" + name_right + "'";
+                break;
+            }
+
+            return summary;
+        }
+
         void explore_edge(CandidatePath &path, LifetimeId next, LifetimeConstraint constraint) {
-            auto &prev = path.location;
             auto &node = graph->get_node(next);
 
-            // Check that the edge is in the right direction and within the right bounds to
-            // be a potential link in the causal chain.
-            if (!target.should_traverse(prev, node, constraint)) {
+            // See `Target` for an explanation of why we only consider nodes with the a given
+            // `order` value.
+            if (node.order != target.required_order) {
+                return;
+            }
+
+            if (path.has_visited(node)) {
                 return;
             }
 
             bool is_target = node.lifetime == target.end.lifetime;
-            bool is_root = node.lifetime == target.begin.lifetime;
+
+            std::string summary = get_summary(constraint);
 
             // Construct the new path, which may have a new state of overall progress.
-            auto new_path = path.with_step(constraint, node, is_target);
+            auto new_path = path.with_step(constraint, node, is_target, summary);
             auto &node_distance = distances[node.tarjan_id];
 
             if (node_distance.get_for(new_path.state) <= new_path.distance) {
@@ -272,8 +345,7 @@ namespace {
 
             node_distance.set_for(new_path.state, new_path.distance);
 
-            if ((is_target && new_path.complete_at_target()) ||
-                (is_root && new_path.complete_at_root())) {
+            if (is_target && new_path.completable()) {
                 best_path = std::move(new_path);
             } else {
                 candidate_paths.push(std::move(new_path));
@@ -332,14 +404,11 @@ namespace {
             }
         }
 
-        void process_node(LifetimeId id,
-                          const LifetimeGroup &group,
-                          const LifetimeConstraint *reached_by_constraint = nullptr) {
+        void process_node(LifetimeId id, const LifetimeGroup &group) {
             // std::cout << "Processing lifetime " << id.lt_id << std::endl;
 
             auto node = &graph.get_node(id);
             node->lowlink = node->tarjan_id;
-            node->reached_by_constraint = reached_by_constraint;
             node->on_stack = true;
             tarjan_stack.push(node);
 
@@ -382,7 +451,11 @@ namespace {
                     continue;
                 }
 
-                process_node(queued_lifetime, group, queued_constraint);
+                process_node(queued_lifetime, group);
+                node->lowlink = std::min(node->lowlink, graph.get_node(queued_lifetime).lowlink);
+                // std::cout << "Updated lowlink of lifetime " << id.lt_id << " to " <<
+                // node->lowlink
+                //           << std::endl;
             }
 
             if (node->lowlink == node->tarjan_id) {
@@ -396,7 +469,7 @@ namespace {
                     // std::cout << "Unifying lifetime " << top->lifetime.lt_id
                     //           << " with root lifetime " << id.lt_id << " and assigning order "
                     //           << next_sort_id << std::endl;
-                    unify(*node, *top, top->reached_by_constraint);
+                    unify(*node, *top);
                     if (top->lifetime == id) {
                         break;
                     }
@@ -417,7 +490,7 @@ namespace {
                     //           << id.lt_id << " because it's already indexed" << std::endl;
                     continue;
                 }
-                unify(*node, graph.get_node(eq_id), &constraint);
+                unify(*node, graph.get_node(eq_id));
                 union_equal_successors(eq_id, group);
                 // std::cout << "Unifying equal lifetime " << eq_id.lt_id << " and lifetime "
                 //           << id.lt_id << std::endl;
@@ -446,14 +519,7 @@ namespace {
             }
         }
 
-        void unify(LifetimeNode &left,
-                   LifetimeNode &right,
-                   const LifetimeConstraint *constraint = nullptr) {
-            const error::Cause *origin = nullptr;
-            if (constraint != nullptr && constraint->origin.has_value()) {
-                origin = &constraint->origin.value();
-            }
-
+        void unify(LifetimeNode &left, LifetimeNode &right) {
             auto left_root = &union_find(left);
             auto right_root = &union_find(right);
             if (left_root == right_root) {
@@ -461,7 +527,6 @@ namespace {
             }
 
             right_root->parent = &left;
-            right_root->parent_link = origin;
         }
 
         LifetimeNode &union_find(LifetimeNode &node) {
@@ -471,77 +536,6 @@ namespace {
             return union_find(*node.parent);
         }
 
-        std::vector<error::Cause> get_union_path(const LifetimeNode &node) const {
-            std::vector<error::Cause> path;
-            auto current = &node;
-            while (current->parent != nullptr) {
-                if (current->parent_link != nullptr) {
-                    path.push_back(*current->parent_link);
-                }
-
-                current = current->parent;
-            }
-            return path;
-        }
-
-        void detect_conflicts(LifetimeConstraint constraint,
-                              const LifetimeGroup *lifetimes,
-                              error::Reporter *errors) {
-            auto left = graph.get_node(constraint.left_id);
-            auto right = graph.get_node(constraint.right_id);
-
-            if (constraint.relation == LifetimeRelation::Greater && left.order <= right.order) {
-                report_outlives_conflict(&left, &right, constraint, lifetimes, errors);
-            } else if (constraint.relation == LifetimeRelation::GreaterEqual &&
-                       left.order < right.order) {
-                report_outlives_conflict(&left, &right, constraint, lifetimes, errors);
-            } else if (constraint.relation == LifetimeRelation::Less && left.order >= right.order) {
-                report_outlives_conflict(&right, &left, constraint, lifetimes, errors);
-            } else if (constraint.relation == LifetimeRelation::LessEqual &&
-                       left.order > right.order) {
-                report_outlives_conflict(&right, &left, constraint, lifetimes, errors);
-            }
-        }
-
-        void report_outlives_conflict(LifetimeNode *lifetime,
-                                      LifetimeNode *outlives,
-                                      const LifetimeConstraint &constraint,
-                                      const LifetimeGroup *lifetimes,
-                                      error::Reporter *errors) {
-            auto name_left = lifetimes->get_lifetime_by_id(lifetime->lifetime)->get_debug_name();
-            auto name_right = lifetimes->get_lifetime_by_id(outlives->lifetime)->get_debug_name();
-
-            auto path_finder = DjikstraPathFinder(&graph, lifetimes, *lifetime, *outlives);
-            std::vector<error::Cause> path = path_finder.find_path();
-
-            if (path.empty()) {
-                std::cout << "No path found between " << name_left << " and " << name_right
-                          << ", cannot report error without location\n";
-                return;
-            }
-
-            std::optional<error::Location> l = std::nullopt;
-
-            if (path.front().location.has_value()) {
-                l = path.front().location;
-                path.erase(path.begin());
-            } else {
-                for (const auto &p : path) {
-                    if (p.location.has_value()) {
-                        l = p.location.value();
-                        break;
-                    }
-                }
-            }
-
-            if (l.has_value()) {
-                errors->E_L_OUTLV_VIOL(l.value(), name_left, name_right, path);
-            } else {
-                std::cout << "No location found for conflict between " << name_left << " and "
-                          << name_right << ", reporting without location\n";
-            }
-        }
-
         const LifetimeGraph &get_graph() const { return graph; }
 
     private:
@@ -549,6 +543,137 @@ namespace {
         std::stack<QueuedNode *> outlives_stack;
         std::stack<LifetimeNode *> tarjan_stack;
         int sorted_id = 0;
+    };
+
+    class ConflictDetector {
+        struct ErrorCandidate {
+            error::Location location;
+            std::vector<error::Cause> path;
+            std::optional<LifetimeError> error_code;
+            std::string name_left;
+            std::string name_right;
+        };
+
+    public:
+        ConflictDetector(LifetimeGraph *graph,
+                         error::Reporter *errors,
+                         const LifetimeGroup *lifetimes)
+            : graph(graph), errors(errors), lifetimes(lifetimes) {}
+
+        void detect_all_conflicts() {
+            for (auto &constraint : lifetimes->get_constraints()) {
+                check_conflict(constraint);
+            }
+
+            for (auto &[location, candidate] : candidates) {
+                report_error(candidate);
+            }
+        }
+
+        void check_conflict(LifetimeConstraint constraint) {
+            auto left = graph->get_node(constraint.left_id);
+            auto right = graph->get_node(constraint.right_id);
+
+            if (constraint.relation == LifetimeRelation::Greater && !(left.order > right.order)) {
+                report_unsatisfied_outlives(&left, &right, constraint, lifetimes, errors);
+            } else if (constraint.relation == LifetimeRelation::GreaterEqual &&
+                       !(left.order >= right.order)) {
+                report_unsatisfied_outlives(&left, &right, constraint, lifetimes, errors);
+            } else if (constraint.relation == LifetimeRelation::Less &&
+                       !(left.order < right.order)) {
+                report_unsatisfied_outlives(&right, &left, constraint, lifetimes, errors);
+            } else if (constraint.relation == LifetimeRelation::LessEqual &&
+                       !(left.order <= right.order)) {
+                report_unsatisfied_outlives(&right, &left, constraint, lifetimes, errors);
+            }
+        }
+
+        void report_unsatisfied_outlives(LifetimeNode *expected_greater,
+                                         LifetimeNode *expected_lesser,
+                                         const LifetimeConstraint &constraint,
+                                         const LifetimeGroup *lifetimes,
+                                         error::Reporter *errors) {
+            auto name_left =
+                lifetimes->get_lifetime_by_id(expected_greater->lifetime)->get_debug_name();
+            auto name_right =
+                lifetimes->get_lifetime_by_id(expected_lesser->lifetime)->get_debug_name();
+
+            auto path_finder = OutlivesCounterexample(graph,
+                                                      lifetimes,
+                                                      *expected_greater,
+                                                      *expected_lesser,
+                                                      constraint);
+            std::vector<error::Cause> path = path_finder.find_path();
+
+            std::optional<error::Location> l = std::nullopt;
+
+            if (path.empty()) {
+                throw std::runtime_error("No path found between " + name_left + " and " +
+                                         name_right + ", cannot report error without location");
+            } else if (!path.front().location.has_value()) {
+                throw std::runtime_error("Expected path to start with a location");
+            }
+
+            l = path.front().location;
+            path.front().location = std::nullopt;
+
+            std::optional<LifetimeError> error_code = std::nullopt;
+            if (constraint.origin.has_value() && constraint.origin->error.has_value()) {
+                error_code = constraint.origin->error.value();
+            }
+
+            queue_error(ErrorCandidate{l.value(), path, error_code, name_left, name_right});
+        }
+
+        void queue_error(ErrorCandidate candidate) {
+            auto location = candidate.location;
+            auto path = candidate.path;
+
+            if (candidates.find(location) == candidates.end()) {
+                candidates[location] = candidate;
+            } else {
+                auto &existing_candidate = candidates[location];
+                if (existing_candidate.path.size() > path.size()) {
+                    existing_candidate = candidate;
+                }
+            }
+        }
+
+        void report_error(ErrorCandidate &candidate) {
+            auto location = candidate.location;
+            auto path = candidate.path;
+
+            if (candidate.error_code.has_value()) {
+                switch (candidate.error_code.value()) {
+                case LifetimeError::EscapesStack:
+                    errors->E_L_ESC_STACK(location, path);
+                    return;
+                case LifetimeError::EscapesBlock:
+                    errors->E_L_ESC_BLOCK(location, path);
+                    return;
+                case LifetimeError::EscapesArena:
+                    errors->E_L_ESC_RNA(location, path);
+                    return;
+                case LifetimeError::EscapesContext:
+                    errors->E_L_ESC_CTX(location, path);
+                    return;
+                case LifetimeError::InvalidUseOfAny:
+                    errors->E_L_INV_ANY(location, path);
+                    return;
+                case LifetimeError::InvalidUseOfMy:
+                    errors->E_L_INV_MY(location, path);
+                    return;
+                }
+            }
+
+            errors->E_L_OUTLV_VIOL(location, candidate.name_left, candidate.name_right, path);
+        }
+
+    private:
+        std::unordered_map<error::Location, ErrorCandidate> candidates;
+        LifetimeGraph *graph;
+        error::Reporter *errors;
+        const LifetimeGroup *lifetimes;
     };
 } // namespace
 
@@ -566,7 +691,6 @@ void LifetimeSolver::solve(const LifetimeGroup &group) {
         auto lifetime = group.get_lifetime_by_id(node.lifetime);
     }
 
-    for (auto &constraint : group.get_constraints()) {
-        solver.detect_conflicts(constraint, &group, errors);
-    }
+    auto detect_conflicts = ConflictDetector(&graph, errors, &group);
+    detect_conflicts.detect_all_conflicts();
 }

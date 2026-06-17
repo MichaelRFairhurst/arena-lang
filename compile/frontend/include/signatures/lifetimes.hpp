@@ -126,11 +126,32 @@ namespace arena::sema {
         Less,
     };
 
+    enum class LifetimeError {
+        EscapesStack,
+        EscapesBlock,
+        EscapesContext,
+        EscapesArena,
+        InvalidUseOfAny,
+        InvalidUseOfMy,
+    };
+
+    struct ConstraintCause {
+        std::string description;
+        std::optional<error::Location> location;
+        std::vector<error::Supplement> supplements;
+        std::optional<LifetimeError> error;
+
+        bool operator==(const ConstraintCause &other) const {
+            return error == other.error && description == other.description && location == other.location &&
+                   supplements == other.supplements;
+        }
+    };
+
     struct LifetimeConstraint {
         LifetimeId left_id;
         LifetimeRelation relation;
         LifetimeId right_id;
-        std::optional<error::Cause> origin;
+        std::optional<ConstraintCause> origin;
 
         bool operator==(const LifetimeConstraint &other) const {
             return left_id.lt_id == other.left_id.lt_id && relation == other.relation &&
@@ -170,11 +191,11 @@ namespace arena::sema {
         void add_constraint(Lifetime &left,
                             LifetimeRelation relation,
                             Lifetime &right,
-                            const error::Cause &origin);
+                            const ConstraintCause &origin);
         void add_constraint(LifetimeId left,
                             LifetimeRelation relation,
                             LifetimeId right,
-                            const error::Cause &origin);
+                            const ConstraintCause &origin);
         void set_context(FunctionId function_id) { context = function_id; }
         void set_context(TypeId type_id) { context = type_id; }
         LifetimeId get_max_lifetime_id() const { return lifetimes.back().group_lifetime_id; }

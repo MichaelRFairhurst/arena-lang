@@ -1,22 +1,21 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<arena>
+Error[E-L_ESC_RNA]: Pointer value to a nested arena escapes its arena block
 at compile/lang_tests/lifetimes/arena/nested_arenas.rna:7:19:7:26
   :         p_outer = p_inner;
-  :                   ^^^^^^^ Conflict root
-  .
- ... caused by
-  -> Outer *arena outlives nested *arena lifetime
+  :                   ^^^^^^^ Escape occurs here
   :
- == Note: Nested '*arena' defined here
-  :     vvvvvvv
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*arena<ctx>' may not outlive '*arena'
+  : 2. Lifetime '*arena<ctx>' must outlive '*arena'
+  .
+ ... caused by 1.
+  -> 'int*arena' assigned to pointer with lifetime '*arena<ctx>'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*arena<outer>' lifetime is greater than '*arena<inner>'
+  :
+ == note: '*arena<inner>' defined here
   :     arena {
-  :  ... (3 more lines) ...
-  :     }
-  : ^^^^^  --- nested_arenas.rna:4:5
-  .
- ... caused by
-  -> nested_arenas.rna:7:19
-  :         p_outer = p_inner;
-  :                   ^^^^^^^ pointer assignment
-  :
- == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  :     ^^^^^^^  --- nested_arenas.rna:4:5

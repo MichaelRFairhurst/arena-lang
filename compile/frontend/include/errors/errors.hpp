@@ -26,8 +26,9 @@
  *   - A note kind (e.g., "Note" or "Help")
  *   - A human-readable description of the note
  *   - An optional source location (start and end token)
- * - A list of causes
- *   - Description
+ * - A list of causes, where each cause has
+ *   - Summary (e.g., "a < b", "b < c", "c < a")
+ *   - Full description ("assignment requires that ....")
  *   - Source location (start and end token)
  *   - A list of supplementary notes
  *
@@ -39,6 +40,10 @@
  *  :      x = y.&;
  *  :          ^^^ assigned here
  *  :
+ *  : Conflicting requirements:
+ *  : 1. *stack lifetime must be greater than *static lifetime
+ *  : 2. *static lifetime must be greater than *stack lifetime
+ *  :
  * == Note: Variable has lifetime of block here src/main.arena:3:5
  * [[src/main.arena:3:5]]:
  *  :         v
@@ -47,23 +52,22 @@
  *  : }
  *  : ^ variable lifetime is this block
  *  :
- * caused by:
+ * caused by 1. *stack lifetime must be greater than *static lifetime:
  * [[src/main.arena:3:5]]:
  *  :      let x: *static;
  *  :      ^^^^^^^^^^^^^^ use of static lifetime
  *  :
- * caused by:
+ * caused by 2. *static lifetime must be greater than *stack lifetime:
  * [[src/main.arena:2:5]]:
  *  :      x = y.&;
  *  :          ^^^ address of variable
  *  :
- * caused by:
+ * == Note: variable 'y' declared with stack lifetime here
  * [[src/main.arena:1:5]]:
  *  :      let y: i32;
  *  :      ^^^^^^^^^^ variable declaration
  *  :
  * == Note: Every lifetime is less than the static lifetime
- * == Note: Local variables have lifetimes that end at the end of their block
  * == Help: Consider assigning by value instead of by reference
  * ```
  */
@@ -96,13 +100,14 @@ namespace arena::error {
     };
 
     struct Cause {
-        std::string description;
+        std::string summary;
+        std::string full_description;
         std::optional<Location> location;
         std::vector<Supplement> supplements;
 
         bool operator==(const Cause &other) const {
-            return description == other.description && location == other.location &&
-                   supplements == other.supplements;
+            return summary == other.summary && full_description == other.full_description &&
+                   location == other.location && supplements == other.supplements;
         }
     };
 
@@ -134,6 +139,9 @@ namespace arena::error {
         bool operator!=(const Error &other) const { return !(*this == other); }
 
         std::string_view get_code() const { return code; }
+        bool is_lifetime_error() const { return get_code().substr(0, 3) == "E-L"; }
+        bool is_type_error() const { return get_code().substr(0, 3) == "E-T"; }
+
         const Location &get_location() const { return location; }
         std::string_view get_label() const { return label; }
 
@@ -144,10 +152,11 @@ namespace arena::error {
         const ast::Token *get_begin() const { return location.begin; }
         const ast::Token *get_end() const { return location.end; }
 
-        void add_cause(std::string description,
+        void add_cause(std::string summary,
+                       std::string full_description,
                        std::optional<Location> location = std::nullopt,
                        std::vector<Supplement> supplements = {}) {
-            causes.push_back({description, location, supplements});
+            causes.push_back({summary, full_description, location, supplements});
         }
 
         void add_supplement(SupplementKind kind,
@@ -379,15 +388,129 @@ namespace arena::error {
             });
         }
 
+        Error &E_L_ESC_STACK(Location l, std::vector<Cause> causes) {
+            auto &err = report({
+                "E-L_ESC_STACK",
+                l,
+                "Escape occurs here",
+                std::vector<Chunk>{
+                    "Pointer value with stack lifetime escapes the function stack",
+                },
+            });
+
+            for (const auto &cause : causes) {
+                err.add_cause(cause.summary,
+                              cause.full_description,
+                              cause.location,
+                              cause.supplements);
+            }
+            return err;
+        }
+
+        Error &E_L_ESC_BLOCK(Location l, std::vector<Cause> causes) {
+            auto &err = report({
+                "E-L_ESC_BLOCK",
+                l,
+                "Escape occurs here",
+                std::vector<Chunk>{
+                    "Pointer value to stack escapes the lifetime of its block",
+                },
+            });
+
+            for (const auto &cause : causes) {
+                err.add_cause(cause.summary,
+                              cause.full_description,
+                              cause.location,
+                              cause.supplements);
+            }
+            return err;
+        }
+
+        Error &E_L_ESC_CTX(Location l, std::vector<Cause> causes) {
+            auto &err = report({
+                "E-L_ESC_CTX",
+                l,
+                "Escape occurs here",
+                std::vector<Chunk>{
+                    "Pointer value to caller's arena escapes that arena",
+                },
+            });
+
+            for (const auto &cause : causes) {
+                err.add_cause(cause.summary,
+                              cause.full_description,
+                              cause.location,
+                              cause.supplements);
+            }
+            return err;
+        }
+
+        Error &E_L_ESC_RNA(Location l, std::vector<Cause> causes) {
+            auto &err = report({
+                "E-L_ESC_RNA",
+                l,
+                "Escape occurs here",
+                std::vector<Chunk>{
+                    "Pointer value to a nested arena escapes its arena block",
+                },
+            });
+
+            for (const auto &cause : causes) {
+                err.add_cause(cause.summary,
+                              cause.full_description,
+                              cause.location,
+                              cause.supplements);
+            }
+            return err;
+        }
+
+        Error &E_L_INV_ANY(Location l, std::vector<Cause> causes) {
+            auto &err = report({
+                "E-L_INV_ANY",
+                l,
+                "Results in invalid use of '*any' lifetime",
+                std::vector<Chunk>{
+                    "Pointer to '*any' lifetime is used in a way that requires a more specific "
+                    "lifetime",
+                },
+            });
+
+            for (const auto &cause : causes) {
+                err.add_cause(cause.summary,
+                              cause.full_description,
+                              cause.location,
+                              cause.supplements);
+            }
+            return err;
+        }
+
+        Error &E_L_INV_MY(Location l, std::vector<Cause> causes) {
+            auto &err = report({
+                "E-L_INV_MY",
+                l,
+                "Results in invalid use of '*my' lifetime",
+                std::vector<Chunk>{
+                    "The '*my' lifetime does not guarantee a lifetime that can be used in this way",
+                },
+            });
+
+            for (const auto &cause : causes) {
+                err.add_cause(cause.summary,
+                              cause.full_description,
+                              cause.location,
+                              cause.supplements);
+            }
+            return err;
+        }
+
         Error &E_L_OUTLV_VIOL(Location l,
                               std::string ltshort,
                               std::string ltlong,
                               std::vector<Cause> causes) {
-
             auto &err = report({
                 "E-L_OUTLV_VIOL",
                 l,
-                "Conflict root",
+                causes.front().full_description,
                 std::vector<Chunk>{
                     "Lifetime violation between *",
                     ltshort,
@@ -397,7 +520,10 @@ namespace arena::error {
             });
 
             for (const auto &cause : causes) {
-                err.add_cause(cause.description, cause.location, cause.supplements);
+                err.add_cause(cause.summary,
+                              cause.full_description,
+                              cause.location,
+                              cause.supplements);
             }
             return err;
         }
@@ -443,4 +569,11 @@ namespace arena::error {
 
 } // namespace arena::error
 
+template<>
+struct std::hash<arena::error::Location> {
+    size_t operator()(const arena::error::Location &loc) const {
+        return std::hash<const char*>()(loc.begin->text.data()) ^
+               (std::hash<const char*>()(loc.end->text.data()) << 1);
+    }
+};
 #endif

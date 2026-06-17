@@ -1,398 +1,281 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *a and *<outer arena>
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:32:10:32:26
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:32:23:32:25
   :     p2 = identity_int(p1);
-  :          ^^^^^^^^^^^^^^^^ Conflict root
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *a and *static
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:39:10:39:26
+  :                       ^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*a' may not outlive '*stack'
+  : 2. Lifetime '*arena<ctx>' may not outlive '*a'
+  : 3. Lifetime '*arena<ctx>' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*a'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> implicit_free_lifetime.rna:32:10
   :     p2 = identity_int(p1);
-  :          ^^^^^^^^^^^^^^^^ Conflict root
+  :          ^^^^^^^^^^^^^^^^ 'int*a' assigned to pointer with lifetime '*arena<ctx>'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 3.
+  -> '*arena<ctx>' lifetime is greater than '*stack'
+  :
+ == note: involving '*stack' lifetime for this function block
+  : fun use_int_identity_bad1() {
+  :                             ^  --- implicit_free_lifetime.rna:28:29
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *a and *static
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:46:10:46:26
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:39:23:39:25
   :     p2 = identity_int(p1);
-  :          ^^^^^^^^^^^^^^^^ Conflict root
+  :                       ^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*a' may not outlive '*stack'
+  : 2. Lifetime '*static' may not outlive '*a'
+  : 3. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*a'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> implicit_free_lifetime.rna:39:10
+  :     p2 = identity_int(p1);
+  :          ^^^^^^^^^^^^^^^^ 'int*a' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 3.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun use_int_identity_bad2() {
+  :                             ^  --- implicit_free_lifetime.rna:35:29
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
+at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:46:23:46:25
+  :     p2 = identity_int(p1);
+  :                       ^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*a' may not outlive '*arena<ctx>'
+  : 2. Lifetime '*static' may not outlive '*a'
+  : 3. Lifetime '*static' must outlive '*arena<ctx>'
+  .
+ ... caused by 1.
+  -> 'int*arena<ctx>' assigned to pointer with lifetime '*a'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> implicit_free_lifetime.rna:46:10
+  :     p2 = identity_int(p1);
+  :          ^^^^^^^^^^^^^^^^ 'int*a' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 3.
+  -> '*static' lifetime is greater than '*arena<ctx>'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: the outer '*arena' lifetime matches the lifetime of the caller's current arena.
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:65:10:65:29
   :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
-  .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+  :          ^^^^^^^^^^^^^^^^^^^ Escape occurs here
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                                v
-  : fun use_struct_identity_bad1() {
-  :  ... (4 more lines) ...
-  : }
-  : ^  --- implicit_free_lifetime.rna:61:32
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*stack' must match '*a'
+  : 2. Lifetime '*a' must match '*arena<ctx>'
+  : 3. Lifetime '*arena<ctx>' must outlive '*stack'
   .
- ... caused by
-  -> implicit_free_lifetime.rna:65:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+ ... caused by 1.
+  -> 'SomeStruct*a' assigned to pointer with lifetime '*stack'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
+ ... caused by 2.
   -> implicit_free_lifetime.rna:65:26
   :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
+  :                          ^^ 'SomeStruct*arena<ctx>' assigned to pointer with lifetime '*a'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
+  .
+ ... caused by 3.
+  -> '*arena<ctx>' lifetime is greater than '*stack'
+  :
+ == note: involving '*stack' lifetime for this function block
+  : fun use_struct_identity_bad1() {
+  :                                ^  --- implicit_free_lifetime.rna:61:32
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:72:26:72:28
   :     p1 = identity_struct(p2);
-  :                          ^^ Conflict root
-  .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+  :                          ^^ Escape occurs here
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                                v
-  : fun use_struct_identity_bad2() {
-  :  ... (4 more lines) ...
-  : }
-  : ^  --- implicit_free_lifetime.rna:68:32
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*a' must match '*stack'
+  : 2. Lifetime '*arena<ctx>' must match '*a'
+  : 3. Lifetime '*arena<ctx>' must outlive '*stack'
   .
- ... caused by
-  -> implicit_free_lifetime.rna:72:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
+ ... caused by 1.
+  -> 'SomeStruct*stack' assigned to pointer with lifetime '*a'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
+ ... caused by 2.
   -> implicit_free_lifetime.rna:72:10
   :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :          ^^^^^^^^^^^^^^^^^^^ 'SomeStruct*a' assigned to pointer with lifetime '*arena<ctx>'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
+  .
+ ... caused by 3.
+  -> '*arena<ctx>' lifetime is greater than '*stack'
+  :
+ == note: involving '*stack' lifetime for this function block
+  : fun use_struct_identity_bad2() {
+  :                                ^  --- implicit_free_lifetime.rna:68:32
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:79:10:79:29
   :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
-  .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :          ^^^^^^^^^^^^^^^^^^^ Escape occurs here
   :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*stack' must match '*a'
+  : 2. Lifetime '*a' must match '*static'
+  : 3. Lifetime '*static' must outlive '*stack'
   .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+ ... caused by 1.
+  -> 'SomeStruct*a' assigned to pointer with lifetime '*stack'
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                                v
-  : fun use_struct_identity_bad3() {
-  :  ... (4 more lines) ...
-  : }
-  : ^  --- implicit_free_lifetime.rna:75:32
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
-  -> implicit_free_lifetime.rna:79:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-  .
- ... caused by
+ ... caused by 2.
   -> implicit_free_lifetime.rna:79:26
   :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
+  :                          ^^ 'SomeStruct*static' assigned to pointer with lifetime '*a'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:79:10:79:29
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+ ... caused by 3.
+  -> '*static' lifetime is greater than '*stack'
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                                v
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
   : fun use_struct_identity_bad3() {
-  :  ... (4 more lines) ...
-  : }
-  : ^  --- implicit_free_lifetime.rna:75:32
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:79:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:79:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-  .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
-  :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  :                                ^  --- implicit_free_lifetime.rna:75:32
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:79:10:79:29
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
-  .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
-  :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
-  .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
-  :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                                v
-  : fun use_struct_identity_bad3() {
-  :  ... (4 more lines) ...
-  : }
-  : ^  --- implicit_free_lifetime.rna:75:32
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:79:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:79:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:86:26:86:28
   :     p1 = identity_struct(p2);
-  :                          ^^ Conflict root
-  .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :                          ^^ Escape occurs here
   :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*a' must match '*stack'
+  : 2. Lifetime '*static' must match '*a'
+  : 3. Lifetime '*static' must outlive '*stack'
   .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+ ... caused by 1.
+  -> 'SomeStruct*stack' assigned to pointer with lifetime '*a'
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                                v
-  : fun use_struct_identity_bad4() {
-  :  ... (4 more lines) ...
-  : }
-  : ^  --- implicit_free_lifetime.rna:82:32
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
-  -> implicit_free_lifetime.rna:86:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-  .
- ... caused by
+ ... caused by 2.
   -> implicit_free_lifetime.rna:86:10
   :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :          ^^^^^^^^^^^^^^^^^^^ 'SomeStruct*a' assigned to pointer with lifetime '*static'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *<outer arena> and *<stack>
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:86:26:86:28
-  :     p1 = identity_struct(p2);
-  :                          ^^ Conflict root
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
+ ... caused by 3.
+  -> '*static' lifetime is greater than '*stack'
   :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                                v
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
   : fun use_struct_identity_bad4() {
-  :  ... (4 more lines) ...
-  : }
-  : ^  --- implicit_free_lifetime.rna:82:32
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:86:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+  :                                ^  --- implicit_free_lifetime.rna:82:32
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:86:26:86:28
-  :     p1 = identity_struct(p2);
-  :                          ^^ Conflict root
-  .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
-  :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
-  .
- ... caused by
-  -> Outer function *arena outlives all function *<stack> lifetimes
-  :
- == Note: Relevant '*<stack>' lifetime is for this block
-  :                                v
-  : fun use_struct_identity_bad4() {
-  :  ... (4 more lines) ...
-  : }
-  : ^  --- implicit_free_lifetime.rna:82:32
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:86:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:86:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
 at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:93:10:93:29
   :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
-  .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :          ^^^^^^^^^^^^^^^^^^^ Escape occurs here
   :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*arena<ctx>' must match '*a'
+  : 2. Lifetime '*a' must match '*static'
+  : 3. Lifetime '*static' must outlive '*arena<ctx>'
   .
- ... caused by
-  -> implicit_free_lifetime.rna:93:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+ ... caused by 1.
+  -> 'SomeStruct*a' assigned to pointer with lifetime '*arena<ctx>'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
+ ... caused by 2.
   -> implicit_free_lifetime.rna:93:26
   :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
+  :                          ^^ 'SomeStruct*static' assigned to pointer with lifetime '*a'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:93:10:93:29
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ Conflict root
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+ ... caused by 3.
+  -> '*static' lifetime is greater than '*arena<ctx>'
   :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:93:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:93:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: the outer '*arena' lifetime matches the lifetime of the caller's current arena.
 
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
 at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:100:26:100:28
   :     p1 = identity_struct(p2);
-  :                          ^^ Conflict root
-  .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :                          ^^ Escape occurs here
   :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*a' must match '*arena<ctx>'
+  : 2. Lifetime '*static' must match '*a'
+  : 3. Lifetime '*static' must outlive '*arena<ctx>'
   .
- ... caused by
-  -> implicit_free_lifetime.rna:100:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
+ ... caused by 1.
+  -> 'SomeStruct*arena<ctx>' assigned to pointer with lifetime '*a'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
+ ... caused by 2.
   -> implicit_free_lifetime.rna:100:10
   :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
+  :          ^^^^^^^^^^^^^^^^^^^ 'SomeStruct*a' assigned to pointer with lifetime '*static'
   :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-
-
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
-at compile/lang_tests/lifetimes/function_boundary/implicit_free_lifetime.rna:100:26:100:28
-  :     p1 = identity_struct(p2);
-  :                          ^^ Conflict root
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
   .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+ ... caused by 3.
+  -> '*static' lifetime is greater than '*arena<ctx>'
   :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:100:26
-  :     p1 = identity_struct(p2);
-  :                          ^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
-  .
- ... caused by
-  -> implicit_free_lifetime.rna:100:10
-  :     p1 = identity_struct(p2);
-  :          ^^^^^^^^^^^^^^^^^^^ pointer assignment
-  :
- == Note: Pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
- == Help: Const pointer types are lifetime-prmissive.
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: the outer '*arena' lifetime matches the lifetime of the caller's current arena.

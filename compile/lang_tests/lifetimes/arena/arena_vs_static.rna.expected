@@ -1,17 +1,20 @@
 
-Error[E-L_OUTLV_VIOL]: Lifetime violation between *static and *<outer arena>
+Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
 at compile/lang_tests/lifetimes/arena/arena_vs_static.rna:2:27:2:29
   :     let p2: int *static = p1;
-  :                           ^^ Conflict root
-  .
- ... caused by
-  -> The '*static' lifetime outlives the function's outer '*arena' lifetime
+  :                           ^^ Escape occurs here
   :
- == Help: The outer '*arena' lifetime represents lifetime of the caller's current arena.
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*arena<ctx>'
+  : 2. Lifetime '*static' must outlive '*arena<ctx>'
   .
- ... caused by
-  -> arena_vs_static.rna:2:27
-  :     let p2: int *static = p1;
-  :                           ^^ pointer assignment
+ ... caused by 1.
+  -> 'int*arena<ctx>' assigned to pointer with lifetime '*static'
   :
- == Note: Pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*arena<ctx>'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: the outer '*arena' lifetime matches the lifetime of the caller's current arena.

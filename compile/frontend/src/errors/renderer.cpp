@@ -89,14 +89,19 @@ namespace {
 
         std::string show_range(const Source &source,
                                const error::Range &range,
-                               std::string message) const {
+                               std::string message,
+                               bool limit_to_one_line = false) const {
             std::string result;
-            if (range.start.line == range.end.line) {
+            if (range.start.line == range.end.line || limit_to_one_line) {
+                auto end_column =
+                    range.end.line == range.start.line
+                        ? range.end.column
+                        : source.line_endings.get_line(source.contents, range.start.line).size();
                 result += show_line_subrange(source,
                                              message,
                                              range.start.line,
                                              range.start.column,
-                                             range.end.column);
+                                             end_column);
             } else {
                 result += show_multiline_subrange(source, range, message);
             }
@@ -104,8 +109,15 @@ namespace {
             return result;
         }
 
-        std::string show_cause(const Source &source, const error::Cause &cause) const {
-            std::string result = " ... caused by\n";
+        std::string show_cause(const Source &source,
+                               const error::Cause &cause,
+                               size_t index = 0) const {
+            std::string result = " ... caused by";
+            if (index > 0) {
+                result += " " + std::to_string(index) + ".\n";
+            } else {
+                result += ":\n";
+            }
 
             if (cause.location.has_value()) {
                 auto begin = start_offset_of(source, cause.location->begin);
@@ -113,9 +125,9 @@ namespace {
 
                 auto range = source.line_endings.offset_length_to_range(begin, end - begin);
                 result += "  -> " + short_location_string(source, range.start) + "\n";
-                result += show_range(source, range, std::string(cause.description));
+                result += show_range(source, range, std::string(cause.full_description));
             } else {
-                result += "  -> " + std::string(cause.description) + "\n";
+                result += "  -> " + std::string(cause.full_description) + "\n";
             }
 
             if (!cause.supplements.empty()) {
@@ -155,15 +167,25 @@ namespace {
             return result;
         }
 
+        std::string conflict_message(const Error &error) const {
+            if (error.is_lifetime_error()) {
+                return "Conflicting lifetime requirements";
+            } else if (error.is_type_error()) {
+                return "Conflicting types";
+            } else {
+                return "Error trace";
+            }
+        }
+
         std::string supplement_message(const Source &source,
                                        const error::Supplement &supplement) const {
             std::string result;
             switch (supplement.kind) {
             case error::SupplementKind::Note:
-                result = " == Note: ";
+                result = " == note: ";
                 break;
             case error::SupplementKind::Help:
-                result = " == Help: ";
+                result = " == help: ";
                 break;
             }
             result += supplement.message + "\n";
@@ -174,7 +196,7 @@ namespace {
 
                 auto range = source.line_endings.offset_length_to_range(begin, end - begin);
                 std::string location = short_location_string(source, range.start);
-                result += show_range(source, range, " --- " + location);
+                result += show_range(source, range, " --- " + location, true);
             }
             return result;
         }
@@ -216,9 +238,27 @@ std::string CliRenderer::render(std::filesystem::path path,
             }
         }
 
-        for (const auto &cause : error.get_causes()) {
+        auto causes = error.get_causes();
+        if (causes.size() == 1) {
             rendered_error += "  .\n";
-            rendered_error += impl.show_cause(source, cause);
+            rendered_error += impl.show_cause(source, causes[0]);
+        } else if (!causes.empty()) {
+            rendered_error += "  :\n";
+            rendered_error += "  : " + impl.conflict_message(error) + ":\n";
+
+            size_t cause_index = 1;
+            for (const auto &cause : causes) {
+                rendered_error +=
+                    "  : " + std::to_string(cause_index) + ". " + cause.summary + "\n";
+                ++cause_index;
+            }
+
+            cause_index = 1;
+            for (const auto &cause : causes) {
+                rendered_error += "  .\n";
+                rendered_error += impl.show_cause(source, cause, cause_index);
+                ++cause_index;
+            }
         }
 
         result += rendered_error + "\n";

@@ -4,10 +4,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:11:18:11:28
   :     let i: int = get_bool();
   :                  ^^^^^^^^^^ type mismatch
   .
- == Note: expected type int based on variable 'i'
+ == note: expected type int based on variable 'i'
   :     let i: int = get_bool();
   :     ^^^^^^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:11:5
- == Note: got conflicting type bool for return type
+ == note: got conflicting type bool for return type
   :     let i: int = get_bool();
   :                  ^^^^^^^^^^  --- invalid_use_return.rna:11:18
 
@@ -17,10 +17,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:12:9:12:21
   :     i = get_struct();
   :         ^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type int based on lvalue in assignment here
+ == note: expected type int based on lvalue in assignment here
   :     i = get_struct();
   :     ^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:12:5
- == Note: got conflicting type SomeStruct for return type
+ == note: got conflicting type SomeStruct for return type
   :     i = get_struct();
   :         ^^^^^^^^^^^^  --- invalid_use_return.rna:12:9
 
@@ -30,10 +30,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:13:9:13:21
   :     i = get_intptr();
   :         ^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type int based on lvalue in assignment here
+ == note: expected type int based on lvalue in assignment here
   :     i = get_intptr();
   :     ^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:13:5
- == Note: got conflicting type int*<free> for return type
+ == note: got conflicting type int*<free> for return type
   :     i = get_intptr();
   :         ^^^^^^^^^^^^  --- invalid_use_return.rna:13:9
 
@@ -43,10 +43,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:14:9:14:22
   :     i = get_boolptr();
   :         ^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type int based on lvalue in assignment here
+ == note: expected type int based on lvalue in assignment here
   :     i = get_boolptr();
   :     ^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:14:5
- == Note: got conflicting type bool*<free> for return type
+ == note: got conflicting type bool*<free> for return type
   :     i = get_boolptr();
   :         ^^^^^^^^^^^^^  --- invalid_use_return.rna:14:9
 
@@ -56,10 +56,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:15:9:15:24
   :     i = get_structptr();
   :         ^^^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type int based on lvalue in assignment here
+ == note: expected type int based on lvalue in assignment here
   :     i = get_structptr();
   :     ^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:15:5
- == Note: got conflicting type SomeStruct*<free> for return type
+ == note: got conflicting type SomeStruct*<free> for return type
   :     i = get_structptr();
   :         ^^^^^^^^^^^^^^^  --- invalid_use_return.rna:15:9
 
@@ -69,10 +69,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:17:19:17:28
   :     let b: bool = get_int();
   :                   ^^^^^^^^^ type mismatch
   .
- == Note: expected type bool based on variable 'b'
+ == note: expected type bool based on variable 'b'
   :     let b: bool = get_int();
   :     ^^^^^^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:17:5
- == Note: got conflicting type int for return type
+ == note: got conflicting type int for return type
   :     let b: bool = get_int();
   :                   ^^^^^^^^^  --- invalid_use_return.rna:17:19
 
@@ -82,10 +82,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:18:9:18:21
   :     b = get_struct();
   :         ^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type bool based on lvalue in assignment here
+ == note: expected type bool based on lvalue in assignment here
   :     b = get_struct();
   :     ^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:18:5
- == Note: got conflicting type SomeStruct for return type
+ == note: got conflicting type SomeStruct for return type
   :     b = get_struct();
   :         ^^^^^^^^^^^^  --- invalid_use_return.rna:18:9
 
@@ -95,10 +95,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:19:9:19:21
   :     b = get_intptr();
   :         ^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type bool based on lvalue in assignment here
+ == note: expected type bool based on lvalue in assignment here
   :     b = get_intptr();
   :     ^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:19:5
- == Note: got conflicting type int*<free> for return type
+ == note: got conflicting type int*<free> for return type
   :     b = get_intptr();
   :         ^^^^^^^^^^^^  --- invalid_use_return.rna:19:9
 
@@ -108,10 +108,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:20:9:20:22
   :     b = get_boolptr();
   :         ^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type bool based on lvalue in assignment here
+ == note: expected type bool based on lvalue in assignment here
   :     b = get_boolptr();
   :     ^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:20:5
- == Note: got conflicting type bool*<free> for return type
+ == note: got conflicting type bool*<free> for return type
   :     b = get_boolptr();
   :         ^^^^^^^^^^^^^  --- invalid_use_return.rna:20:9
 
@@ -121,10 +121,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:21:9:21:24
   :     b = get_structptr();
   :         ^^^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type bool based on lvalue in assignment here
+ == note: expected type bool based on lvalue in assignment here
   :     b = get_structptr();
   :     ^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:21:5
- == Note: got conflicting type SomeStruct*<free> for return type
+ == note: got conflicting type SomeStruct*<free> for return type
   :     b = get_structptr();
   :         ^^^^^^^^^^^^^^^  --- invalid_use_return.rna:21:9
 
@@ -134,10 +134,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:23:25:23:34
   :     let s: SomeStruct = get_int();
   :                         ^^^^^^^^^ type mismatch
   .
- == Note: expected type SomeStruct based on variable 's'
+ == note: expected type SomeStruct based on variable 's'
   :     let s: SomeStruct = get_int();
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:23:5
- == Note: got conflicting type int for return type
+ == note: got conflicting type int for return type
   :     let s: SomeStruct = get_int();
   :                         ^^^^^^^^^  --- invalid_use_return.rna:23:25
 
@@ -147,10 +147,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:24:9:24:19
   :     s = get_bool();
   :         ^^^^^^^^^^ type mismatch
   .
- == Note: expected type SomeStruct based on lvalue in assignment here
+ == note: expected type SomeStruct based on lvalue in assignment here
   :     s = get_bool();
   :     ^^^^^^^^^^^^^^  --- invalid_use_return.rna:24:5
- == Note: got conflicting type bool for return type
+ == note: got conflicting type bool for return type
   :     s = get_bool();
   :         ^^^^^^^^^^  --- invalid_use_return.rna:24:9
 
@@ -160,10 +160,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:25:9:25:21
   :     s = get_intptr();
   :         ^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type SomeStruct based on lvalue in assignment here
+ == note: expected type SomeStruct based on lvalue in assignment here
   :     s = get_intptr();
   :     ^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:25:5
- == Note: got conflicting type int*<free> for return type
+ == note: got conflicting type int*<free> for return type
   :     s = get_intptr();
   :         ^^^^^^^^^^^^  --- invalid_use_return.rna:25:9
 
@@ -173,10 +173,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:26:9:26:22
   :     s = get_boolptr();
   :         ^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type SomeStruct based on lvalue in assignment here
+ == note: expected type SomeStruct based on lvalue in assignment here
   :     s = get_boolptr();
   :     ^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:26:5
- == Note: got conflicting type bool*<free> for return type
+ == note: got conflicting type bool*<free> for return type
   :     s = get_boolptr();
   :         ^^^^^^^^^^^^^  --- invalid_use_return.rna:26:9
 
@@ -186,10 +186,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:27:9:27:24
   :     s = get_structptr();
   :         ^^^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type SomeStruct based on lvalue in assignment here
+ == note: expected type SomeStruct based on lvalue in assignment here
   :     s = get_structptr();
   :     ^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:27:5
- == Note: got conflicting type SomeStruct*<free> for return type
+ == note: got conflicting type SomeStruct*<free> for return type
   :     s = get_structptr();
   :         ^^^^^^^^^^^^^^^  --- invalid_use_return.rna:27:9
 
@@ -199,10 +199,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:29:20:29:29
   :     let ip: int* = get_int();
   :                    ^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type int*<free> based on variable 'ip'
+ == note: expected type int*<free> based on variable 'ip'
   :     let ip: int* = get_int();
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:29:5
- == Note: got conflicting type int for return type
+ == note: got conflicting type int for return type
   :     let ip: int* = get_int();
   :                    ^^^^^^^^^  --- invalid_use_return.rna:29:20
 
@@ -212,10 +212,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:30:10:30:20
   :     ip = get_bool();
   :          ^^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type int*<free> based on lvalue in assignment here
+ == note: expected type int*<free> based on lvalue in assignment here
   :     ip = get_bool();
   :     ^^^^^^^^^^^^^^^  --- invalid_use_return.rna:30:5
- == Note: got conflicting type bool for return type
+ == note: got conflicting type bool for return type
   :     ip = get_bool();
   :          ^^^^^^^^^^  --- invalid_use_return.rna:30:10
 
@@ -225,43 +225,43 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:31:10:31:22
   :     ip = get_struct();
   :          ^^^^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type int*<free> based on lvalue in assignment here
+ == note: expected type int*<free> based on lvalue in assignment here
   :     ip = get_struct();
   :     ^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:31:5
- == Note: got conflicting type SomeStruct for return type
+ == note: got conflicting type SomeStruct for return type
   :     ip = get_struct();
   :          ^^^^^^^^^^^^  --- invalid_use_return.rna:31:10
 
 
-Error[E-T_ASGN_NOREL]: Expected int but got bool in return type
+Error[E-T_ASGN_NOREL]: Expected int but got bool in 'bool*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/calls/invalid_use_return.rna:32:10:32:23
   :     ip = get_boolptr();
   :          ^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type int*<free> based on lvalue in assignment here
+ == note: expected type int*<free> based on lvalue in assignment here
   :     ip = get_boolptr();
   :     ^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:32:5
- == Note: got conflicting type bool*<free> for return type
+ == note: got conflicting type bool*<free> for return type
   :     ip = get_boolptr();
   :          ^^^^^^^^^^^^^  --- invalid_use_return.rna:32:10
   .
- ... caused by
+ ... caused by:
   -> Pointee type of int*<free> must be compatible with pointee type of bool*<free>
 
 
-Error[E-T_ASGN_NOREL]: Expected int but got SomeStruct in return type
+Error[E-T_ASGN_NOREL]: Expected int but got SomeStruct in 'SomeStruct*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/calls/invalid_use_return.rna:33:10:33:25
   :     ip = get_structptr();
   :          ^^^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type int*<free> based on lvalue in assignment here
+ == note: expected type int*<free> based on lvalue in assignment here
   :     ip = get_structptr();
   :     ^^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:33:5
- == Note: got conflicting type SomeStruct*<free> for return type
+ == note: got conflicting type SomeStruct*<free> for return type
   :     ip = get_structptr();
   :          ^^^^^^^^^^^^^^^  --- invalid_use_return.rna:33:10
   .
- ... caused by
+ ... caused by:
   -> Pointee type of int*<free> must be compatible with pointee type of SomeStruct*<free>
 
 
@@ -270,10 +270,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:35:21:35:30
   :     let bp: bool* = get_int();
   :                     ^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type bool*<free> based on variable 'bp'
+ == note: expected type bool*<free> based on variable 'bp'
   :     let bp: bool* = get_int();
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:35:5
- == Note: got conflicting type int for return type
+ == note: got conflicting type int for return type
   :     let bp: bool* = get_int();
   :                     ^^^^^^^^^  --- invalid_use_return.rna:35:21
 
@@ -283,10 +283,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:36:10:36:20
   :     bp = get_bool();
   :          ^^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type bool*<free> based on lvalue in assignment here
+ == note: expected type bool*<free> based on lvalue in assignment here
   :     bp = get_bool();
   :     ^^^^^^^^^^^^^^^  --- invalid_use_return.rna:36:5
- == Note: got conflicting type bool for return type
+ == note: got conflicting type bool for return type
   :     bp = get_bool();
   :          ^^^^^^^^^^  --- invalid_use_return.rna:36:10
 
@@ -296,43 +296,43 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:37:10:37:22
   :     bp = get_struct();
   :          ^^^^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type bool*<free> based on lvalue in assignment here
+ == note: expected type bool*<free> based on lvalue in assignment here
   :     bp = get_struct();
   :     ^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:37:5
- == Note: got conflicting type SomeStruct for return type
+ == note: got conflicting type SomeStruct for return type
   :     bp = get_struct();
   :          ^^^^^^^^^^^^  --- invalid_use_return.rna:37:10
 
 
-Error[E-T_ASGN_NOREL]: Expected bool but got int in return type
+Error[E-T_ASGN_NOREL]: Expected bool but got int in 'int*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/calls/invalid_use_return.rna:38:10:38:22
   :     bp = get_intptr();
   :          ^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type bool*<free> based on lvalue in assignment here
+ == note: expected type bool*<free> based on lvalue in assignment here
   :     bp = get_intptr();
   :     ^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:38:5
- == Note: got conflicting type int*<free> for return type
+ == note: got conflicting type int*<free> for return type
   :     bp = get_intptr();
   :          ^^^^^^^^^^^^  --- invalid_use_return.rna:38:10
   .
- ... caused by
+ ... caused by:
   -> Pointee type of bool*<free> must be compatible with pointee type of int*<free>
 
 
-Error[E-T_ASGN_NOREL]: Expected bool but got SomeStruct in return type
+Error[E-T_ASGN_NOREL]: Expected bool but got SomeStruct in 'SomeStruct*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/calls/invalid_use_return.rna:39:10:39:25
   :     bp = get_structptr();
   :          ^^^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type bool*<free> based on lvalue in assignment here
+ == note: expected type bool*<free> based on lvalue in assignment here
   :     bp = get_structptr();
   :     ^^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:39:5
- == Note: got conflicting type SomeStruct*<free> for return type
+ == note: got conflicting type SomeStruct*<free> for return type
   :     bp = get_structptr();
   :          ^^^^^^^^^^^^^^^  --- invalid_use_return.rna:39:10
   .
- ... caused by
+ ... caused by:
   -> Pointee type of bool*<free> must be compatible with pointee type of SomeStruct*<free>
 
 
@@ -341,10 +341,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:41:27:41:36
   :     let sp: SomeStruct* = get_int();
   :                           ^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type SomeStruct*<free> based on variable 'sp'
+ == note: expected type SomeStruct*<free> based on variable 'sp'
   :     let sp: SomeStruct* = get_int();
   :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:41:5
- == Note: got conflicting type int for return type
+ == note: got conflicting type int for return type
   :     let sp: SomeStruct* = get_int();
   :                           ^^^^^^^^^  --- invalid_use_return.rna:41:27
 
@@ -354,10 +354,10 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:42:10:42:20
   :     sp = get_bool();
   :          ^^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type SomeStruct*<free> based on lvalue in assignment here
+ == note: expected type SomeStruct*<free> based on lvalue in assignment here
   :     sp = get_bool();
   :     ^^^^^^^^^^^^^^^  --- invalid_use_return.rna:42:5
- == Note: got conflicting type bool for return type
+ == note: got conflicting type bool for return type
   :     sp = get_bool();
   :          ^^^^^^^^^^  --- invalid_use_return.rna:42:10
 
@@ -367,41 +367,41 @@ at compile/lang_tests/typechecking/calls/invalid_use_return.rna:43:10:43:22
   :     sp = get_struct();
   :          ^^^^^^^^^^^^ pointer type mismatch
   .
- == Note: expected type SomeStruct*<free> based on lvalue in assignment here
+ == note: expected type SomeStruct*<free> based on lvalue in assignment here
   :     sp = get_struct();
   :     ^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:43:5
- == Note: got conflicting type SomeStruct for return type
+ == note: got conflicting type SomeStruct for return type
   :     sp = get_struct();
   :          ^^^^^^^^^^^^  --- invalid_use_return.rna:43:10
 
 
-Error[E-T_ASGN_NOREL]: Expected SomeStruct but got int in return type
+Error[E-T_ASGN_NOREL]: Expected SomeStruct but got int in 'int*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/calls/invalid_use_return.rna:44:10:44:22
   :     sp = get_intptr();
   :          ^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type SomeStruct*<free> based on lvalue in assignment here
+ == note: expected type SomeStruct*<free> based on lvalue in assignment here
   :     sp = get_intptr();
   :     ^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:44:5
- == Note: got conflicting type int*<free> for return type
+ == note: got conflicting type int*<free> for return type
   :     sp = get_intptr();
   :          ^^^^^^^^^^^^  --- invalid_use_return.rna:44:10
   .
- ... caused by
+ ... caused by:
   -> Pointee type of SomeStruct*<free> must be compatible with pointee type of int*<free>
 
 
-Error[E-T_ASGN_NOREL]: Expected SomeStruct but got bool in return type
+Error[E-T_ASGN_NOREL]: Expected SomeStruct but got bool in 'bool*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/calls/invalid_use_return.rna:45:10:45:23
   :     sp = get_boolptr();
   :          ^^^^^^^^^^^^^ type mismatch
   .
- == Note: expected type SomeStruct*<free> based on lvalue in assignment here
+ == note: expected type SomeStruct*<free> based on lvalue in assignment here
   :     sp = get_boolptr();
   :     ^^^^^^^^^^^^^^^^^^  --- invalid_use_return.rna:45:5
- == Note: got conflicting type bool*<free> for return type
+ == note: got conflicting type bool*<free> for return type
   :     sp = get_boolptr();
   :          ^^^^^^^^^^^^^  --- invalid_use_return.rna:45:10
   .
- ... caused by
+ ... caused by:
   -> Pointee type of SomeStruct*<free> must be compatible with pointee type of bool*<free>

@@ -1,125 +1,153 @@
 
-Error[E-T_ASGN_NOREL]: Expected int but got int*<free> in variable 'y'
+Error[E-T_ASGN_NOREL]: Expected int but got int*<free> in 'int*<free>*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/assignable/incompatible_pointers_nested.rna:2:9:2:10
   :     x = y;
   :         ^ type mismatch
   .
- == Note: expected type int*<free>*<free> based on lvalue in assignment here
+ == note: expected type int*<free>*<free> based on lvalue in assignment here
   :     x = y;
   :     ^^^^^  --- incompatible_pointers_nested.rna:2:5
- == Note: got conflicting type int*<free>*<free>*<free> for variable 'y'
+ == note: got conflicting type int*<free>*<free>*<free> for variable 'y'
   : fun f(x: int**, y: int***) {
   :                 ^^^^^^  --- incompatible_pointers_nested.rna:1:17
+  :
+  : Conflicting types:
+  : 1. Pointee type mismatch
+  : 2. Pointee type mismatch
   .
- ... caused by
+ ... caused by 1.
   -> Pointee type of int*<free> must be compatible with pointee type of int*<free>*<free>
   .
- ... caused by
+ ... caused by 2.
   -> Pointee type of int*<free>*<free> must be compatible with pointee type of int*<free>*<free>*<free>
 
 
-Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int in variable 'x'
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int in 'int*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/assignable/incompatible_pointers_nested.rna:3:9:3:10
   :     y = x;
   :         ^ pointer type mismatch
   .
- == Note: expected type int*<free>*<free>*<free> based on lvalue in assignment here
+ == note: expected type int*<free>*<free>*<free> based on lvalue in assignment here
   :     y = x;
   :     ^^^^^  --- incompatible_pointers_nested.rna:3:5
- == Note: got conflicting type int*<free>*<free> for variable 'x'
+ == note: got conflicting type int*<free>*<free> for variable 'x'
   : fun f(x: int**, y: int***) {
   :       ^^^^^^  --- incompatible_pointers_nested.rna:1:7
+  :
+  : Conflicting types:
+  : 1. Pointee type mismatch
+  : 2. Pointee type mismatch
   .
- ... caused by
+ ... caused by 1.
   -> Pointee type of int*<free>*<free> must be compatible with pointee type of int*<free>
   .
- ... caused by
+ ... caused by 2.
   -> Pointee type of int*<free>*<free>*<free> must be compatible with pointee type of int*<free>*<free>
 
 
-Error[E-T_ASGN_NOREL]: Expected char but got bool in variable 'y'
+Error[E-T_ASGN_NOREL]: Expected char but got bool in 'bool*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/assignable/incompatible_pointers_nested.rna:7:9:7:10
   :     x = y;
   :         ^ type mismatch
   .
- == Note: expected type char*<free>*<free>*<free> based on lvalue in assignment here
+ == note: expected type char*<free>*<free>*<free> based on lvalue in assignment here
   :     x = y;
   :     ^^^^^  --- incompatible_pointers_nested.rna:7:5
- == Note: got conflicting type bool*<free>*<free>*<free> for variable 'y'
+ == note: got conflicting type bool*<free>*<free>*<free> for variable 'y'
   : fun g(x: char***, y: bool***) {
   :                   ^^^^^^^  --- incompatible_pointers_nested.rna:6:19
+  :
+  : Conflicting types:
+  : 1. Pointee type mismatch
+  : 2. Pointee type mismatch
+  : 3. Pointee type mismatch
   .
- ... caused by
+ ... caused by 1.
   -> Pointee type of char*<free> must be compatible with pointee type of bool*<free>
   .
- ... caused by
+ ... caused by 2.
   -> Pointee type of char*<free>*<free> must be compatible with pointee type of bool*<free>*<free>
   .
- ... caused by
+ ... caused by 3.
   -> Pointee type of char*<free>*<free>*<free> must be compatible with pointee type of bool*<free>*<free>*<free>
 
 
-Error[E-T_ASGN_NOREL]: Expected bool but got char in variable 'x'
+Error[E-T_ASGN_NOREL]: Expected bool but got char in 'char*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/assignable/incompatible_pointers_nested.rna:8:9:8:10
   :     y = x;
   :         ^ type mismatch
   .
- == Note: expected type bool*<free>*<free>*<free> based on lvalue in assignment here
+ == note: expected type bool*<free>*<free>*<free> based on lvalue in assignment here
   :     y = x;
   :     ^^^^^  --- incompatible_pointers_nested.rna:8:5
- == Note: got conflicting type char*<free>*<free>*<free> for variable 'x'
+ == note: got conflicting type char*<free>*<free>*<free> for variable 'x'
   : fun g(x: char***, y: bool***) {
   :       ^^^^^^^  --- incompatible_pointers_nested.rna:6:7
+  :
+  : Conflicting types:
+  : 1. Pointee type mismatch
+  : 2. Pointee type mismatch
+  : 3. Pointee type mismatch
   .
- ... caused by
+ ... caused by 1.
   -> Pointee type of bool*<free> must be compatible with pointee type of char*<free>
   .
- ... caused by
+ ... caused by 2.
   -> Pointee type of bool*<free>*<free> must be compatible with pointee type of char*<free>*<free>
   .
- ... caused by
+ ... caused by 3.
   -> Pointee type of bool*<free>*<free>*<free> must be compatible with pointee type of char*<free>*<free>*<free>
 
 
-Error[E-T_ASGN_NOREL]: Expected SomeStruct but got SomeStruct[10] in variable 'y'
+Error[E-T_ASGN_NOREL]: Expected SomeStruct but got SomeStruct[10] in 'SomeStruct[10]*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/assignable/incompatible_pointers_nested.rna:13:9:13:10
   :     x = y;
   :         ^ type mismatch
   .
- == Note: expected type SomeStruct*<free>*<free>*<free> based on lvalue in assignment here
+ == note: expected type SomeStruct*<free>*<free>*<free> based on lvalue in assignment here
   :     x = y;
   :     ^^^^^  --- incompatible_pointers_nested.rna:13:5
- == Note: got conflicting type SomeStruct[10]*<free>*<free>*<free> for variable 'y'
+ == note: got conflicting type SomeStruct[10]*<free>*<free>*<free> for variable 'y'
   : fun h(x: SomeStruct***, y: SomeStruct[10]***) {
   :                         ^^^^^^^^^^^^^^^^^  --- incompatible_pointers_nested.rna:12:25
+  :
+  : Conflicting types:
+  : 1. Pointee type mismatch
+  : 2. Pointee type mismatch
+  : 3. Pointee type mismatch
   .
- ... caused by
+ ... caused by 1.
   -> Pointee type of SomeStruct*<free> must be compatible with pointee type of SomeStruct[10]*<free>
   .
- ... caused by
+ ... caused by 2.
   -> Pointee type of SomeStruct*<free>*<free> must be compatible with pointee type of SomeStruct[10]*<free>*<free>
   .
- ... caused by
+ ... caused by 3.
   -> Pointee type of SomeStruct*<free>*<free>*<free> must be compatible with pointee type of SomeStruct[10]*<free>*<free>*<free>
 
 
-Error[E-T_ARR_NONARR]: Expected a compatible array type, but got SomeStruct in variable 'x'
+Error[E-T_ARR_NONARR]: Expected a compatible array type, but got SomeStruct in 'SomeStruct*<free>' assigned to pointer with lifetime '*<free>'
 at compile/lang_tests/typechecking/assignable/incompatible_pointers_nested.rna:14:9:14:10
   :     y = x;
   :         ^ array element type mismatch
   .
- == Note: expected type SomeStruct[10]*<free>*<free>*<free> based on lvalue in assignment here
+ == note: expected type SomeStruct[10]*<free>*<free>*<free> based on lvalue in assignment here
   :     y = x;
   :     ^^^^^  --- incompatible_pointers_nested.rna:14:5
- == Note: got conflicting type SomeStruct*<free>*<free>*<free> for variable 'x'
+ == note: got conflicting type SomeStruct*<free>*<free>*<free> for variable 'x'
   : fun h(x: SomeStruct***, y: SomeStruct[10]***) {
   :       ^^^^^^^^^^^^^  --- incompatible_pointers_nested.rna:12:7
+  :
+  : Conflicting types:
+  : 1. Pointee type mismatch
+  : 2. Pointee type mismatch
+  : 3. Pointee type mismatch
   .
- ... caused by
+ ... caused by 1.
   -> Pointee type of SomeStruct[10]*<free> must be compatible with pointee type of SomeStruct*<free>
   .
- ... caused by
+ ... caused by 2.
   -> Pointee type of SomeStruct[10]*<free>*<free> must be compatible with pointee type of SomeStruct*<free>*<free>
   .
- ... caused by
+ ... caused by 3.
   -> Pointee type of SomeStruct[10]*<free>*<free>*<free> must be compatible with pointee type of SomeStruct*<free>*<free>*<free>

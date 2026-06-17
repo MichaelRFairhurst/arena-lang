@@ -17,3 +17,43 @@ fun g() {
     let p4 = p3;
     let p5: int *static = p4;
 }
+
+fun h() {
+    let i_stack: int;
+
+    let p1: int* = i_stack.&;
+    let p2: int* = p1;
+    let p3: int* = p2;
+    let p4: int* = p3;
+    let p5: int *stack = p4;
+}
+
+fun i() {
+    let i_stack: int;
+
+    let p1: int* = i_stack.&;
+    let p2: int* = p1;
+    let p3: int* = p2;
+    let p4: int* = p3;
+    let p5: int *static = p4;
+}
+
+fun h() {
+    let i_stack: int;
+
+    let p1: int *a = i_stack.&;
+    let p2: int *b = p1;
+    let p3: int *c = p2;
+    let p4: int *d = p3;
+    let p5: int *stack = p4;
+}
+
+fun i() {
+    let i_stack: int;
+
+    let p1: int *a = i_stack.&;
+    let p2: int *b = p1;
+    let p3: int *c = p2;
+    let p4: int *d = p3;
+    let p5: int *static = p4;
+}
