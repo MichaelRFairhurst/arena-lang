@@ -1,0 +1,44 @@
+
+Error[E-T_ASGN_NOCNST]: Expected SomeStruct but got non-const qualified type SomeStruct const in dereferenced type
+at compile/lang_tests/typechecking/operators/deref/deref_const.rna:11:9:11:15
+  :     s = scpc.*;
+  :         ^^^^^^ const qualifier would be dropped here
+  .
+ == note: type 'SomeStruct const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type SomeStruct based on lvalue in assignment here
+  :     s = scpc.*;
+  :     ^^^^^^^^^^  --- deref_const.rna:11:5
+ == note: got conflicting type SomeStruct const for dereferenced type
+  :     s = scpc.*;
+  :         ^^^^^^  --- deref_const.rna:11:9
+
+
+Error[E-T_ASGN_NOCNST]: Expected SomeStruct but got non-const qualified type SomeStruct const in dereferenced type
+at compile/lang_tests/typechecking/operators/deref/deref_const.rna:12:9:12:14
+  :     s = spc.*;
+  :         ^^^^^ const qualifier would be dropped here
+  .
+ == note: type 'SomeStruct const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type SomeStruct based on lvalue in assignment here
+  :     s = spc.*;
+  :     ^^^^^^^^^  --- deref_const.rna:12:5
+ == note: got conflicting type SomeStruct const for dereferenced type
+  :     s = spc.*;
+  :         ^^^^^  --- deref_const.rna:12:9
+
+
+Error[E-T_ASGN_NOCNST]: Expected SomeStruct but got non-const qualified type SomeStruct const in dereferenced type
+at compile/lang_tests/typechecking/operators/deref/deref_const.rna:13:9:13:14
+  :     s = scp.*;
+  :         ^^^^^ const qualifier would be dropped here
+  .
+ == note: type 'SomeStruct const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type SomeStruct based on lvalue in assignment here
+  :     s = scp.*;
+  :     ^^^^^^^^^  --- deref_const.rna:13:5
+ == note: got conflicting type SomeStruct const for dereferenced type
+  :     s = scp.*;
+  :         ^^^^^  --- deref_const.rna:13:9

@@ -1,0 +1,121 @@
+fun primitives() {
+    let ci: int const;
+    let i: int;
+
+    ci = ci;
+    ci = i;
+    i = ci;
+
+    let cb: bool const;
+    let b: bool;
+
+    cb = cb;
+    cb = b;
+    b = cb;
+}
+
+fun pointers_to_const() {
+    let icp: int const*;
+    let ip: int*;
+
+    let bcp: bool const*;
+    let bp: bool*;
+
+    icp = icp;
+    icp = ip;
+    ip = icp;
+
+    bcp = bcp;
+    bcp = bp;
+    bp = bcp;
+}
+
+fun const_pointers() {
+    let ipc: int *const;
+    let ip: int*;
+
+    let bpc: bool *const;
+    let bp: bool*;
+
+    ipc = ipc;
+    ipc = ip;
+    ip = ipc;
+
+    bpc = bpc;
+    bpc = bp;
+    bp = bpc;
+}
+
+fun const_pointers_to_const() {
+    let icpc: int const * const;
+    let ipc: int * const;
+    let icp: int const *;
+    let ip: int *;
+
+    icpc = icpc;
+    icpc = ipc;
+    icpc = icp;
+    icpc = ip;
+
+    ipc = icpc;
+    ipc = ipc;
+    ipc = icp;
+    ipc = ip;
+
+    icp = icpc;
+    icp = ipc;
+    icp = icp;
+    icp = ip;
+
+    ip = icpc;
+    ip = ipc;
+    ip = icp;
+    ip = ip;
+}
+
+struct SomeStruct;
+
+fun const_strict_structs() {
+    let cs: SomeStruct const;
+    let s: SomeStruct;
+
+    cs = cs;
+    cs = s;
+    s = cs;
+}
+
+fun const_strict_struct_pointers() {
+    let spc: SomeStruct const*;
+    let sp: SomeStruct*;
+
+    spc = spc;
+    spc = sp;
+    sp = spc;
+}
+
+fun struct_const_pointers_to_const() {
+    let scpc: SomeStruct const * const;
+    let spc: SomeStruct * const;
+    let scp: SomeStruct const *;
+    let sp: SomeStruct *;
+
+    scpc = scpc;
+    scpc = spc;
+    scpc = scp;
+    scpc = sp;
+
+    spc = scpc;
+    spc = spc;
+    spc = scp;
+    spc = sp;
+
+    scp = scpc;
+    scp = spc;
+    scp = scp;
+    scp = sp;
+
+    sp = scpc;
+    sp = spc;
+    sp = scp;
+    sp = sp;
+}

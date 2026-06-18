@@ -1,0 +1,232 @@
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:14:22:14:35
+  :     static_p_const = stack_p_const;
+  :                      ^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun g() {
+  :         ^  --- const_struct.rna:10:9
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:28:22:28:35
+  :     static_const_p = stack_const_p;
+  :                      ^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct const*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct const' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun i() {
+  :         ^  --- const_struct.rna:24:9
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:42:24:42:39
+  :     static_p_const_p = stack_p_const_p;
+  :                        ^^^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct const*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct const' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun k() {
+  :         ^  --- const_struct.rna:38:9
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:56:22:56:35
+  :     static_const_p = stack_p_const;
+  :                      ^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' must match '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun m() {
+  :         ^  --- const_struct.rna:52:9
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:63:22:63:35
+  :     static_p_const = stack_const_p;
+  :                      ^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct const*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct const' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun n() {
+  :         ^  --- const_struct.rna:59:9
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:70:21:70:35
+  :     stack_const_p = static_p_const;
+  :                     ^^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*stack' must match '*static'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct*static' assigned to pointer with lifetime '*stack'
+  :
+ == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
+ == help: try using a const pointer to make this lifetime-permissive.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun o() {
+  :         ^  --- const_struct.rna:66:9
+
+Ideally we should accept the above code. It fails because `static_p_const` is treated as "losing" its constness, so we don't make the assignment context const. Then it's inner type is non-const and const-strict, though the lhs's pointee is const and const-permissive.
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:77:22:77:41
+  :     static_p_const = stack_const_p_const;
+  :                      ^^^^^^^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct const*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct const' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun p() {
+  :         ^  --- const_struct.rna:73:9
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:91:22:91:41
+  :     static_const_p = stack_const_p_const;
+  :                      ^^^^^^^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct const*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct const' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun r() {
+  :         ^  --- const_struct.rna:87:9
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:105:28:105:41
+  :     static_const_p_const = stack_p_const;
+  :                            ^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun t() {
+  :         ^  --- const_struct.rna:101:9
+
+
+Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
+at compile/lang_tests/lifetimes/lifetime_strict/const_struct.rna:119:28:119:41
+  :     static_const_p_const = stack_const_p;
+  :                            ^^^^^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*static' may not outlive '*stack'
+  : 2. Lifetime '*static' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'SomeStruct const*stack' assigned to pointer with lifetime '*static'
+  :
+ == note: pointee 'SomeStruct const' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*static' lifetime is greater than '*stack'
+  :
+ == note: '*static' lifetimes exist for the entire duration of the program
+ == note: involving '*stack' lifetime for this function block
+  : fun v() {
+  :         ^  --- const_struct.rna:115:9

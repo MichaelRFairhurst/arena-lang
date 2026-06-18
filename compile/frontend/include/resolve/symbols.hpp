@@ -113,6 +113,21 @@ namespace arena::sema {
     };
 
     /**
+     * A symbol for a const type, such as the pointee of `int const*`, where the inner type is
+     * described by a `TypeId`.
+     *
+     * These can be turned into a `TypeId` by the `TypeSymbolRegistry`, and the resulting ID can be
+     * used for looking up resolved types etc.
+     */
+    struct ConstTypeSymbol {
+        TypeId const_type;
+
+        bool operator==(const ConstTypeSymbol &other) const {
+            return const_type.t_id == other.const_type.t_id;
+        }
+    };
+
+    /**
      * A symbol for a `void` type, used internally.
      */
     struct VoidTypeSymbol {
@@ -133,6 +148,7 @@ namespace arena::sema {
     using TypeSymbol = std::variant<NamedTypeSymbol,
                                     ArrayTypeSymbol,
                                     PointerTypeSymbol,
+                                    ConstTypeSymbol,
                                     VoidTypeSymbol,
                                     ErrorTypeSymbol>;
 
@@ -231,6 +247,10 @@ struct std::hash<arena::sema::TypeSymbol> {
         return hash;
     }
 
+    size_t operator()(const arena::sema::ConstTypeSymbol &symbol) const {
+        return std::hash<size_t>()(symbol.const_type.t_id);
+    }
+
     size_t operator()(const arena::sema::VoidTypeSymbol &) const {
         return 1; // All void type symbols hash to the same values
     }
@@ -303,6 +323,8 @@ namespace arena::sema {
                 return *array;
             } else if (PointerTypeSymbol *pointer = std::get_if<PointerTypeSymbol>(&symbol)) {
                 return *pointer;
+            } else if (ConstTypeSymbol *ctype = std::get_if<ConstTypeSymbol>(&symbol)) {
+                return *ctype;
             } else if (std::get_if<VoidTypeSymbol>(&symbol)) {
                 return VoidTypeSymbol{};
             } else if (std::get_if<ErrorTypeSymbol>(&symbol)) {

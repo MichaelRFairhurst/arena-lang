@@ -1,6 +1,7 @@
 #include "types/typecheck.hpp"
 #include "types/inference.hpp"
 #include "types/lifetimes.hpp"
+#include "types/operations.hpp"
 #include "types/substitute.hpp"
 #include "errors/errors.hpp"
 #include <iostream>
@@ -11,7 +12,7 @@ namespace {
 
     class TypeCheckTransform {
     public:
-        TypeCheckTransform(util::Arena *arena, TypecheckOperations ops)
+        TypeCheckTransform(util::Arena *arena, TypeOperations ops)
             : middleware(arena), ops(ops),
               current_arena_lifetime(ops.get_lifetimes().get_ctx_lifetime()) {}
 
@@ -214,17 +215,19 @@ namespace {
             case ast::TokenType::STAR: {
                 // Set constraint to the "unsafe" lifetime, which is the lifetime that accepts all
                 // lifetimes. This is equivalent to not constraining the lifetime.
-                operand_inference_ctx.constrain_points_to(inference_ctx_parent,
-                                                          ops.get_lifetimes().get_unsafe_lifetime(),
-                                                          step.ast);
+                operand_inference_ctx
+                    .constrain_points_to(inference_ctx_parent,
+                                         ops.get_lifetimes().get_unsafe_lifetime(),
+                                         step.ast,
+                                         InferenceContext::ConstraintKind::Suggestion);
                 resolve_child(step, 0, &operand_inference_ctx);
                 inference_ctx_parent->constrain_dereferences(&operand_inference_ctx, step.ast);
                 auto child_info = std::get<ResolvedTypeInfo>(step.out->children[0].info);
                 auto ptr_type = ops.get_type(child_info.type_id);
-                auto ptr = std::get_if<PointerType>(&ptr_type.get_program_type());
-                if (ptr) {
+                auto lifetime = ops.pointed_lifetime(child_info.type_id);
+                if (lifetime.has_value()) {
                     // Note: `constrain_dereferences` already reports errors for non-pointer types.
-                    value_category = ResolvedLValue{ptr->lifetime};
+                    value_category = ResolvedLValue{lifetime.value()};
                 }
                 break;
             }
@@ -293,7 +296,7 @@ namespace {
         LifetimeId current_arena_lifetime;
 
     private:
-        TypecheckOperations ops;
+        TypeOperations ops;
         ExprTransformMiddleware middleware;
         InferenceContext *inference_ctx = nullptr;
     };
@@ -302,7 +305,7 @@ namespace {
     public:
         StatementTypeCheckTransform(util::Arena *arena,
                                     TypeCheckTransform *expr_typecheck,
-                                    TypecheckOperations ops)
+                                    TypeOperations ops)
             : middleware(arena), expr_typecheck(expr_typecheck), ops(ops) {}
 
         ResolvedStatement *typecheck(const ResolvedStatement &stmt_in) {
@@ -363,129 +366,10 @@ namespace {
     private:
         StmtTransformMiddleware middleware;
         TypeCheckTransform *expr_typecheck;
-        TypecheckOperations ops;
+        TypeOperations ops;
     };
 
 } // namespace
-
-ResolvedType TypecheckOperations::get_type(TypeId id) const {
-    return ttable->get_type(id, lifetimes);
-}
-
-std::string TypecheckOperations::get_type_name(TypeId id) const {
-    return std::string(get_type(id).get_name());
-}
-
-std::string TypecheckOperations::get_type_name(TypeId id,
-                                               const LifetimeGroup &type_lifetimes) const {
-    return std::string(ttable->get_type(id, &type_lifetimes).get_name());
-}
-
-TypeId TypecheckOperations::substitute_lifetimes(
-    TypeId type_id,
-    const LifetimeGroup &type_lifetimes,
-    const std::unordered_map<LifetimeId, LifetimeId> &substitutions) const {
-    return arena::sema::substitute_lifetimes(type_id, type_lifetimes, ttable, substitutions);
-}
-
-error::Error *TypecheckOperations::require_assignable(
-    TypeId lhs, TypeId rhs, const ast::Node *node, std::string message, bool force_strict) {
-    if (lhs == rhs) {
-        return nullptr;
-    }
-
-    auto lhs_type = get_type(lhs);
-    auto rhs_type = get_type(rhs);
-    if (lhs_type.is_error() || rhs_type.is_error()) {
-        // Don't report spurious errors if one of the types is already an error
-        return nullptr;
-    }
-
-    if (auto lhs_array = std::get_if<ArrayType>(&lhs_type.get_program_type())) {
-        auto rhs_array = std::get_if<ArrayType>(&rhs_type.get_program_type());
-        if (!rhs_array) {
-            return &errors->E_T_ARR_NONARR(node, message, get_type_name(rhs));
-        }
-
-        if (rhs_array->size < lhs_array->size) {
-            return &errors->E_T_ARR_SZ_MIS(node, message, lhs_array->size, rhs_array->size);
-        }
-
-        auto err = require_assignable(lhs_type.get_id(), rhs_type.get_id(), node, message);
-        if (err != nullptr) {
-            err->add_cause("Array element type mismatch",
-                           "Array elements of " + get_type_name(lhs) + " must be compatible with " +
-                               get_type_name(rhs));
-            return err;
-        }
-    } else if (auto left_ptr = std::get_if<PointerType>(&lhs_type.get_program_type())) {
-        auto lhs_pointee_id = left_ptr->pointee_type;
-        auto right_ptr = std::get_if<PointerType>(&rhs_type.get_program_type());
-        if (!right_ptr) {
-            return &errors->E_T_PTR_NONPTR(node, message, get_type_name(rhs));
-        }
-        auto rhs_pointee_id = right_ptr->pointee_type;
-        auto rhs_pointee = get_type(rhs_pointee_id);
-        auto constraint = rhs_pointee.is_lifetime_strict() || force_strict
-                              ? LifetimeRelation::Equals
-                              : LifetimeRelation::LessEqual;
-        std::vector<error::Supplement> supplements;
-
-        if (rhs_pointee.is_lifetime_strict()) {
-            supplements.push_back(
-                error::Supplement{error::SupplementKind::Note,
-                                  "pointee '" + get_type_name(rhs_pointee_id) +
-                                      "' is lifetime-strict cannot have its lifetime shortened."});
-            supplements.push_back(
-                error::Supplement{error::SupplementKind::Help,
-                                  "try using a const pointer to make this lifetime-permissive."});
-        } else if (force_strict) {
-            supplements.push_back(
-                error::Supplement{error::SupplementKind::Note,
-                                  "constraint here is lifetime-strict, likely due to nested "
-                                  "pointers, and cannot have its lifetime shortened."});
-            supplements.push_back(
-                error::Supplement{error::SupplementKind::Help,
-                                  "try a const pointer to make this lifetime-permissive."});
-        } else {
-            supplements.push_back(
-                error::Supplement{error::SupplementKind::Note,
-                                  "pointee '" + get_type_name(rhs_pointee_id) +
-                                      "' is lifetime-permissive, its lifetime may be shortened."});
-        }
-
-        std::string message =
-            "'" + get_type_name(rhs) + "' assigned to pointer with lifetime '*" +
-            lifetimes->get_lifetime_by_id(left_ptr->lifetime)->get_debug_name() + "'";
-
-        lifetimes->add_constraint(left_ptr->lifetime,
-                                  constraint,
-                                  right_ptr->lifetime,
-                                  ConstraintCause{message, node, std::move(supplements)});
-
-        auto err = require_assignable(lhs_pointee_id, rhs_pointee_id, node, message, true);
-        if (err != nullptr) {
-            err->add_cause("Pointee type mismatch",
-                           "Pointee type of " + get_type_name(lhs) +
-                               " must be compatible with pointee type of " + get_type_name(rhs));
-        }
-
-        return err;
-    }
-
-    return &errors->E_T_ASGN_NOREL(node, message, get_type_name(lhs), get_type_name(rhs));
-}
-
-bool TypecheckOperations::types_equal(TypeId a, TypeId b) {
-    auto left_type = get_type(a);
-    auto right_type = get_type(b);
-    if (left_type.is_error() || right_type.is_error()) {
-        // Don't report spurious errors if one of the types is already an error
-        return true;
-    }
-
-    return a == b;
-}
 
 ResolvedExpressionsResult TypeChecker::type_check(
     const std::vector<const ResolvedDeclaration *> &decls, const VariableRegistry *variables) {
@@ -501,7 +385,7 @@ ResolvedExpressionsResult TypeChecker::type_check(
         // Copy lifetime group
         auto lifetime_group = decl->lifetimes;
 
-        TypecheckOperations ops(ftable, ttable, variables, &lifetime_group, &errors);
+        TypeOperations ops(ftable, ttable, variables, &lifetime_group, &errors);
         TypeCheckTransform typecheck(&arena, ops);
         StatementTypeCheckTransform stmt_typecheck(&arena, &typecheck, ops);
 

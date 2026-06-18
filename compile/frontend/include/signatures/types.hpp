@@ -37,6 +37,10 @@ namespace arena::sema {
         LifetimeId lifetime;
     };
 
+    struct ConstType {
+        TypeId const_type;
+    };
+
     struct ArrayType {
         TypeId element_type;
         size_t size;
@@ -46,8 +50,14 @@ namespace arena::sema {
 
     struct ErrorType {};
 
-    using ProgramType =
-        std::variant<StructType, IntegralType, FloatingType, PointerType, ArrayType, VoidType, ErrorType>;
+    using ProgramType = std::variant<StructType,
+                                     IntegralType,
+                                     FloatingType,
+                                     PointerType,
+                                     ConstType,
+                                     ArrayType,
+                                     VoidType,
+                                     ErrorType>;
 
     class ResolvedType {
     public:
@@ -68,8 +78,6 @@ namespace arena::sema {
         std::string_view get_name() const { return name; }
 
         bool is_primitive() const;
-
-        bool is_lifetime_strict() const;
 
     private:
         std::string_view name;
@@ -99,7 +107,7 @@ namespace arena::sema {
 
         ResolvedType get_named_type(NamedTypeSymbol named) const;
 
-        bool operator==(const TypeTable& other) const;
+        bool operator==(const TypeTable &other) const;
 
     private:
         const TypeSymbolRegistry *registry = nullptr;
@@ -109,8 +117,7 @@ namespace arena::sema {
 
     class TypeTableBuilder {
     public:
-        TypeTableBuilder(const TypeSymbolRegistry *registry)
-            : registry(registry) {}
+        TypeTableBuilder(const TypeSymbolRegistry *registry) : registry(registry) {}
 
         TypeTable build(const std::vector<arena::ast::Declaration *> &declarations) const;
 

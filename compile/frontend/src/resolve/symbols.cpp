@@ -25,10 +25,6 @@ namespace {
             result = registry->get_interned(ArrayTypeSymbol{element_id, 10});
         }
 
-        void visit(const ast::ConstType *const_type) override {
-            throw std::runtime_error("Const types are not supported in type symbols yet");
-        }
-
         void visit(const ast::PointerType *pointer_type) override {
             pointer_type->get_pointee()->accept(this);
             auto pointee_id = registry->get_type_id(result);
@@ -41,6 +37,12 @@ namespace {
             }
 
             result = registry->get_interned(PointerTypeSymbol{pointee_id, lifetime_id});
+        }
+
+        void visit(const ast::ConstType *const_type) override {
+            const_type->get_base_type()->accept(this);
+            auto base_id = registry->get_type_id(result);
+            result = registry->get_interned(ConstTypeSymbol{base_id});
         }
 
         TypeSymbol get_result() const { return result; }
@@ -147,6 +149,8 @@ bool TypeSymbolSet::is_available(TypeSymbol symbol) const {
                 auto pointee_id = s.pointee_type;
                 auto pointee_symbol = registry->get_type_symbol(pointee_id);
                 return is_available(pointee_symbol);
+            } else if constexpr (std::is_same_v<T, ConstTypeSymbol>) {
+                return is_available(registry->get_type_symbol(s.const_type));
             } else if constexpr (std::is_same_v<T, ArrayTypeSymbol>) {
                 auto element_id = s.element_type;
                 auto element_symbol = registry->get_type_symbol(element_id);

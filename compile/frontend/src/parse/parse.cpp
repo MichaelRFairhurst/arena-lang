@@ -193,6 +193,8 @@ namespace arena::parse {
                 return set_head(TokenType::IMPORT, tokenText);
             } else if (tokenText == "struct") {
                 return set_head(TokenType::STRUCT, tokenText);
+            } else if (tokenText == "const") {
+                return set_head(TokenType::CONST, tokenText);
             }
 
             return set_head(TokenType::IDENTIFIER, tokenText);
@@ -314,6 +316,9 @@ namespace arena::parse {
                     Token *closeBracket =
                         require_take_token(TokenType::CLOSE_BRACKET, "to close array type");
                     type = arena->alloc<ArrayType>(type, openBracket, size, closeBracket);
+                } else if (tokens.peek()->type == TokenType::CONST) {
+                    Token *constToken = tokens.take();
+                    type = arena->alloc<ConstType>(constToken, type);
                 } else {
                     break;
                 }

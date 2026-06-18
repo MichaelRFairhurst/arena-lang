@@ -255,6 +255,19 @@ namespace arena::error {
             });
         }
 
+        Error &E_T_ASGN_NOCNST(Location l,
+                              std::string message,
+                              std::string expected,
+                              std::string actual_type) {
+            return report({
+                "E-T_ASGN_NOCNST",
+                l,
+                "const qualifier would be dropped here",
+                std::vector<
+                    Chunk>{"Expected ", expected, " but got non-const qualified type ", actual_type, " in ", message},
+            });
+        }
+
         Error &E_T_ASGN_NOREL(Location l,
                               std::string message,
                               std::string expected,

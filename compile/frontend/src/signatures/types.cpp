@@ -54,6 +54,23 @@ namespace {
                                 interned_name};
         }
 
+        ResolvedType operator()(const ConstTypeSymbol &symbol) {
+            auto type_id = registry->get_type_id(symbol);
+            auto consted_id = symbol.const_type;
+            auto consted_type = type_table->get_type(consted_id, lifetimes);
+
+            std::string name = consted_type.get_name().empty()
+                                   ? "<unknown>"
+                                   : std::string(consted_type.get_name());
+            name += " const";
+
+            // TODO fix this absolute royal hack to intern the name into the type symbol
+            auto tmp_symbol = registry->get_interned(NamedTypeSymbol{name});
+            std::string_view interned_name = std::get<NamedTypeSymbol>(tmp_symbol).name;
+
+            return ResolvedType{type_id, ConstType{consted_id}, symbol, interned_name};
+        }
+
         ResolvedType operator()(const VoidTypeSymbol &symbol) {
             auto type_id = registry->get_type_id(symbol);
             return ResolvedType{type_id, VoidType{}, symbol, "<void>"};
@@ -139,16 +156,6 @@ TypeTable TypeTable::builtin_type_table(const TypeSymbolRegistry &registry) {
 bool ResolvedType::is_primitive() const {
     return std::holds_alternative<IntegralType>(program_type) ||
            std::holds_alternative<FloatingType>(program_type);
-}
-
-bool ResolvedType::is_lifetime_strict() const {
-    if (is_primitive() || is_void() || is_error()) {
-        return false;
-    }
-
-    // TODO: Handle const types
-    // TODO: Handle lifetime strictness for complex types.
-    return true;
 }
 
 void TypeTable::add_type(ResolvedType type) {

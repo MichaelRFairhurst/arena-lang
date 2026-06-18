@@ -1,0 +1,191 @@
+
+Error[E-T_ASGN_NOCNST]: Expected int but got non-const qualified type int const in 'int const*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:26:10:26:13
+  :     ip = icp;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == help: try copying the underlying value, or ensure both sides are equally const-qualified
+ == note: expected type int*<free> based on lvalue in assignment here
+  :     ip = icp;
+  :     ^^^^^^^^  --- const_non_const.rna:26:5
+ == note: got conflicting type int const*<free> for variable 'icp'
+  :     let icp: int const*;
+  :     ^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:18:5
+  .
+ ... caused by:
+  -> Pointee type of int*<free> must be compatible with pointee type of int const*<free>
+
+
+Error[E-T_ASGN_NOCNST]: Expected bool but got non-const qualified type bool const in 'bool const*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:30:10:30:13
+  :     bp = bcp;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == help: try copying the underlying value, or ensure both sides are equally const-qualified
+ == note: expected type bool*<free> based on lvalue in assignment here
+  :     bp = bcp;
+  :     ^^^^^^^^  --- const_non_const.rna:30:5
+ == note: got conflicting type bool const*<free> for variable 'bcp'
+  :     let bcp: bool const*;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:21:5
+  .
+ ... caused by:
+  -> Pointee type of bool*<free> must be compatible with pointee type of bool const*<free>
+
+
+Error[E-T_ASGN_NOCNST]: Expected int*<free> but got non-const qualified type int*<free> const in variable 'ipc'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:42:10:42:13
+  :     ip = ipc;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == note: type 'int*<free> const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type int*<free> based on lvalue in assignment here
+  :     ip = ipc;
+  :     ^^^^^^^^  --- const_non_const.rna:42:5
+ == note: got conflicting type int*<free> const for variable 'ipc'
+  :     let ipc: int *const;
+  :     ^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:34:5
+
+
+Error[E-T_ASGN_NOCNST]: Expected bool*<free> but got non-const qualified type bool*<free> const in variable 'bpc'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:46:10:46:13
+  :     bp = bpc;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == note: type 'bool*<free> const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type bool*<free> based on lvalue in assignment here
+  :     bp = bpc;
+  :     ^^^^^^^^  --- const_non_const.rna:46:5
+ == note: got conflicting type bool*<free> const for variable 'bpc'
+  :     let bpc: bool *const;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:37:5
+
+
+Error[E-T_ASGN_NOCNST]: Expected int*<free> but got non-const qualified type int const*<free> const in variable 'icpc'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:70:10:70:14
+  :     ip = icpc;
+  :          ^^^^ const qualifier would be dropped here
+  .
+ == note: type 'int const*<free> const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type int*<free> based on lvalue in assignment here
+  :     ip = icpc;
+  :     ^^^^^^^^^  --- const_non_const.rna:70:5
+ == note: got conflicting type int const*<free> const for variable 'icpc'
+  :     let icpc: int const * const;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:50:5
+
+
+Error[E-T_ASGN_NOCNST]: Expected int*<free> but got non-const qualified type int*<free> const in variable 'ipc'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:71:10:71:13
+  :     ip = ipc;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == note: type 'int*<free> const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type int*<free> based on lvalue in assignment here
+  :     ip = ipc;
+  :     ^^^^^^^^  --- const_non_const.rna:71:5
+ == note: got conflicting type int*<free> const for variable 'ipc'
+  :     let ipc: int * const;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:51:5
+
+
+Error[E-T_ASGN_NOCNST]: Expected int but got non-const qualified type int const in 'int const*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:72:10:72:13
+  :     ip = icp;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == help: try copying the underlying value, or ensure both sides are equally const-qualified
+ == note: expected type int*<free> based on lvalue in assignment here
+  :     ip = icp;
+  :     ^^^^^^^^  --- const_non_const.rna:72:5
+ == note: got conflicting type int const*<free> for variable 'icp'
+  :     let icp: int const *;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:52:5
+  .
+ ... caused by:
+  -> Pointee type of int*<free> must be compatible with pointee type of int const*<free>
+
+
+Error[E-T_ASGN_NOCNST]: Expected SomeStruct but got non-const qualified type SomeStruct const in variable 'cs'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:84:9:84:11
+  :     s = cs;
+  :         ^^ const qualifier would be dropped here
+  .
+ == note: type 'SomeStruct const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type SomeStruct based on lvalue in assignment here
+  :     s = cs;
+  :     ^^^^^^  --- const_non_const.rna:84:5
+ == note: got conflicting type SomeStruct const for variable 'cs'
+  :     let cs: SomeStruct const;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:79:5
+
+
+Error[E-T_ASGN_NOCNST]: Expected SomeStruct but got non-const qualified type SomeStruct const in 'SomeStruct const*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:93:10:93:13
+  :     sp = spc;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == note: type 'SomeStruct const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type SomeStruct*<free> based on lvalue in assignment here
+  :     sp = spc;
+  :     ^^^^^^^^  --- const_non_const.rna:93:5
+ == note: got conflicting type SomeStruct const*<free> for variable 'spc'
+  :     let spc: SomeStruct const*;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:88:5
+  .
+ ... caused by:
+  -> Pointee type of SomeStruct*<free> must be compatible with pointee type of SomeStruct const*<free>
+
+
+Error[E-T_ASGN_NOCNST]: Expected SomeStruct*<free> but got non-const qualified type SomeStruct const*<free> const in variable 'scpc'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:117:10:117:14
+  :     sp = scpc;
+  :          ^^^^ const qualifier would be dropped here
+  .
+ == note: type 'SomeStruct const*<free> const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type SomeStruct*<free> based on lvalue in assignment here
+  :     sp = scpc;
+  :     ^^^^^^^^^  --- const_non_const.rna:117:5
+ == note: got conflicting type SomeStruct const*<free> const for variable 'scpc'
+  :     let scpc: SomeStruct const * const;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:97:5
+
+
+Error[E-T_ASGN_NOCNST]: Expected SomeStruct*<free> but got non-const qualified type SomeStruct*<free> const in variable 'spc'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:118:10:118:13
+  :     sp = spc;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == note: type 'SomeStruct*<free> const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type SomeStruct*<free> based on lvalue in assignment here
+  :     sp = spc;
+  :     ^^^^^^^^  --- const_non_const.rna:118:5
+ == note: got conflicting type SomeStruct*<free> const for variable 'spc'
+  :     let spc: SomeStruct * const;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:98:5
+
+
+Error[E-T_ASGN_NOCNST]: Expected SomeStruct but got non-const qualified type SomeStruct const in 'SomeStruct const*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/const_non_const.rna:119:10:119:13
+  :     sp = scp;
+  :          ^^^ const qualifier would be dropped here
+  .
+ == note: type 'SomeStruct const' is const-strict
+ == help: consider using a const pointer, or ensure both sides are equally const-qualified
+ == note: expected type SomeStruct*<free> based on lvalue in assignment here
+  :     sp = scp;
+  :     ^^^^^^^^  --- const_non_const.rna:119:5
+ == note: got conflicting type SomeStruct const*<free> for variable 'scp'
+  :     let scp: SomeStruct const *;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- const_non_const.rna:99:5
+  .
+ ... caused by:
+  -> Pointee type of SomeStruct*<free> must be compatible with pointee type of SomeStruct const*<free>

@@ -1,0 +1,20 @@
+struct SomeStruct;
+
+fun f() {
+    let scpc: SomeStruct const * const;
+    let spc: SomeStruct * const;
+    let scp: SomeStruct const *;
+    let sp: SomeStruct *;
+    let sc: SomeStruct const;
+    let s: SomeStruct;
+
+    s = scpc.*;
+    s = spc.*;
+    s = scp.*;
+    s = sp.*;
+
+    sc = scpc.*;
+    sc = spc.*;
+    sc = scp.*;
+    sc = sp.*;
+}

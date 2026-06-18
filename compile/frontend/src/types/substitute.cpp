@@ -27,6 +27,10 @@ namespace {
             return PointerTypeSymbol{pointee, substitute(symbol.lifetime)};
         }
 
+        TypeSymbol operator()(const ConstTypeSymbol &symbol) {
+            return ConstTypeSymbol{substitute(symbol.const_type)};
+        }
+
         TypeSymbol operator()(const ArrayTypeSymbol &array_type) {
             auto element = substitute(array_type.element_type);
             return ArrayTypeSymbol{element, array_type.size};

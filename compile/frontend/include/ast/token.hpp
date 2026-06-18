@@ -48,6 +48,7 @@ namespace arena::ast {
         RET,
         IMPORT,
         STRUCT,
+        CONST,
         UNINITIALIZED_TOKEN,
         END_OF_INPUT,
     };

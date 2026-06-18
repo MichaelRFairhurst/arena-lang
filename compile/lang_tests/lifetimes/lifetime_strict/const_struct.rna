@@ -1,0 +1,120 @@
+struct SomeStruct;
+
+fun f() {
+    let stack_p_const: SomeStruct *stack const;
+    let static_p_const: SomeStruct *static const;
+
+    stack_p_const = static_p_const;
+}
+
+fun g() {
+    let stack_p_const: SomeStruct *stack const;
+    let static_p_const: SomeStruct *static const;
+
+    static_p_const = stack_p_const;
+}
+
+fun h() {
+    let stack_const_p: SomeStruct const *stack;
+    let static_const_p: SomeStruct const *static;
+
+    stack_const_p = static_const_p;
+}
+
+fun i() {
+    let stack_const_p: SomeStruct const *stack;
+    let static_const_p: SomeStruct const *static;
+
+    static_const_p = stack_const_p;
+}
+
+fun j() {
+    let stack_p_const_p: SomeStruct const *stack const;
+    let static_p_const_p: SomeStruct const *static const;
+
+    stack_p_const_p = static_p_const_p;
+}
+
+fun k() {
+    let stack_p_const_p: SomeStruct const *stack const;
+    let static_p_const_p: SomeStruct const *static const;
+
+    static_p_const_p = stack_p_const_p;
+}
+
+fun l() {
+    let stack_p_const: SomeStruct *stack const;
+    let static_const_p: SomeStruct const *static;
+
+    stack_p_const = static_const_p;
+}
+
+fun m() {
+    let stack_p_const: SomeStruct *stack const;
+    let static_const_p: SomeStruct const *static;
+
+    static_const_p = stack_p_const;
+}
+
+fun n() {
+    let stack_const_p: SomeStruct const *stack;
+    let static_p_const: SomeStruct *static const;
+
+    static_p_const = stack_const_p;
+}
+
+fun o() {
+    let stack_const_p: SomeStruct const *stack;
+    let static_p_const: SomeStruct *static const;
+
+    stack_const_p = static_p_const;
+}
+
+fun p() {
+    let stack_const_p_const: SomeStruct const *stack const;
+    let static_p_const: SomeStruct *static const;
+
+    static_p_const = stack_const_p_const;
+}
+
+fun q() {
+    let stack_const_p_const: SomeStruct const *stack const;
+    let static_p_const: SomeStruct const *static;
+
+    stack_const_p_const = static_p_const;
+}
+
+fun r() {
+    let stack_const_p_const: SomeStruct const *stack const;
+    let static_const_p: SomeStruct const *static;
+
+    static_const_p = stack_const_p_const;
+}
+
+fun s() {
+    let stack_p_const: SomeStruct *stack const;
+    let static_const_p_const: SomeStruct const *static const;
+
+    stack_p_const = static_const_p_const;
+}
+
+fun t() {
+    let stack_p_const: SomeStruct *stack const;
+    let static_const_p_const: SomeStruct const *static const;
+
+    static_const_p_const = stack_p_const;
+}
+
+fun u() {
+    let stack_const_p: SomeStruct const *stack;
+    let static_const_p_const: SomeStruct const *static const;
+
+    stack_const_p = static_const_p_const;
+}
+
+fun v() {
+    let stack_const_p: SomeStruct const *stack;
+    let static_const_p_const: SomeStruct const *static const;
+
+    static_const_p_const = stack_const_p;
+}
