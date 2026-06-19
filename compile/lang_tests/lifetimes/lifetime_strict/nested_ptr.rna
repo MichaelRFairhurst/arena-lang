@@ -1,41 +1,51 @@
 fun f(x: int *arena *arena, y: int *arena *arena) {
-    x = y;
+    // Lifetimes exactly match for lifetime-strict pointer types.
+    x = y; // OK
 }
 
 fun g(x: int *static *arena, y: int *arena *arena) {
-    x = y;
+    // Lifetimes do not exactly match for lifetime-strict pointer types.
+    x = y; // E-L_ESC_CTX
 }
 
 fun h(x: int *static *arena, y: int *arena *arena) {
-    y = x;
+    // Lifetimes do not exactly match for lifetime-strict pointer types.
+    y = x; // E-L_ESC_CTX
 }
 
 fun i(x: int *arena *static, y: int *arena *arena) {
-    x = y;
+    // Lifetimes do not exactly match for lifetime-strict pointer types.
+    x = y; // E-L_ESC_CTX
 }
 
 fun j(x: int *arena *static, y: int *arena *arena) {
-    y = x;
+    // Lifetimes do not exactly match for lifetime-strict pointer types.
+    y = x; // E-L_ESC_CTX
 }
 
 struct SomeStruct;
 
 fun k(x: SomeStruct *arena *arena, y: SomeStruct *arena *arena) {
-    x = y;
+    // Lifetimes exactly match
+    x = y; // OK
 }
 
 fun l(x: SomeStruct *static *arena, y: SomeStruct *arena *arena) {
-    x = y;
+    // Lifetimes do not exactly match for lifetime-strict pointer types.
+    x = y; // E-L_ESC_CTX
 }
 
 fun m(x: SomeStruct *static *arena, y: SomeStruct *arena *arena) {
-    y = x;
+    // Lifetimes do not exactly match for lifetime-strict pointer types.
+    y = x; // E-L_ESC_CTX
 }
 
 fun n(x: SomeStruct *arena *static, y: SomeStruct *arena *arena) {
-    x = y;
+    // Lifetimes do not exactly match for lifetime-strict pointer types.
+    x = y; // E-L_ESC_CTX
 }
 
 fun n(x: SomeStruct *arena *static, y: SomeStruct *arena *arena) {
-    y = x;
+    // Lifetimes do not exactly match for lifetime-strict pointer types.
+    y = x; // E-L_ESC_CTX
 }

@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:6:9:6:10
-  :     x = y;
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:8:9:8:10
+  :     x = y; // E-L_ESC_CTX
   :         ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -22,8 +22,8 @@ at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:6:9:6:10
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:10:9:10:10
-  :     y = x;
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:13:9:13:10
+  :     y = x; // E-L_ESC_CTX
   :         ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -44,8 +44,8 @@ at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:10:9:10:10
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:14:9:14:10
-  :     x = y;
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:18:9:18:10
+  :     x = y; // E-L_ESC_CTX
   :         ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -66,8 +66,8 @@ at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:14:9:14:10
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:18:9:18:10
-  :     y = x;
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:23:9:23:10
+  :     y = x; // E-L_ESC_CTX
   :         ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -88,8 +88,8 @@ at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:18:9:18:10
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:28:9:28:10
-  :     x = y;
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:35:9:35:10
+  :     x = y; // E-L_ESC_CTX
   :         ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -110,8 +110,8 @@ at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:28:9:28:10
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:32:9:32:10
-  :     y = x;
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:40:9:40:10
+  :     y = x; // E-L_ESC_CTX
   :         ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -132,8 +132,8 @@ at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:32:9:32:10
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:36:9:36:10
-  :     x = y;
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:45:9:45:10
+  :     x = y; // E-L_ESC_CTX
   :         ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -154,8 +154,8 @@ at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:36:9:36:10
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:40:9:40:10
-  :     y = x;
+at compile/lang_tests/lifetimes/lifetime_strict/nested_ptr.rna:50:9:50:10
+  :     y = x; // E-L_ESC_CTX
   :         ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
