@@ -2,38 +2,46 @@ fun ret_arena() -> int *arena;
 fun take_arena(p: int *arena);
 
 fun call_funcs_ok() {
-    let p1: int *arena = ret_arena();
-
-    take_arena(p1);
+    // Our arena and callee's arena match
+    let p1: int *arena = ret_arena(); // OK
+    take_arena(p1); // OK
 }
 
 fun call_funcs_bad1() {
-    let p1: int *static = ret_arena();
+    // Our arena is the callee's arena, neither are *static
+    let p1: int *static = ret_arena(); // E-L_ESC_CTX
 }
 
 fun call_funcs_bad2() {
     let i : int;
-    take_arena(i.&);
+    // Cannot pass address of stack variable i as an *arena object
+    take_arena(i.&); // E-L_ESC_STACK
 }
 
 fun share_nested() {
     arena {
-        let p1: int *arena = ret_arena();
-        take_arena(p1);
+        // Callee's *arena is this arena block, so is p1's *arena
+        let p1: int *arena = ret_arena(); // OK
+        take_arena(p1); // OK
     }
 }
 
 fun share_wrong_arena1() {
+    // p1 uses the context *arena
     let p1: int *arena;
     arena {
-        p1 = ret_arena();
+        // Calle *arena is this new block, cannot assign to outer arena with longer lifetime
+        p1 = ret_arena(); // E-L_ESC_RNA
     }
 }
 
 fun share_wrong_arena2() {
+    // p1 uses the context *arena
     let p1: int *arena;
     arena {
-        take_arena(p1);
+        // Calle *arena is this new block, and int* is lifetime-permissive, so we can
+        // use an outer arena value as then nested one.
+        take_arena(p1); // OK
     }
 }
 
@@ -44,6 +52,8 @@ fun take_arena_struct(p: SomeStruct *arena);
 fun share_wrong_arena3() {
     let p1: SomeStruct *arena;
     arena {
-        take_arena_struct(p1);
+        // Calle *arena is this new block, and SomeStruct* is lifetime-strict, so we
+        // *arena<ctx> must match *arena<nested>, which is an error.
+        take_arena_struct(p1); // E-L_ESC_RNA
     }
 }

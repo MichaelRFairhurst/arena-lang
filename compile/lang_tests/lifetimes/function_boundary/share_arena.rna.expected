@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:11:27:11:38
-  :     let p1: int *static = ret_arena();
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:12:27:12:38
+  :     let p1: int *static = ret_arena(); // E-L_ESC_CTX
   :                           ^^^^^^^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -21,8 +21,8 @@ at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:11:27:11:38
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:16:16:16:19
-  :     take_arena(i.&);
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:18:16:18:19
+  :     take_arena(i.&); // E-L_ESC_STACK
   :                ^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -39,12 +39,12 @@ at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:16:16:16:19
   :
  == note: involving '*stack' lifetime for this function block
   : fun call_funcs_bad2() {
-  :                       ^  --- share_arena.rna:14:23
+  :                       ^  --- share_arena.rna:15:23
 
 
 Error[E-L_ESC_RNA]: Pointer value to a nested arena escapes its arena block
-at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:29:14:29:25
-  :         p1 = ret_arena();
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:34:14:34:25
+  :         p1 = ret_arena(); // E-L_ESC_RNA
   :              ^^^^^^^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -61,12 +61,12 @@ at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:29:14:29:25
   :
  == note: '*arena<inner>' defined here
   :     arena {
-  :     ^^^^^^^  --- share_arena.rna:28:5
+  :     ^^^^^^^  --- share_arena.rna:32:5
 
 
 Error[E-L_ESC_RNA]: Pointer value to a nested arena escapes its arena block
-at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:47:27:47:29
-  :         take_arena_struct(p1);
+at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:57:27:57:29
+  :         take_arena_struct(p1); // E-L_ESC_RNA
   :                           ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -84,4 +84,4 @@ at compile/lang_tests/lifetimes/function_boundary/share_arena.rna:47:27:47:29
   :
  == note: '*arena<inner>' defined here
   :     arena {
-  :     ^^^^^^^  --- share_arena.rna:46:5
+  :     ^^^^^^^  --- share_arena.rna:54:5

@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/function_boundary/pass_static.rna:13:17:13:19
-  :     take_static(p1);
+at compile/lang_tests/lifetimes/function_boundary/pass_static.rna:14:17:14:19
+  :     take_static(p1); // E-L_ESC_STACK
   :                 ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
