@@ -1,0 +1,43 @@
+fun zero() {
+    let i: int = 0;
+}
+
+fun hex() {
+    let i: int = 0x123;
+}
+
+fun binary() {
+    let i: int = 0b101001;
+}
+
+fun oct() {
+    let i: int = 8x644;
+}
+
+fun dec_quote_space() {
+    let i: int = 123'345;
+}
+
+fun dec_under_space() {
+    let i: int = 123_345;
+}
+
+fun hex_quote_space() {
+    let i: int = 0xABC'DEF;
+}
+
+fun hex_under_space() {
+    let i: int = 0xABC_DEF;
+}
+
+fun bad() {
+    let b1: bool = 0;
+    let b2: bool = 1;
+    let b3: bool = 123;
+    let b4: bool = 0x123;
+    let b5: bool = 8x123;
+    let b6: bool = 0b01;
+
+    let d1: double64 = 1;
+    let c1: char const* = 1;
+}

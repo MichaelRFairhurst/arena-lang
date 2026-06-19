@@ -1,0 +1,103 @@
+
+Error[E-T_ASGN_NOREL]: Expected bool but got int in here
+at compile/lang_tests/typechecking/literals/int_literal.rna:34:20:34:21
+  :     let b1: bool = 0;
+  :                    ^ type mismatch
+  .
+ == note: expected type bool based on variable 'b1'
+  :     let b1: bool = 0;
+  :     ^^^^^^^^^^^^^^^^^  --- int_literal.rna:34:5
+ == note: got conflicting type int for here
+  :     let b1: bool = 0;
+  :                    ^  --- int_literal.rna:34:20
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got int in here
+at compile/lang_tests/typechecking/literals/int_literal.rna:35:20:35:21
+  :     let b2: bool = 1;
+  :                    ^ type mismatch
+  .
+ == note: expected type bool based on variable 'b2'
+  :     let b2: bool = 1;
+  :     ^^^^^^^^^^^^^^^^^  --- int_literal.rna:35:5
+ == note: got conflicting type int for here
+  :     let b2: bool = 1;
+  :                    ^  --- int_literal.rna:35:20
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got int in here
+at compile/lang_tests/typechecking/literals/int_literal.rna:36:20:36:23
+  :     let b3: bool = 123;
+  :                    ^^^ type mismatch
+  .
+ == note: expected type bool based on variable 'b3'
+  :     let b3: bool = 123;
+  :     ^^^^^^^^^^^^^^^^^^^  --- int_literal.rna:36:5
+ == note: got conflicting type int for here
+  :     let b3: bool = 123;
+  :                    ^^^  --- int_literal.rna:36:20
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got int in here
+at compile/lang_tests/typechecking/literals/int_literal.rna:37:20:37:25
+  :     let b4: bool = 0x123;
+  :                    ^^^^^ type mismatch
+  .
+ == note: expected type bool based on variable 'b4'
+  :     let b4: bool = 0x123;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- int_literal.rna:37:5
+ == note: got conflicting type int for here
+  :     let b4: bool = 0x123;
+  :                    ^^^^^  --- int_literal.rna:37:20
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got int in here
+at compile/lang_tests/typechecking/literals/int_literal.rna:38:20:38:25
+  :     let b5: bool = 8x123;
+  :                    ^^^^^ type mismatch
+  .
+ == note: expected type bool based on variable 'b5'
+  :     let b5: bool = 8x123;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- int_literal.rna:38:5
+ == note: got conflicting type int for here
+  :     let b5: bool = 8x123;
+  :                    ^^^^^  --- int_literal.rna:38:20
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got int in here
+at compile/lang_tests/typechecking/literals/int_literal.rna:39:20:39:24
+  :     let b6: bool = 0b01;
+  :                    ^^^^ type mismatch
+  .
+ == note: expected type bool based on variable 'b6'
+  :     let b6: bool = 0b01;
+  :     ^^^^^^^^^^^^^^^^^^^^  --- int_literal.rna:39:5
+ == note: got conflicting type int for here
+  :     let b6: bool = 0b01;
+  :                    ^^^^  --- int_literal.rna:39:20
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got int in here
+at compile/lang_tests/typechecking/literals/int_literal.rna:41:24:41:25
+  :     let d1: double64 = 1;
+  :                        ^ type mismatch
+  .
+ == note: expected type double64 based on variable 'd1'
+  :     let d1: double64 = 1;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- int_literal.rna:41:5
+ == note: got conflicting type int for here
+  :     let d1: double64 = 1;
+  :                        ^  --- int_literal.rna:41:24
+
+
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int in here
+at compile/lang_tests/typechecking/literals/int_literal.rna:42:27:42:28
+  :     let c1: char const* = 1;
+  :                           ^ pointer type mismatch
+  .
+ == note: expected type char const*<free> based on variable 'c1'
+  :     let c1: char const* = 1;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^  --- int_literal.rna:42:5
+ == note: got conflicting type int for here
+  :     let c1: char const* = 1;
+  :                           ^  --- int_literal.rna:42:27

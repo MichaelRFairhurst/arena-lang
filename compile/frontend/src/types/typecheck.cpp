@@ -83,8 +83,27 @@ namespace {
         }
 
         TypeId operator()(ExprTransformStep<ast::LiteralExpression> step) {
-            // For now we treat all literals as ints...
-            return set_type(step.out, NamedTypeSymbol{"int"}, ResolvedRValue{});
+            auto token = step.ast->get_literal()->begin();
+            if (std::holds_alternative<int64_t>(token->literalValue)) {
+                return set_type(step.out, NamedTypeSymbol{"int"}, ResolvedRValue{});
+            } else if (std::holds_alternative<std::string_view>(token->literalValue)) {
+                if (token->text[0] == '"') {
+                    auto char_type = ops.get_types().get_type_id(NamedTypeSymbol{"char"});
+                    auto const_char_type = ops.get_types().get_type_id(ConstTypeSymbol{char_type});
+                    auto const_char_ptr_sym =
+                        PointerTypeSymbol{const_char_type,
+                                          ops.get_lifetimes().get_global_lifetime()};
+                    return set_type(step.out, const_char_ptr_sym, ResolvedRValue{});
+                } else if (token->text[0] == '\'') {
+                    return set_type(step.out, NamedTypeSymbol{"char"}, ResolvedRValue{});
+                } else {
+                    throw std::runtime_error("Unknown string literal type");
+                }
+            } else if (std::holds_alternative<double>(token->literalValue)) {
+                return set_type(step.out, NamedTypeSymbol{"double64"}, ResolvedRValue{});
+            }
+
+            throw std::runtime_error("Unknown literal type");
         }
 
         TypeId operator()(ExprTransformStep<ast::BinaryExpression> step) {

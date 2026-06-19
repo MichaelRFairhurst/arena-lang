@@ -49,6 +49,10 @@ namespace arena::ast {
 
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
+        std::string to_string() const override { return literal->to_string(); }
+
+        const Literal *get_literal() const { return literal; }
+
     private:
         Literal *literal;
     };
@@ -70,17 +74,11 @@ namespace arena::ast {
 
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        const Expression *get_left() const {
-            return left;
-        }
+        const Expression *get_left() const { return left; }
 
-        const Expression *get_right() const {
-            return right;
-        }
+        const Expression *get_right() const { return right; }
 
-        TokenType get_operator() const {
-            return op->type;
-        }
+        TokenType get_operator() const { return op->type; }
 
     private:
         Token *op;
@@ -101,13 +99,9 @@ namespace arena::ast {
 
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        const Expression *get_operand() const {
-            return operand;
-        }
+        const Expression *get_operand() const { return operand; }
 
-        const Token* get_operator_token() const {
-            return op;
-        }
+        const Token *get_operator_token() const { return op; }
 
         TokenType get_operator() const { return op->type; }
 
@@ -130,17 +124,11 @@ namespace arena::ast {
 
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        const Expression *get_operand() const {
-            return operand;
-        }
+        const Expression *get_operand() const { return operand; }
 
-        TokenType get_operator() const {
-            return op->type;
-        }
+        TokenType get_operator() const { return op->type; }
 
-        const Token *get_operator_token() const {
-            return op;
-        }
+        const Token *get_operator_token() const { return op; }
 
     private:
         Expression *operand;
@@ -161,9 +149,7 @@ namespace arena::ast {
 
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        const Expression *get_object() const {
-            return object;
-        }
+        const Expression *get_object() const { return object; }
 
     private:
         Expression *object;
@@ -188,13 +174,9 @@ namespace arena::ast {
             return callee->to_string() + "(" + util::concat(args, ", ") + ")";
         }
 
-        const Expression *get_callee() const {
-            return callee;
-        }
+        const Expression *get_callee() const { return callee; }
 
-        const std::vector<Expression *> &get_args() const {
-            return args;
-        }
+        const std::vector<Expression *> &get_args() const { return args; }
 
     private:
         Expression *callee;
@@ -224,13 +206,9 @@ namespace arena::ast {
 
         void accept(Visitor *visitor) const override { visitor->visit(this); }
 
-        const Expression *get_expr() const {
-            return expr;
-        }
+        const Expression *get_expr() const { return expr; }
 
-        const Type* get_type() const {
-            return targetType;
-        }
+        const Type *get_type() const { return targetType; }
 
     private:
         Expression *expr;

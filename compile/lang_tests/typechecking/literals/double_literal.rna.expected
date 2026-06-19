@@ -1,0 +1,116 @@
+
+Error[E-T_ASGN_NOREL]: Expected int but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:10:19:10:22
+  :     let i1: int = 0.0;
+  :                   ^^^ type mismatch
+  .
+ == note: expected type int based on variable 'i1'
+  :     let i1: int = 0.0;
+  :     ^^^^^^^^^^^^^^^^^^  --- double_literal.rna:10:5
+ == note: got conflicting type double64 for here
+  :     let i1: int = 0.0;
+  :                   ^^^  --- double_literal.rna:10:19
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:11:19:11:24
+  :     let i2: int = 123.0;
+  :                   ^^^^^ type mismatch
+  .
+ == note: expected type int based on variable 'i2'
+  :     let i2: int = 123.0;
+  :     ^^^^^^^^^^^^^^^^^^^^  --- double_literal.rna:11:5
+ == note: got conflicting type double64 for here
+  :     let i2: int = 123.0;
+  :                   ^^^^^  --- double_literal.rna:11:19
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:12:19:12:24
+  :     let i3: int = 0.123;
+  :                   ^^^^^ type mismatch
+  .
+ == note: expected type int based on variable 'i3'
+  :     let i3: int = 0.123;
+  :     ^^^^^^^^^^^^^^^^^^^^  --- double_literal.rna:12:5
+ == note: got conflicting type double64 for here
+  :     let i3: int = 0.123;
+  :                   ^^^^^  --- double_literal.rna:12:19
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:14:20:14:23
+  :     let b1: bool = 0.0;
+  :                    ^^^ type mismatch
+  .
+ == note: expected type bool based on variable 'b1'
+  :     let b1: bool = 0.0;
+  :     ^^^^^^^^^^^^^^^^^^^  --- double_literal.rna:14:5
+ == note: got conflicting type double64 for here
+  :     let b1: bool = 0.0;
+  :                    ^^^  --- double_literal.rna:14:20
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:15:20:15:25
+  :     let b2: bool = 123.0;
+  :                    ^^^^^ type mismatch
+  .
+ == note: expected type bool based on variable 'b2'
+  :     let b2: bool = 123.0;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- double_literal.rna:15:5
+ == note: got conflicting type double64 for here
+  :     let b2: bool = 123.0;
+  :                    ^^^^^  --- double_literal.rna:15:20
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:16:20:16:25
+  :     let b3: bool = 0.123;
+  :                    ^^^^^ type mismatch
+  .
+ == note: expected type bool based on variable 'b3'
+  :     let b3: bool = 0.123;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- double_literal.rna:16:5
+ == note: got conflicting type double64 for here
+  :     let b3: bool = 0.123;
+  :                    ^^^^^  --- double_literal.rna:16:20
+
+
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:18:27:18:30
+  :     let c1: char const* = 0.0;
+  :                           ^^^ pointer type mismatch
+  .
+ == note: expected type char const*<free> based on variable 'c1'
+  :     let c1: char const* = 0.0;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^  --- double_literal.rna:18:5
+ == note: got conflicting type double64 for here
+  :     let c1: char const* = 0.0;
+  :                           ^^^  --- double_literal.rna:18:27
+
+
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:19:27:19:32
+  :     let c2: char const* = 123.0;
+  :                           ^^^^^ pointer type mismatch
+  .
+ == note: expected type char const*<free> based on variable 'c2'
+  :     let c2: char const* = 123.0;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- double_literal.rna:19:5
+ == note: got conflicting type double64 for here
+  :     let c2: char const* = 123.0;
+  :                           ^^^^^  --- double_literal.rna:19:27
+
+
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got double64 in here
+at compile/lang_tests/typechecking/literals/double_literal.rna:20:27:20:32
+  :     let c3: char const* = 0.123;
+  :                           ^^^^^ pointer type mismatch
+  .
+ == note: expected type char const*<free> based on variable 'c3'
+  :     let c3: char const* = 0.123;
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- double_literal.rna:20:5
+ == note: got conflicting type double64 for here
+  :     let c3: char const* = 0.123;
+  :                           ^^^^^  --- double_literal.rna:20:27

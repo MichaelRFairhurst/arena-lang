@@ -1,0 +1,39 @@
+fun basic() {
+    let x: char const * = "basic string";
+}
+
+fun empty() {
+    let x: char const * = "";
+}
+
+fun symbols() {
+    let x: char const * = "basic! string + * 123 & @ # $ % ^ ( ) { } / ? + = | - _ ' , < . >";
+}
+
+fun escapes() {
+    let x: char const * = "\n \r \0 \" \\";
+}
+
+fun singleqoute() {
+    let x: char = 'a';
+}
+
+fun singleqoutedouble() {
+    let x: char = '"';
+}
+
+fun singleqouteesc() {
+    let c1: char = '\'';
+    let c2: char = '\r';
+    let c3: char = '\n';
+    let c4: char = '\0';
+    let c5: char = '\\';
+}
+
+fun bad() {
+    let s: char const * = 'c';
+    let c: char = "str";
+    let i: int = "1";
+    let b: bool = "true";
+    let d: double = "0.0";
+}

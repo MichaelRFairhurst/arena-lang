@@ -1,0 +1,21 @@
+fun zero() {
+    let x: double = 0.0;
+}
+
+fun giant() {
+    let x: double = 12340234.0;
+}
+
+fun bad() {
+    let i1: int = 0.0;
+    let i2: int = 123.0;
+    let i3: int = 0.123;
+
+    let b1: bool = 0.0;
+    let b2: bool = 123.0;
+    let b3: bool = 0.123;
+
+    let c1: char const* = 0.0;
+    let c2: char const* = 123.0;
+    let c3: char const* = 0.123;
+}

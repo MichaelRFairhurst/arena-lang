@@ -1,0 +1,51 @@
+
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got char in here
+at compile/lang_tests/typechecking/literals/string_literal.rna:34:27:34:30
+  :     let s: char const * = 'c';
+  :                           ^^^ pointer type mismatch
+  .
+ == note: expected type char const*<free> based on variable 's'
+  :     let s: char const * = 'c';
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^  --- string_literal.rna:34:5
+ == note: got conflicting type char for here
+  :     let s: char const * = 'c';
+  :                           ^^^  --- string_literal.rna:34:27
+
+
+Error[E-T_ASGN_NOREL]: Expected char but got char const*static in here
+at compile/lang_tests/typechecking/literals/string_literal.rna:35:19:35:24
+  :     let c: char = "str";
+  :                   ^^^^^ type mismatch
+  .
+ == note: expected type char based on variable 'c'
+  :     let c: char = "str";
+  :     ^^^^^^^^^^^^^^^^^^^^  --- string_literal.rna:35:5
+ == note: got conflicting type char const*static for here
+  :     let c: char = "str";
+  :                   ^^^^^  --- string_literal.rna:35:19
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got char const*static in here
+at compile/lang_tests/typechecking/literals/string_literal.rna:36:18:36:21
+  :     let i: int = "1";
+  :                  ^^^ type mismatch
+  .
+ == note: expected type int based on variable 'i'
+  :     let i: int = "1";
+  :     ^^^^^^^^^^^^^^^^^  --- string_literal.rna:36:5
+ == note: got conflicting type char const*static for here
+  :     let i: int = "1";
+  :                  ^^^  --- string_literal.rna:36:18
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got char const*static in here
+at compile/lang_tests/typechecking/literals/string_literal.rna:37:19:37:25
+  :     let b: bool = "true";
+  :                   ^^^^^^ type mismatch
+  .
+ == note: expected type bool based on variable 'b'
+  :     let b: bool = "true";
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- string_literal.rna:37:5
+ == note: got conflicting type char const*static for here
+  :     let b: bool = "true";
+  :                   ^^^^^^  --- string_literal.rna:37:19

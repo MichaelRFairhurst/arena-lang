@@ -13,22 +13,6 @@ namespace arena::parse {
     using namespace arena::ast;
 
     class TokenIterator {
-        util::Arena *arena;
-        std::string_view state;
-        Token *prev = nullptr;
-        Token *head = nullptr;
-
-        Token *set_head(TokenType type, std::string_view text) {
-            prev = head;
-            head = arena->alloc<Token>(Token{type, text, nullptr});
-
-            if (prev != nullptr) {
-                prev->next = head;
-            }
-
-            return head;
-        }
-
     public:
         TokenIterator(util::Arena *arena, std::string_view input) : arena(arena), state(input) {}
 
@@ -56,149 +40,369 @@ namespace arena::parse {
         }
 
         Token *next() {
-            auto begin = std::find_if_not(state.begin(), state.end(), isspace);
+            while (true) {
+                auto begin = std::find_if_not(state.begin(), state.end(), isspace);
 
-            state = std::string_view(begin, state.end() - begin);
-            if (state.empty()) {
-                return set_head(TokenType::END_OF_INPUT, state);
-            }
-
-            std::optional<TokenType> matchType;
-
-            if (state.size() > 1) {
-                // Check for multi-character tokens first
-                std::string_view twoCharToken = state.substr(0, 2);
-                if (twoCharToken == "&&") {
-                    matchType = TokenType::AND;
-                } else if (twoCharToken == "||") {
-                    matchType = TokenType::OR;
-                } else if (twoCharToken == "==") {
-                    matchType = TokenType::EQUAL_EQUAL;
-                } else if (twoCharToken == "!=") {
-                    matchType = TokenType::NOT_EQUAL;
-                } else if (twoCharToken == "<=") {
-                    matchType = TokenType::LESS_EQUAL;
-                } else if (twoCharToken == ">=") {
-                    matchType = TokenType::GREATER_EQUAL;
-                } else if (twoCharToken == "->") {
-                    matchType = TokenType::ARROW;
+                state = std::string_view(begin, state.end() - begin);
+                if (state.empty()) {
+                    return set_head(TokenType::END_OF_INPUT, state);
                 }
 
-                if (matchType.has_value()) {
-                    state.remove_prefix(2);
-                    return set_head(matchType.value(), twoCharToken);
+                if (state[0] != '/') {
+                    break;
+                }
+
+                if (!lex_comment()) {
+                    break;
                 }
             }
-
-            std::string_view tokenText = state.substr(0, 1);
 
             switch (state[0]) {
             case '+':
-                matchType = TokenType::PLUS;
-                break;
+                return n_char_token(TokenType::PLUS, 1);
             case '-':
-                matchType = TokenType::MINUS;
-                break;
+                return lex_match("->", TokenType::ARROW, [this]() {
+                    return n_char_token(TokenType::MINUS, 1);
+                });
             case '*':
-                matchType = TokenType::STAR;
-                break;
+                return n_char_token(TokenType::STAR, 1);
             case '/':
-                matchType = TokenType::SLASH;
-                break;
+                return n_char_token(TokenType::SLASH, 1);
             case '=':
-                matchType = TokenType::EQUAL;
-                break;
+                return lex_match("==", TokenType::EQUAL_EQUAL, [this]() {
+                    return n_char_token(TokenType::EQUAL, 1);
+                });
             case '(':
-                matchType = TokenType::OPEN_PAREN;
-                break;
+                return n_char_token(TokenType::OPEN_PAREN, 1);
             case ')':
-                matchType = TokenType::CLOSE_PAREN;
-                break;
+                return n_char_token(TokenType::CLOSE_PAREN, 1);
             case '[':
-                matchType = TokenType::OPEN_BRACKET;
-                break;
+                return n_char_token(TokenType::OPEN_BRACKET, 1);
             case ']':
-                matchType = TokenType::CLOSE_BRACKET;
-                break;
+                return n_char_token(TokenType::CLOSE_BRACKET, 1);
             case '<':
-                matchType = TokenType::LESS;
-                break;
+                return lex_match("<=", TokenType::LESS_EQUAL, [this]() {
+                    return n_char_token(TokenType::LESS, 1);
+                });
             case '>':
-                matchType = TokenType::GREATER;
-                break;
+                return lex_match(">=", TokenType::GREATER_EQUAL, [this]() {
+                    return n_char_token(TokenType::GREATER, 1);
+                });
             case '.':
-                matchType = TokenType::DOT;
-                break;
+                return n_char_token(TokenType::DOT, 1);
             case '!':
-                matchType = TokenType::NOT;
-                break;
+                return lex_match("!=", TokenType::NOT_EQUAL, [this]() {
+                    return n_char_token(TokenType::NOT, 1);
+                });
             case '&':
-                matchType = TokenType::AMP;
-                break;
+                return lex_match("&&", TokenType::AND, [this]() {
+                    return n_char_token(TokenType::AMP, 1);
+                });
+            case '|':
+                return lex_match("||", TokenType::OR, [this]() {
+                    return n_char_token(TokenType::INVALID, 1);
+                });
             case '{':
-                matchType = TokenType::OPEN_BRACE;
-                break;
+                return n_char_token(TokenType::OPEN_BRACE, 1);
             case '}':
-                matchType = TokenType::CLOSE_BRACE;
-                break;
+                return n_char_token(TokenType::CLOSE_BRACE, 1);
             case ':':
-                matchType = TokenType::COLON;
-                break;
+                return n_char_token(TokenType::COLON, 1);
             case ';':
-                matchType = TokenType::SEMICOLON;
-                break;
+                return n_char_token(TokenType::SEMICOLON, 1);
             case ',':
-                matchType = TokenType::COMMA;
-                break;
+                return n_char_token(TokenType::COMMA, 1);
+            case 'a':
+                return keyword_match("as", TokenType::AS, lex_ident());
+            case 'c':
+                return keyword_match("const", TokenType::CONST, lex_ident());
+            case 'e':
+                return keyword_match("else", TokenType::ELSE, lex_ident());
+            case 'f':
+                return keyword_match("fun",
+                                     TokenType::FUN,
+                                     keyword_match("false", TokenType::FALSE, lex_ident()));
+            case 'i':
+                return keyword_match("import",
+                                     TokenType::IMPORT,
+                                     keyword_match("if", TokenType::IF, lex_ident()));
+            case 'l':
+                return keyword_match("let", TokenType::LET, lex_ident());
+            case 'r':
+                return keyword_match("ret", TokenType::RET, lex_ident());
+            case 's':
+                return keyword_match("struct", TokenType::STRUCT, lex_ident());
+            case 't':
+                return keyword_match("true", TokenType::TRUE, lex_ident());
+            case 'w':
+                return keyword_match("while", TokenType::WHILE, lex_ident());
+            case '"':
+            case '\'':
+                return lex_quoted_string();
             default:
                 // fall through
                 ;
             }
 
-            if (matchType.has_value()) {
-                state.remove_prefix(1);
-                return set_head(matchType.value(), tokenText);
+            if (std::isalpha(state[0]) || state[0] == '_') {
+                return lex_ident();
             }
 
-            // TODO: handle integer literals, string literals, comments, etc.
-
-            auto alphaNumEnd = std::find_if_not(state.begin(), state.end(), [](char c) {
-                return std::isalnum(c) || c == '_';
-            });
-
-            tokenText = std::string_view(state.data(), alphaNumEnd - state.begin());
-            state = std::string_view(alphaNumEnd, state.end() - alphaNumEnd);
-
-            if (tokenText == "as") {
-                return set_head(TokenType::AS, tokenText);
-            } else if (tokenText == "fun") {
-                return set_head(TokenType::FUN, tokenText);
-            } else if (tokenText == "true") {
-                return set_head(TokenType::TRUE, tokenText);
-            } else if (tokenText == "false") {
-                return set_head(TokenType::FALSE, tokenText);
-            } else if (tokenText == "if") {
-                return set_head(TokenType::IF, tokenText);
-            } else if (tokenText == "else") {
-                return set_head(TokenType::ELSE, tokenText);
-            } else if (tokenText == "for") {
-                return set_head(TokenType::FOR, tokenText);
-            } else if (tokenText == "while") {
-                return set_head(TokenType::WHILE, tokenText);
-            } else if (tokenText == "let") {
-                return set_head(TokenType::LET, tokenText);
-            } else if (tokenText == "ret") {
-                return set_head(TokenType::RET, tokenText);
-            } else if (tokenText == "import") {
-                return set_head(TokenType::IMPORT, tokenText);
-            } else if (tokenText == "struct") {
-                return set_head(TokenType::STRUCT, tokenText);
-            } else if (tokenText == "const") {
-                return set_head(TokenType::CONST, tokenText);
+            if (std::isdigit(state[0])) {
+                return lex_number();
             }
 
-            return set_head(TokenType::IDENTIFIER, tokenText);
+            return n_char_token(TokenType::INVALID, 1);
         }
+
+    private:
+        template <typename Else>
+        Token *lex_match(std::string_view expected, TokenType type, Else &&elseFunc) {
+            if (state.size() >= expected.size() && state.substr(0, expected.size()) == expected) {
+                return n_char_token(type, expected.size());
+            }
+
+            return elseFunc();
+        }
+
+        Token *n_char_token(TokenType type, int n, Token::Value literalValue = {}) {
+            std::string_view tokenText = state.substr(0, n);
+            state.remove_prefix(n);
+            return set_head(type, tokenText, literalValue);
+        }
+
+        Token *iter_token(TokenType type,
+                          std::string_view::iterator it,
+                          Token::Value literalValue = {}) {
+            return n_char_token(type, std::distance(state.begin(), it), literalValue);
+        }
+
+        Token *keyword_match(std::string_view expected, TokenType type, Token *ident) {
+            if (ident->text == expected) {
+                ident->type = type;
+            }
+
+            return ident;
+        }
+
+        bool lex_comment() {
+            if (state[0] != '/' || state.size() < 2) {
+                return false;
+            }
+
+            if (state[1] == '/') {
+                // single-line comment, skip to end of line
+                auto it = std::find(state.begin(), state.end(), '\n');
+                iter_token(TokenType::COMMENT, it);
+                return true;
+            }
+
+            auto end = lex_multiline_comment_nestable(state.begin());
+            if (end.has_value()) {
+                iter_token(TokenType::COMMENT, end.value());
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Lexes a multiline comment, but supports nesting.
+         *
+         * This allows you to use slash-star comments to comment out blocks of code that already
+         * contain slash-star comments.
+         */
+        std::optional<std::string_view::iterator> lex_multiline_comment_nestable(
+            std::string_view::iterator begin) {
+            auto it = begin;
+            if (it == state.end() || *it != '/') {
+                return std::nullopt;
+            }
+            it++;
+
+            if (it == state.end() || *it != '*') {
+                return std::nullopt;
+            }
+            it++;
+
+            for (; it != state.end(); ++it) {
+                if (*it == '/') {
+                    it = lex_multiline_comment_nestable(it).value_or(it + 1);
+                }
+
+                if (*it == '*') {
+                    it++;
+                    if (it != state.end() && *it == '/') {
+                        return it + 1;
+                    }
+                }
+            }
+
+            // Unclosed comment, return end of input
+            return it;
+        }
+
+        Token *lex_ident() {
+            auto it = state.begin();
+            auto end = state.end();
+
+            for (; it != end; ++it) {
+                if (!std::isalnum(*it) && *it != '_') {
+                    break;
+                }
+            }
+
+            return iter_token(TokenType::IDENTIFIER, it);
+        }
+
+        Token *lex_quoted_string() {
+            char quoteChar = state[0];
+            auto it = state.begin() + 1;
+            std::string value;
+
+            for (; it != state.end(); ++it) {
+                if (*it == '\\') {
+                    // skip escaped character
+                    ++it;
+                    if (it == state.end()) {
+                        break;
+                    }
+                    switch (*it) {
+                    case 'n':
+                        value += '\n';
+                        break;
+                    case 't':
+                        value += '\t';
+                        break;
+                    case 'r':
+                        value += '\r';
+                        break;
+                    case '0':
+                        value += '\0';
+                        break;
+                    case '\\':
+                        value += '\\';
+                        break;
+                    }
+                } else if (*it == quoteChar) {
+                    ++it;
+                    break;
+                } else {
+                    value += *it;
+                }
+            }
+
+            // Ensure data is stored in the parse tree arena.
+            char *interned = arena->alloc_array<char>(value.size());
+            std::copy(value.begin(), value.end(), interned);
+
+            return iter_token(TokenType::STRING, it, std::string_view(interned, value.size()));
+        }
+
+        Token *lex_number() {
+            __int128_t value = 0;
+            int base = 10;
+            int decimal = -1;
+            auto it = state.begin();
+
+            if (state.size() >= 2 && state[0] == '0') {
+                if (state[1] == 'x' || state[1] == 'X') {
+                    base = 16;
+                    it += 2;
+                } else if (state[1] == 'b' || state[1] == 'B') {
+                    base = 2;
+                    it += 2;
+                }
+            } else if (state.size() >= 2 && state[0] == '8' && state[1] == 'x') {
+                base = 8;
+                it += 2;
+            }
+
+            for (; it != state.end(); ++it) {
+                if (*it == '\'' || *it == '_') {
+                    continue; // skip digit separators
+                }
+
+                if (*it == '.') {
+                    if (decimal != -1) {
+                        break; // second decimal point, stop parsing
+                    }
+                    decimal = 1;
+                    continue;
+                } else if (decimal != -1) {
+                    decimal *= base;
+                }
+
+                bool valid_digit = false;
+                switch (base) {
+                case 2: {
+                    if (*it != '0' && *it != '1') {
+                        break;
+                    }
+                    valid_digit = true;
+                    value = value * 2 + (*it - '0');
+                    break;
+                }
+                case 8: {
+                    if (*it < '0' || *it > '7') {
+                        break;
+                    }
+                    valid_digit = true;
+                    value = value * 8 + (*it - '0');
+                    break;
+                }
+                case 10: {
+                    if (!std::isdigit(*it)) {
+                        break;
+                    }
+                    valid_digit = true;
+                    value = value * 10 + (*it - '0');
+                    break;
+                }
+
+                case 16: {
+                    if (!std::isxdigit(*it)) {
+                        break;
+                    }
+                    valid_digit = true;
+                    int digit = std::isdigit(*it) ? (*it - '0') : (std::tolower(*it) - 'a' + 10);
+                    value = value * 16 + digit;
+                    break;
+                }
+                default:
+                    throw std::runtime_error("Invalid base");
+                }
+
+                if (!valid_digit) {
+                    break;
+                }
+            }
+
+            Token::Value literalValue;
+            if (decimal == -1) {
+                literalValue = static_cast<int64_t>(value);
+            } else {
+                literalValue = static_cast<double>(value) / decimal;
+            }
+
+            return iter_token(TokenType::INTEGER, it, literalValue);
+        }
+
+        Token *set_head(TokenType type, std::string_view text, Token::Value literalValue = {}) {
+            prev = head;
+            head = arena->alloc<Token>(Token{type, text, nullptr, literalValue});
+
+            if (prev != nullptr) {
+                prev->next = head;
+            }
+
+            return head;
+        }
+
+        util::Arena *arena;
+        std::string_view state;
+        Token *prev = nullptr;
+        Token *head = nullptr;
     };
 
     class Parser {
@@ -253,8 +457,7 @@ namespace arena::parse {
                 if (tokens.peek()->type == TokenType::GREATER) {
                     auto closeToken = tokens.take(); // consume '>'
                     if (generic_args.empty()) {
-                        errors.E_P_UNEXP(closeToken,
-                                          "non-empty generic parameter list", "empty");
+                        errors.E_P_UNEXP(closeToken, "non-empty generic parameter list", "empty");
                     }
 
                     break;
@@ -262,8 +465,8 @@ namespace arena::parse {
                            tokens.peek()->type == TokenType::OPEN_BRACE ||
                            tokens.peek()->type == TokenType::SEMICOLON) {
                     errors.E_P_UNEXP(tokens.peek(),
-                                  "a type argument in generic parameter list",
-                                      std::string(tokens.peek()->text));
+                                     "a type argument in generic parameter list",
+                                     std::string(tokens.peek()->text));
                     break;
                 }
 
@@ -328,9 +531,15 @@ namespace arena::parse {
         }
 
         Literal *parse_literal() {
-            // TODO: actually parse different literals
-            auto literalToken = require_take_token(TokenType::IDENTIFIER, "to start literal");
-            return arena->alloc<Literal>(literalToken);
+            Token *tok;
+            if (tokens.peek()->type == TokenType::INTEGER ||
+                tokens.peek()->type == TokenType::STRING) {
+                tok = tokens.take();
+            } else {
+                tok = tokens.take_synthetic(TokenType::INTEGER);
+            }
+
+            return arena->alloc<Literal>(tok);
         }
 
         Expression *parse_primary_expression() {
@@ -340,6 +549,10 @@ namespace arena::parse {
                 Token *close_paren =
                     require_take_token(TokenType::CLOSE_PAREN, "to close parenthesized expression");
                 return expr;
+            } else if (tokens.peek()->type == TokenType::INTEGER ||
+                       tokens.peek()->type == TokenType::STRING) {
+                Literal *literal = parse_literal();
+                return arena->alloc<LiteralExpression>(literal);
             }
 
             auto idToken =
@@ -386,8 +599,8 @@ namespace arena::parse {
 
                 if (!arg_allowed) {
                     errors.E_P_UNEXP(tokens.peek(),
-                                      "')' or ',' but got: " +
-                                      std::string(tokens.peek()->text), "");
+                                     "')' or ',' but got: " + std::string(tokens.peek()->text),
+                                     "");
 
                     if (tokens.peek()->type == TokenType::END_OF_INPUT ||
                         tokens.peek()->type == TokenType::SEMICOLON ||
@@ -537,7 +750,8 @@ namespace arena::parse {
         }
 
         ArenaStatement *parse_arena_statement() {
-            Token *arenaToken = require_take_token(TokenType::IDENTIFIER, "to start arena statement");
+            Token *arenaToken =
+                require_take_token(TokenType::IDENTIFIER, "to start arena statement");
             assert(arenaToken->text == "arena");
             BlockStatement *block = parse_block_statement();
             return arena->alloc<ArenaStatement>(arenaToken, block);
@@ -553,7 +767,8 @@ namespace arena::parse {
                 return parse_return_statement();
             } else if (tokens.peek()->type == TokenType::OPEN_BRACE) {
                 return parse_block_statement();
-            } else if (tokens.peek()->type == TokenType::IDENTIFIER && tokens.peek()->text == "arena") {
+            } else if (tokens.peek()->type == TokenType::IDENTIFIER &&
+                       tokens.peek()->text == "arena") {
                 return parse_arena_statement();
             } else {
                 // default to expression statement
@@ -710,7 +925,9 @@ namespace arena::parse {
                 std::string message = "Expected " + std::string(token_type_to_string(expected)) +
                                       context_message_spaced + " but got '" +
                                       std::string(tokens.peek()->text) + "'";
-                errors.E_P_UNEXP(tokens.peek(), token_type_to_string(expected), tokens.peek()->text);
+                errors.E_P_UNEXP(tokens.peek(),
+                                 token_type_to_string(expected),
+                                 tokens.peek()->text);
                 return tokens.take_synthetic(expected);
             }
         }
