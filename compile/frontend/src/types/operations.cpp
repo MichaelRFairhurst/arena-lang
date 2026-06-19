@@ -240,15 +240,15 @@ error::Error *TypeOperations::require_assignable(TypeId lhs,
         }
         auto rhs_pointee_id = right_ptr->pointee_type;
         auto rhs_pointee = get_type(rhs_pointee_id);
-        auto constraint = context.is_const || (!is_lifetime_strict(rhs_pointee_id) && context.is_copy)
+        auto constraint = context.is_const || (!is_lifetime_strict(lhs_pointee_id) && context.is_copy)
                               ? LifetimeRelation::LessEqual
                               : LifetimeRelation::Equals;
         std::vector<error::Supplement> supplements;
 
-        if (is_lifetime_strict(rhs_pointee_id) && !context.is_const) {
+        if (is_lifetime_strict(lhs_pointee_id) && !context.is_const) {
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Note,
-                                  "pointee '" + get_type_name(rhs_pointee_id) +
+                                  "pointee '" + get_type_name(lhs_pointee_id) +
                                       "' is lifetime-strict cannot have its lifetime shortened."});
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Help,
@@ -264,7 +264,7 @@ error::Error *TypeOperations::require_assignable(TypeId lhs,
         } else {
             supplements.push_back(
                 error::Supplement{error::SupplementKind::Note,
-                                  "pointee '" + get_type_name(rhs_pointee_id) +
+                                  "pointee '" + get_type_name(lhs_pointee_id) +
                                       "' is lifetime-permissive, its lifetime may be shortened."});
         }
 

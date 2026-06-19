@@ -4,117 +4,214 @@ fun f() {
     let stack_p_const: SomeStruct *stack const;
     let static_p_const: SomeStruct *static const;
 
-    stack_p_const = static_p_const;
+    // SomeStruct* const is lifetime-permissive due to const, so a *static may be
+    // used as a *stack value.
+    stack_p_const = static_p_const;// OK
 }
 
 fun g() {
     let stack_p_const: SomeStruct *stack const;
     let static_p_const: SomeStruct *static const;
 
-    static_p_const = stack_p_const;
+    // A *stack value cannot be used as a *static value even though SomeStruct *const
+    // is lifetime-permissive
+    static_p_const = stack_p_const; // E-L_ESC_STACK
 }
 
 fun h() {
     let stack_const_p: SomeStruct const *stack;
     let static_const_p: SomeStruct const *static;
 
-    stack_const_p = static_const_p;
+    // SomeStruct const* is lifetime-permissive due to const, so a *static may be
+    // used as a *stack value.
+    stack_const_p = static_const_p; // OK
 }
 
 fun i() {
     let stack_const_p: SomeStruct const *stack;
     let static_const_p: SomeStruct const *static;
 
-    static_const_p = stack_const_p;
+    // A *stack value cannot be used as a *static value even though SomeStruct const *
+    // is lifetime-permissive
+    static_const_p = stack_const_p; // E-L_ESC_STACK
 }
 
 fun j() {
     let stack_p_const_p: SomeStruct const *stack const;
     let static_p_const_p: SomeStruct const *static const;
 
-    stack_p_const_p = static_p_const_p;
+    // SomeStruct const * const is lifetime-permissive due to const, so a *static may be
+    // used as a *stack value.
+    stack_p_const_p = static_p_const_p;  // OK
 }
 
 fun k() {
     let stack_p_const_p: SomeStruct const *stack const;
     let static_p_const_p: SomeStruct const *static const;
 
-    static_p_const_p = stack_p_const_p;
+    // A *stack value cannot be used as a *static value even though SomeStruct const * const
+    // is lifetime-permissive
+    static_p_const_p = stack_p_const_p; // E-L_ESC_STACK
 }
 
 fun l() {
     let stack_p_const: SomeStruct *stack const;
     let static_const_p: SomeStruct const *static;
 
-    stack_p_const = static_const_p;
+    // SomeStruct * const and SomeStruct const * are both lifetime-permissive due to const, so a
+    // *static may be used as a *stack value.
+    stack_p_const = static_const_p; // OK
 }
 
 fun m() {
     let stack_p_const: SomeStruct *stack const;
     let static_const_p: SomeStruct const *static;
 
-    static_const_p = stack_p_const;
+    // A *stack value cannot be used as a *static value even though SomeStruct const * and
+    // SomeStruct const * are both lifetime-permissive
+    static_const_p = stack_p_const; // E-L_ESC_STACK
 }
 
 fun n() {
     let stack_const_p: SomeStruct const *stack;
     let static_p_const: SomeStruct *static const;
 
-    static_p_const = stack_const_p;
+    // SomeStruct * const and SomeStruct const * are both lifetime-permissive due to const, so a
+    // *static may be used as a *stack value.
+    stack_const_p = static_p_const; // OK
 }
 
 fun o() {
     let stack_const_p: SomeStruct const *stack;
     let static_p_const: SomeStruct *static const;
 
-    stack_const_p = static_p_const;
+    // A *stack value cannot be used as a *static value even though SomeStruct const * and
+    // SomeStruct const * are both lifetime-permissive
+    static_p_const = stack_const_p; // E-L_ESC_STACK
 }
 
 fun p() {
     let stack_const_p_const: SomeStruct const *stack const;
     let static_p_const: SomeStruct *static const;
 
-    static_p_const = stack_const_p_const;
+    // SomeStruct * const and SomeStruct const * const are both lifetime-permissive due to const,
+    // so a *static may be used as a *stack value.
+    stack_const_p_const = static_p_const; // OK
 }
 
 fun q() {
     let stack_const_p_const: SomeStruct const *stack const;
     let static_p_const: SomeStruct const *static;
 
-    stack_const_p_const = static_p_const;
+    // A *stack value cannot be used as a *static value even though SomeStruct * const and
+    // SomeStruct const * const are both lifetime-permissive
+    static_p_const = stack_const_p_const; // E-L_ESC_STACK
 }
 
 fun r() {
     let stack_const_p_const: SomeStruct const *stack const;
     let static_const_p: SomeStruct const *static;
 
-    static_const_p = stack_const_p_const;
+    // SomeStruct const * and SomeStruct const * const are both lifetime-permissive due to const,
+    // so a *static may be used as a *stack value.
+    stack_const_p_const = static_const_p; // OK
 }
 
 fun s() {
-    let stack_p_const: SomeStruct *stack const;
-    let static_const_p_const: SomeStruct const *static const;
+    let stack_const_p_const: SomeStruct const *stack const;
+    let static_const_p: SomeStruct const *static;
 
-    stack_p_const = static_const_p_const;
+    // A *stack value cannot be used as a *static value even though SomeStruct const * and
+    // SomeStruct const * const are both lifetime-permissive
+    static_const_p = stack_const_p_const; // E-L_EST_STACK
 }
 
 fun t() {
     let stack_p_const: SomeStruct *stack const;
     let static_const_p_const: SomeStruct const *static const;
 
-    static_const_p_const = stack_p_const;
+    // SomeStruct * const and SomeStruct const * const are both lifetime-permissive due to const,
+    // so a *static may be used as a *stack value.
+    stack_p_const = static_const_p_const; // OK
 }
 
 fun u() {
-    let stack_const_p: SomeStruct const *stack;
+    let stack_p_const: SomeStruct *stack const;
     let static_const_p_const: SomeStruct const *static const;
 
-    stack_const_p = static_const_p_const;
+    // A *stack value cannot be used as a *static value even though SomeStruct * const and
+    // SomeStruct const * const are both lifetime-permissive
+    static_const_p_const = stack_p_const; // E-L_ESC_STACK
 }
 
 fun v() {
     let stack_const_p: SomeStruct const *stack;
     let static_const_p_const: SomeStruct const *static const;
 
-    static_const_p_const = stack_const_p;
+    // SomeStruct const * and SomeStruct const * const are both lifetime-permissive due to const,
+    // so a *static may be used as a *stack value.
+    stack_const_p = static_const_p_const; // OK
+}
+
+fun w() {
+    let stack_const_p: SomeStruct const *stack;
+    let static_const_p_const: SomeStruct const *static const;
+
+    // A *stack value cannot be used as a *static value even though SomeStruct const * and
+    // SomeStruct const * const are both lifetime-permissive
+    static_const_p_const = stack_const_p; // E-L_EST_STACK
+}
+
+fun x() {
+    let stack_const_p: SomeStruct const *stack;
+    let static_p: SomeStruct *static;
+
+    // SomeStruct const * is lifetime-permissive due to const, so a *static may be used as a *stack
+    // value.
+    stack_const_p = static_p; // OK
+}
+
+fun y() {
+    let stack_p: SomeStruct *stack;
+    let static_const_p: SomeStruct const *static;
+
+    // A *stack value cannot be used as a *static value even though SomeStruct const * is
+    // lifetime-permissive
+    static_const_p = stack_p; // E-L_ESC_STACK
+}
+
+fun z() {
+    let stack_p_const: SomeStruct *stack const;
+    let static_p: SomeStruct *static;
+
+    // SomeStruct * const is lifetime-permissive due to const, so a *static may be used as a *stack
+    // value.
+    stack_p_const = static_p; // OK
+}
+
+fun a1() {
+    let stack_p: SomeStruct *stack;
+    let static_p_const: SomeStruct *static const;
+
+    // A *stack value cannot be used as a *static value even though SomeStruct * const is
+    // lifetime-permissive
+    static_p_const = stack_p; // E-L_ESC_STACK
+}
+
+fun z() {
+    let stack_const_p_const: SomeStruct const *stack const;
+    let static_p: SomeStruct *static;
+
+    // SomeStruct const * const is lifetime-permissive due to const, so a *static may be used as a *stack
+    // value.
+    stack_const_p_const = static_p; // OK
+}
+
+fun a1() {
+    let stack_p: SomeStruct *stack;
+    let static_const_p_const: SomeStruct const *static const;
+
+    // A *stack value cannot be used as a *static value even though SomeStruct const * const is
+    // lifetime-permissive
+    static_const_p_const = stack_p; // E-L_ESC_STACK
 }
