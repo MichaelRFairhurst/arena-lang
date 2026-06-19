@@ -1,3 +1,4 @@
 fun f(p1: int *arena) {
-    let p2: int *static = p1;
+    // Arena-scoped value escapes its arena
+    let p2: int *static = p1; // E-L_ESC_CTX
 }

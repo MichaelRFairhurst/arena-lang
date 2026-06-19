@@ -4,7 +4,8 @@ fun f() {
     arena {
         let p_inner: int *arena;
 
-        p_outer = p_inner;
+        // nested arena value escapes its arena
+        p_outer = p_inner; // E-L_ESC_RNA
     }
 }
 
@@ -14,7 +15,8 @@ fun g() {
     arena {
         let p_inner: int *arena;
 
-        p_inner = p_outer;
+        // int* is not lifetime strict and may be cast to inner arena lifetime
+        p_inner = p_outer; // OK
     }
 }
 
@@ -24,6 +26,7 @@ fun h() {
     {
         let p_inner: int *arena;
 
-        p_outer = p_inner;
+        // Nested block is not an arena block, so arena lifetimes match.
+        p_outer = p_inner; // OK
     }
 }

@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/arena/arena_vs_static.rna:2:27:2:29
-  :     let p2: int *static = p1;
+at compile/lang_tests/lifetimes/arena/arena_vs_static.rna:3:27:3:29
+  :     let p2: int *static = p1; // E-L_ESC_CTX
   :                           ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
