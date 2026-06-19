@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/free/long_chain.rna:18:27:18:29
-  :     let p5: int *static = p4;
+at compile/lang_tests/lifetimes/free/long_chain.rna:24:27:24:29
+  :     let p5: int *static = p4; // E-L_ESC_STACK
   :                           ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -19,11 +19,11 @@ at compile/lang_tests/lifetimes/free/long_chain.rna:18:27:18:29
  == note: '*static' lifetimes exist for the entire duration of the program
  == note: involving '*stack' lifetime for this function block
   : fun g() {
-  :         ^  --- long_chain.rna:11:9
+  :         ^  --- long_chain.rna:13:9
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/free/long_chain.rna:34:20:34:29
+at compile/lang_tests/lifetimes/free/long_chain.rna:44:20:44:29
   :     let p1: int* = i_stack.&;
   :                    ^^^^^^^^^ Escape occurs here
   :
@@ -41,29 +41,29 @@ at compile/lang_tests/lifetimes/free/long_chain.rna:34:20:34:29
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 2.
-  -> long_chain.rna:35:20
+  -> long_chain.rna:45:20
   :     let p2: int* = p1;
   :                    ^^ 'int*<free>' assigned to pointer with lifetime '*<free>'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 3.
-  -> long_chain.rna:36:20
+  -> long_chain.rna:46:20
   :     let p3: int* = p2;
   :                    ^^ 'int*<free>' assigned to pointer with lifetime '*<free>'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 4.
-  -> long_chain.rna:37:20
+  -> long_chain.rna:47:20
   :     let p4: int* = p3;
   :                    ^^ 'int*<free>' assigned to pointer with lifetime '*<free>'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 5.
-  -> long_chain.rna:38:27
-  :     let p5: int *static = p4;
+  -> long_chain.rna:50:27
+  :     let p5: int *static = p4; // E-L_ESC_STACK
   :                           ^^ 'int*<free>' assigned to pointer with lifetime '*static'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
@@ -74,11 +74,11 @@ at compile/lang_tests/lifetimes/free/long_chain.rna:34:20:34:29
  == note: '*static' lifetimes exist for the entire duration of the program
  == note: involving '*stack' lifetime for this function block
   : fun i() {
-  :         ^  --- long_chain.rna:31:9
+  :         ^  --- long_chain.rna:39:9
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/free/long_chain.rna:54:22:54:31
+at compile/lang_tests/lifetimes/free/long_chain.rna:70:22:70:31
   :     let p1: int *a = i_stack.&;
   :                      ^^^^^^^^^ Escape occurs here
   :
@@ -96,29 +96,29 @@ at compile/lang_tests/lifetimes/free/long_chain.rna:54:22:54:31
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 2.
-  -> long_chain.rna:55:22
+  -> long_chain.rna:71:22
   :     let p2: int *b = p1;
   :                      ^^ 'int*a' assigned to pointer with lifetime '*b'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 3.
-  -> long_chain.rna:56:22
+  -> long_chain.rna:72:22
   :     let p3: int *c = p2;
   :                      ^^ 'int*b' assigned to pointer with lifetime '*c'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 4.
-  -> long_chain.rna:57:22
+  -> long_chain.rna:73:22
   :     let p4: int *d = p3;
   :                      ^^ 'int*c' assigned to pointer with lifetime '*d'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 5.
-  -> long_chain.rna:58:27
-  :     let p5: int *static = p4;
+  -> long_chain.rna:76:27
+  :     let p5: int *static = p4; // E-L_ESC_STACK
   :                           ^^ 'int*d' assigned to pointer with lifetime '*static'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
@@ -129,4 +129,4 @@ at compile/lang_tests/lifetimes/free/long_chain.rna:54:22:54:31
  == note: '*static' lifetimes exist for the entire duration of the program
  == note: involving '*stack' lifetime for this function block
   : fun i() {
-  :         ^  --- long_chain.rna:51:9
+  :         ^  --- long_chain.rna:65:9

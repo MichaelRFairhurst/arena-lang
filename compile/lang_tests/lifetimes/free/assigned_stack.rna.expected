@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
 at compile/lang_tests/lifetimes/free/assigned_stack.rna:5:28:5:29
-  :     let bad: int *static = p;
+  :     let bad: int *static = p; // E_L_ESC_STACK
   :                            ^ Escape occurs here
   :
   : Conflicting lifetime requirements:
