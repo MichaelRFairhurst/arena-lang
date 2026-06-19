@@ -13,10 +13,10 @@ fun f() {
     let parena: int *arena;
     let pstatic: int *static;
     let pfree: int *free;
-    one_free_int(pstack);
-    one_free_int(parena);
-    one_free_int(pstatic);
-    one_free_int(pfree);
+    one_free_int(pstack); // OK
+    one_free_int(parena); // OK
+    one_free_int(pstatic); // OK
+    one_free_int(pfree); // OK
 }
 
 fun g() {
@@ -24,25 +24,25 @@ fun g() {
     let parena: int *arena;
     let pstatic: int *static;
     let pfree: int *free;
-    two_free_ints(pstack, pstack);
-    two_free_ints(pstack, parena);
-    two_free_ints(pstack, pstatic);
-    two_free_ints(pstack, pfree);
+    two_free_ints(pstack, pstack); // OK
+    two_free_ints(pstack, parena); // OK
+    two_free_ints(pstack, pstatic); // OK
+    two_free_ints(pstack, pfree); // OK
 
-    two_free_ints(parena, pstack);
-    two_free_ints(parena, parena);
-    two_free_ints(parena, pstatic);
-    two_free_ints(parena, pfree);
+    two_free_ints(parena, pstack); // OK
+    two_free_ints(parena, parena); // OK
+    two_free_ints(parena, pstatic); // OK
+    two_free_ints(parena, pfree); // OK
 
-    two_free_ints(pstatic, pstack);
-    two_free_ints(pstatic, parena);
-    two_free_ints(pstatic, pstatic);
-    two_free_ints(pstatic, pfree);
+    two_free_ints(pstatic, pstack); // OK
+    two_free_ints(pstatic, parena); // OK
+    two_free_ints(pstatic, pstatic); // OK
+    two_free_ints(pstatic, pfree); // OK
 
-    two_free_ints(pfree, pstack);
-    two_free_ints(pfree, parena);
-    two_free_ints(pfree, pstatic);
-    two_free_ints(pfree, pfree);
+    two_free_ints(pfree, pstack); // OK
+    two_free_ints(pfree, parena); // OK
+    two_free_ints(pfree, pstatic); // OK
+    two_free_ints(pfree, pfree); // OK
 }
 
 fun h() {
@@ -50,10 +50,10 @@ fun h() {
     let parena: SomeStruct *arena;
     let pstatic: SomeStruct *static;
     let pfree: SomeStruct *free;
-    one_free_struct(pstack);
-    one_free_struct(parena);
-    one_free_struct(pstatic);
-    one_free_struct(pfree);
+    one_free_struct(pstack); // OK
+    one_free_struct(parena); // OK
+    one_free_struct(pstatic); // OK
+    one_free_struct(pfree); // OK
 }
 
 fun i() {
@@ -62,25 +62,25 @@ fun i() {
     let pstatic: SomeStruct *static;
     let pfree: SomeStruct *free;
 
-    two_free_structs(pstack, pstack);
-    two_free_structs(pstack, parena);
-    two_free_structs(pstack, pstatic);
-    two_free_structs(pstack, pfree);
+    two_free_structs(pstack, pstack); // OK
+    two_free_structs(pstack, parena); // OK
+    two_free_structs(pstack, pstatic); // OK
+    two_free_structs(pstack, pfree); // OK
 
-    two_free_structs(parena, pstack);
-    two_free_structs(parena, parena);
-    two_free_structs(parena, pstatic);
-    two_free_structs(parena, pfree);
+    two_free_structs(parena, pstack); // OK
+    two_free_structs(parena, parena); // OK
+    two_free_structs(parena, pstatic); // OK
+    two_free_structs(parena, pfree); // OK
 
-    two_free_structs(pstatic, pstack);
-    two_free_structs(pstatic, parena);
-    two_free_structs(pstatic, pstatic);
-    two_free_structs(pstatic, pfree);
+    two_free_structs(pstatic, pstack); // OK
+    two_free_structs(pstatic, parena); // OK
+    two_free_structs(pstatic, pstatic); // OK
+    two_free_structs(pstatic, pfree); // OK
 
-    two_free_structs(pfree, pstack);
-    two_free_structs(pfree, parena);
-    two_free_structs(pfree, pstatic);
-    two_free_structs(pfree, pfree);
+    two_free_structs(pfree, pstack); // OK
+    two_free_structs(pfree, parena); // OK
+    two_free_structs(pfree, pstatic); // OK
+    two_free_structs(pfree, pfree); // OK
 }
 
 fun use_int_identity_ok() {
@@ -89,40 +89,47 @@ fun use_int_identity_ok() {
     let pstatic: int *static;
     let pfree: int *free;
 
-    let pstack = identity_int(pstack);
-    let pstack = identity_int(parena);
-    let pstack = identity_int(pstatic);
+    // int* is not lifetime-strict and can be cast to shorter lifetime
+    let pstack = identity_int(pstack); // OK
+    let pstack = identity_int(parena); // OK
+    let pstack = identity_int(pstatic); // OK
 
-    let parena = identity_int(parena);
-    let parena = identity_int(pstatic);
+    let parena = identity_int(parena); // OK
+    let parena = identity_int(pstatic); // OK
 
-    let pstack = identity_int(pstatic);
+    let pstack = identity_int(pstatic); // OK
 
-    let pfree = identity_int(pstack);
-    let pfree = identity_int(parena);
-    let pfree = identity_int(pstatic);
-    let pfree = identity_int(pfree);
+    let pfree = identity_int(pstack); // OK
+    let pfree = identity_int(parena); // OK
+    let pfree = identity_int(pstatic); // OK
+    let pfree = identity_int(pfree); // OK
 }
 
 fun use_int_identity_bad1() {
     let p1: int *stack;
     let p2: int *arena;
 
-    p2 = identity_int(p1);
+    // *a cannot be *stack due to p2 assignment
+    // *a cannot be *arena due to p1 assignment
+    p2 = identity_int(p1); // E-L_ESC_STACK
 }
 
 fun use_int_identity_bad2() {
     let p1: int *stack;
     let p2: int *static;
 
-    p2 = identity_int(p1);
+    // *a cannot be *stack due to p2 assignment
+    // *a cannot be *static due to p1 assignment
+    p2 = identity_int(p1); // E-L_ESC_STACK
 }
 
 fun use_int_identity_bad3() {
     let p1: int *arena;
     let p2: int *static;
 
-    p2 = identity_int(p1);
+    // *a cannot be *arena due to p2 assignment
+    // *a cannot be *static due to p1 assignment
+    p2 = identity_int(p1); // E-L_ESC_CTX
 }
 
 fun use_struct_identity_good() {
@@ -131,50 +138,64 @@ fun use_struct_identity_good() {
     let pstatic : SomeStruct *static;
     let pfree : SomeStruct *;
 
-    pstack = identity_struct(pstack);
-    parena = identity_struct(parena);
-    pstatic = identity_struct(pstatic);
-    pfree = identity_struct(pfree);
+    // SomeStruct is incomplete type so it is lifetime-strict.
+    // These assignments involve equal lifetimes and are OK.
+    pstack = identity_struct(pstack); // OK
+    parena = identity_struct(parena); // OK
+    pstatic = identity_struct(pstatic); // OK
+    pfree = identity_struct(pfree); // OK
 }
 
 fun use_struct_identity_bad1() {
     let p1 : SomeStruct *stack;
     let p2 : SomeStruct *arena;
 
-    p1 = identity_struct(p2);
+    // SomeStruct is incomplete type so it is lifetime-strict
+    // *a must be exactly *stack and exactly *arena which is impossible
+    p1 = identity_struct(p2); // E-L_ESC_STACK
 }
 
 fun use_struct_identity_bad2() {
     let p1 : SomeStruct *arena;
     let p2 : SomeStruct *stack;
 
-    p1 = identity_struct(p2);
+    // SomeStruct is incomplete type so it is lifetime-strict
+    // *a must be exactly *stack and exactly *arena which is impossible
+    p1 = identity_struct(p2); // E-L_ESC_STACK
 }
 
 fun use_struct_identity_bad3() {
     let p1 : SomeStruct *stack;
     let p2 : SomeStruct *static;
 
-    p1 = identity_struct(p2);
+    // SomeStruct is incomplete type so it is lifetime-strict
+    // *a must be exactly *stack and exactly *static which is impossible
+    p1 = identity_struct(p2); // E-L_ESC_STACK
 }
 
 fun use_struct_identity_bad4() {
     let p1 : SomeStruct *static;
     let p2 : SomeStruct *stack;
 
-    p1 = identity_struct(p2);
+    // SomeStruct is incomplete type so it is lifetime-strict
+    // *a must be exactly *stack and exactly *static which is impossible
+    p1 = identity_struct(p2); // E-L_EST_STACK
 }
 
 fun use_struct_identity_bad5() {
     let p1 : SomeStruct *arena;
     let p2 : SomeStruct *static;
 
-    p1 = identity_struct(p2);
+    // SomeStruct is incomplete type so it is lifetime-strict
+    // *a must be exactly *arena and exactly *static which is impossible
+    p1 = identity_struct(p2); // E-L_ESC_CTX
 }
 
 fun use_struct_identity_bad6() {
     let p1 : SomeStruct *static;
     let p2 : SomeStruct *arena;
 
-    p1 = identity_struct(p2);
+    // SomeStruct is incomplete type so it is lifetime-strict
+    // *a must be exactly *arena and exactly *static which is impossible
+    p1 = identity_struct(p2); // E-L_ESC_CTX
 }

@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:23:111:25
-  :     p2 = identity_int(p1);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:114:23:114:25
+  :     p2 = identity_int(p1); // E-L_ESC_STACK
   :                       ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -15,8 +15,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:23:111:
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:111:10
-  :     p2 = identity_int(p1);
+  -> free_lifetimes.rna:114:10
+  :     p2 = identity_int(p1); // E-L_ESC_STACK
   :          ^^^^^^^^^^^^^^^^ 'int*a' assigned to pointer with lifetime '*arena<ctx>'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
@@ -26,12 +26,12 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:111:23:111:
   :
  == note: involving '*stack' lifetime for this function block
   : fun use_int_identity_bad1() {
-  :                             ^  --- free_lifetimes.rna:107:29
+  :                             ^  --- free_lifetimes.rna:108:29
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:23:118:25
-  :     p2 = identity_int(p1);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:123:23:123:25
+  :     p2 = identity_int(p1); // E-L_ESC_STACK
   :                       ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -45,8 +45,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:23:118:
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:118:10
-  :     p2 = identity_int(p1);
+  -> free_lifetimes.rna:123:10
+  :     p2 = identity_int(p1); // E-L_ESC_STACK
   :          ^^^^^^^^^^^^^^^^ 'int*a' assigned to pointer with lifetime '*static'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
@@ -57,12 +57,12 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:118:23:118:
  == note: '*static' lifetimes exist for the entire duration of the program
  == note: involving '*stack' lifetime for this function block
   : fun use_int_identity_bad2() {
-  :                             ^  --- free_lifetimes.rna:114:29
+  :                             ^  --- free_lifetimes.rna:117:29
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:23:125:25
-  :     p2 = identity_int(p1);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:132:23:132:25
+  :     p2 = identity_int(p1); // E-L_ESC_CTX
   :                       ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -76,8 +76,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:23:125:
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:125:10
-  :     p2 = identity_int(p1);
+  -> free_lifetimes.rna:132:10
+  :     p2 = identity_int(p1); // E-L_ESC_CTX
   :          ^^^^^^^^^^^^^^^^ 'int*a' assigned to pointer with lifetime '*static'
   :
  == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
@@ -90,8 +90,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:125:23:125:
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:144:10:144:29
-  :     p1 = identity_struct(p2);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:155:10:155:29
+  :     p1 = identity_struct(p2); // E-L_ESC_STACK
   :          ^^^^^^^^^^^^^^^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -106,8 +106,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:144:10:144:
  == help: try using a const pointer to make this lifetime-permissive.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:144:26
-  :     p1 = identity_struct(p2);
+  -> free_lifetimes.rna:155:26
+  :     p1 = identity_struct(p2); // E-L_ESC_STACK
   :                          ^^ 'SomeStruct*arena<ctx>' assigned to pointer with lifetime '*a'
   :
  == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
@@ -118,12 +118,12 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:144:10:144:
   :
  == note: involving '*stack' lifetime for this function block
   : fun use_struct_identity_bad1() {
-  :                                ^  --- free_lifetimes.rna:140:32
+  :                                ^  --- free_lifetimes.rna:149:32
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:151:26:151:28
-  :     p1 = identity_struct(p2);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:164:26:164:28
+  :     p1 = identity_struct(p2); // E-L_ESC_STACK
   :                          ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -138,8 +138,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:151:26:151:
  == help: try using a const pointer to make this lifetime-permissive.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:151:10
-  :     p1 = identity_struct(p2);
+  -> free_lifetimes.rna:164:10
+  :     p1 = identity_struct(p2); // E-L_ESC_STACK
   :          ^^^^^^^^^^^^^^^^^^^ 'SomeStruct*a' assigned to pointer with lifetime '*arena<ctx>'
   :
  == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
@@ -150,12 +150,12 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:151:26:151:
   :
  == note: involving '*stack' lifetime for this function block
   : fun use_struct_identity_bad2() {
-  :                                ^  --- free_lifetimes.rna:147:32
+  :                                ^  --- free_lifetimes.rna:158:32
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:10:158:29
-  :     p1 = identity_struct(p2);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:173:10:173:29
+  :     p1 = identity_struct(p2); // E-L_ESC_STACK
   :          ^^^^^^^^^^^^^^^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -170,8 +170,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:10:158:
  == help: try using a const pointer to make this lifetime-permissive.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:158:26
-  :     p1 = identity_struct(p2);
+  -> free_lifetimes.rna:173:26
+  :     p1 = identity_struct(p2); // E-L_ESC_STACK
   :                          ^^ 'SomeStruct*static' assigned to pointer with lifetime '*a'
   :
  == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
@@ -183,12 +183,12 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:158:10:158:
  == note: '*static' lifetimes exist for the entire duration of the program
  == note: involving '*stack' lifetime for this function block
   : fun use_struct_identity_bad3() {
-  :                                ^  --- free_lifetimes.rna:154:32
+  :                                ^  --- free_lifetimes.rna:167:32
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:26:165:28
-  :     p1 = identity_struct(p2);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:182:26:182:28
+  :     p1 = identity_struct(p2); // E-L_EST_STACK
   :                          ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -203,8 +203,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:26:165:
  == help: try using a const pointer to make this lifetime-permissive.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:165:10
-  :     p1 = identity_struct(p2);
+  -> free_lifetimes.rna:182:10
+  :     p1 = identity_struct(p2); // E-L_EST_STACK
   :          ^^^^^^^^^^^^^^^^^^^ 'SomeStruct*a' assigned to pointer with lifetime '*static'
   :
  == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
@@ -216,12 +216,12 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:165:26:165:
  == note: '*static' lifetimes exist for the entire duration of the program
  == note: involving '*stack' lifetime for this function block
   : fun use_struct_identity_bad4() {
-  :                                ^  --- free_lifetimes.rna:161:32
+  :                                ^  --- free_lifetimes.rna:176:32
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10:172:29
-  :     p1 = identity_struct(p2);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:191:10:191:29
+  :     p1 = identity_struct(p2); // E-L_ESC_CTX
   :          ^^^^^^^^^^^^^^^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -236,8 +236,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10:172:
  == help: try using a const pointer to make this lifetime-permissive.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:172:26
-  :     p1 = identity_struct(p2);
+  -> free_lifetimes.rna:191:26
+  :     p1 = identity_struct(p2); // E-L_ESC_CTX
   :                          ^^ 'SomeStruct*static' assigned to pointer with lifetime '*a'
   :
  == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
@@ -251,8 +251,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:172:10:172:
 
 
 Error[E-L_ESC_CTX]: Pointer value to caller's arena escapes that arena
-at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:26:179:28
-  :     p1 = identity_struct(p2);
+at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:200:26:200:28
+  :     p1 = identity_struct(p2); // E-L_ESC_CTX
   :                          ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -267,8 +267,8 @@ at compile/lang_tests/lifetimes/function_boundary/free_lifetimes.rna:179:26:179:
  == help: try using a const pointer to make this lifetime-permissive.
   .
  ... caused by 2.
-  -> free_lifetimes.rna:179:10
-  :     p1 = identity_struct(p2);
+  -> free_lifetimes.rna:200:10
+  :     p1 = identity_struct(p2); // E-L_ESC_CTX
   :          ^^^^^^^^^^^^^^^^^^^ 'SomeStruct*a' assigned to pointer with lifetime '*static'
   :
  == note: pointee 'SomeStruct' is lifetime-strict cannot have its lifetime shortened.
