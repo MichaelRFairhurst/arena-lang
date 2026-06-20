@@ -1,17 +1,21 @@
 fun f() {
     let i_outer: int;
-    let p_outer: int *stack = i_outer.&;
+
+    // i_outer also has *stack lifetime
+    let p_outer: int *stack = i_outer.&; // OK
 }
 
 fun g() {
     let i_outer: int;
-    let invalid_outer: int *arena = i_outer.&;
+    // i_outer has incompatible *stack lifetime
+    let invalid_outer: int *arena = i_outer.&; // E-L_ESC_STACK
 }
 
 fun h() {
     {
         let i_inner: int;
-        let p_inner: int *stack = i_inner.&;
+        // i_inner also has *stack<inner> lifetime
+        let p_inner: int *stack = i_inner.&; // OK
     }
 }
 
@@ -19,13 +23,25 @@ fun i() {
     let i_outer: int;
 
     {
-        let p_inner: int *stack = i_outer.&;
+        // i_outer is lifetime-permisisive, so *stack<outer> can be used as *stack<inner>
+        let p_inner: int *stack = i_outer.&; // OK
     }
 }
 
 fun j() {
     {
         let i_inner: int;
-        let invalid_inner: int *arena = i_inner.&;
+        // i_inner has incompatible *stack<inner> lifetime
+        let invalid_inner: int *arena = i_inner.&; // E-L_ESC_STACK
+    }
+}
+
+fun i() {
+    let p_outer: int *stack;
+
+    {
+        let i_inner = 0;
+        // i_inner has incompatible *stack<inner> lifetime vs *stack<outer> lifetime
+        p_outer = i_inner.&; // E-L_ESC_BLOCK
     }
 }

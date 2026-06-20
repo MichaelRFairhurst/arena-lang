@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/stack/stack_as_arena.rna:4:10:4:12
-  :     p1 = p2;
+at compile/lang_tests/lifetimes/stack/stack_as_arena.rna:5:10:5:12
+  :     p1 = p2; // E-L_ESC_STACK
   :          ^^ Escape occurs here
   :
   : Conflicting lifetime requirements:

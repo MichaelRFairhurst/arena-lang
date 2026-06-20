@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:8:37:8:46
-  :     let invalid_outer: int *arena = i_outer.&;
+at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:11:37:11:46
+  :     let invalid_outer: int *arena = i_outer.&; // E-L_ESC_STACK
   :                                     ^^^^^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -18,12 +18,12 @@ at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:8:37:8:46
   :
  == note: involving '*stack' lifetime for this function block
   : fun g() {
-  :         ^  --- addr_of_stack_lifetimes.rna:6:9
+  :         ^  --- addr_of_stack_lifetimes.rna:8:9
 
 
 Error[E-L_ESC_STACK]: Pointer value with stack lifetime escapes the function stack
-at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:29:41:29:50
-  :         let invalid_inner: int *arena = i_inner.&;
+at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:35:41:35:50
+  :         let invalid_inner: int *arena = i_inner.&; // E-L_ESC_STACK
   :                                         ^^^^^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -41,11 +41,33 @@ at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:29:41:29:50
   :
  == note: involving '*stack' lifetime for this function block
   : fun j() {
-  :         ^  --- addr_of_stack_lifetimes.rna:26:9
+  :         ^  --- addr_of_stack_lifetimes.rna:31:9
   .
  ... caused by 3.
   -> '*stack<outer>' lifetime is greater than '*stack<inner>'
   :
  == note: involving '*stack' lifetime for this inner block
   :     {
-  :     ^  --- addr_of_stack_lifetimes.rna:27:5
+  :     ^  --- addr_of_stack_lifetimes.rna:32:5
+
+
+Error[E-L_ESC_BLOCK]: Pointer value to stack escapes the lifetime of its block
+at compile/lang_tests/lifetimes/stack/addr_of_stack_lifetimes.rna:45:19:45:28
+  :         p_outer = i_inner.&; // E-L_ESC_BLOCK
+  :                   ^^^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*stack' may not outlive '*stack'
+  : 2. Lifetime '*stack' must outlive '*stack'
+  .
+ ... caused by 1.
+  -> 'int*stack' assigned to pointer with lifetime '*stack'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*stack<outer>' lifetime is greater than '*stack<inner>'
+  :
+ == note: involving '*stack' lifetime for this inner block
+  :     {
+  :     ^  --- addr_of_stack_lifetimes.rna:42:5

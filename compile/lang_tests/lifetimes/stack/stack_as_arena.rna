@@ -1,5 +1,6 @@
 fun f(p1: int *arena) {
     let p2: int *stack;
 
-    p1 = p2;
+    // *arena lives longer than *stack, so this is invalid
+    p1 = p2; // E-L_ESC_STACK
 }

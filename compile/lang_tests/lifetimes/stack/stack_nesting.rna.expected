@@ -1,7 +1,7 @@
 
 Error[E-L_ESC_BLOCK]: Pointer value to stack escapes the lifetime of its block
-at compile/lang_tests/lifetimes/stack/stack_nesting.rna:6:17:6:22
-  :         outer = inner;
+at compile/lang_tests/lifetimes/stack/stack_nesting.rna:7:17:7:22
+  :         outer = inner; // E-L_ESC_BLOCK
   :                 ^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -22,8 +22,8 @@ at compile/lang_tests/lifetimes/stack/stack_nesting.rna:6:17:6:22
 
 
 Error[E-L_ESC_BLOCK]: Pointer value to stack escapes the lifetime of its block
-at compile/lang_tests/lifetimes/stack/stack_nesting.rna:24:17:24:22
-  :         outer = inner;
+at compile/lang_tests/lifetimes/stack/stack_nesting.rna:28:17:28:22
+  :         outer = inner; // E-L_ESC_BLOCK
   :                 ^^^^^ Escape occurs here
   :
   : Conflicting lifetime requirements:
@@ -40,4 +40,4 @@ at compile/lang_tests/lifetimes/stack/stack_nesting.rna:24:17:24:22
   :
  == note: involving '*stack' lifetime for this inner block
   :     {
-  :     ^  --- stack_nesting.rna:21:5
+  :     ^  --- stack_nesting.rna:25:5

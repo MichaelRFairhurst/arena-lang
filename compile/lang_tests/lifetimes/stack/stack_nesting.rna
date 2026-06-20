@@ -3,7 +3,8 @@ fun isolated_bad() {
     {
         let inner: int *stack;
 
-        outer = inner;
+        // *stack<outer> lives longer than *stack<inner>, so not allowed.
+        outer = inner; // E-L_ESC_BLOCK
     }
 }
 
@@ -12,16 +13,19 @@ fun isolated_ok() {
     {
         let inner: int *stack;
 
-        inner = outer;
+        // *stack<outer> lives longer than *stack<inner>, so this is allowed.
+        inner = outer; // OK
     }
 }
 
 fun mixed() {
+    // Mix the above two tests into one set of constraints to solve.
+
     let outer: int *stack;
     {
         let inner: int *stack;
 
-        outer = inner;
-        inner = outer;
+        outer = inner; // E-L_ESC_BLOCK
+        inner = outer; // OK
     }
 }
