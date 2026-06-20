@@ -84,7 +84,9 @@ namespace {
 
         TypeId operator()(ExprTransformStep<ast::LiteralExpression> step) {
             auto token = step.ast->get_literal()->begin();
-            if (std::holds_alternative<int64_t>(token->literalValue)) {
+            if (token->type == ast::TokenType::TRUE || token->type == ast::TokenType::FALSE) {
+                return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
+            } else if (std::holds_alternative<int64_t>(token->literalValue)) {
                 return set_type(step.out, NamedTypeSymbol{"int"}, ResolvedRValue{});
             } else if (std::holds_alternative<std::string_view>(token->literalValue)) {
                 if (token->text[0] == '"') {

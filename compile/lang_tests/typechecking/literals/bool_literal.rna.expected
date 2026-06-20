@@ -1,0 +1,103 @@
+
+Error[E-T_ASGN_NOREL]: Expected int but got bool in here
+at compile/lang_tests/typechecking/literals/bool_literal.rna:7:19:7:23
+  :     let i1: int = true; // E-T_ASGN_NOREL
+  :                   ^^^^ type mismatch
+  .
+ == note: expected type int based on variable 'i1'
+  :     let i1: int = true; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- bool_literal.rna:7:5
+ == note: got conflicting type bool for here
+  :     let i1: int = true; // E-T_ASGN_NOREL
+  :                   ^^^^  --- bool_literal.rna:7:19
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got bool in here
+at compile/lang_tests/typechecking/literals/bool_literal.rna:8:19:8:24
+  :     let i2: int = false; // E-T_ASGN_NOREL
+  :                   ^^^^^ type mismatch
+  .
+ == note: expected type int based on variable 'i2'
+  :     let i2: int = false; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- bool_literal.rna:8:5
+ == note: got conflicting type bool for here
+  :     let i2: int = false; // E-T_ASGN_NOREL
+  :                   ^^^^^  --- bool_literal.rna:8:19
+
+
+Error[E-T_ASGN_NOREL]: Expected char but got bool in here
+at compile/lang_tests/typechecking/literals/bool_literal.rna:10:20:10:24
+  :     let c1: char = true; // E-T_ASGN_NOREL
+  :                    ^^^^ type mismatch
+  .
+ == note: expected type char based on variable 'c1'
+  :     let c1: char = true; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- bool_literal.rna:10:5
+ == note: got conflicting type bool for here
+  :     let c1: char = true; // E-T_ASGN_NOREL
+  :                    ^^^^  --- bool_literal.rna:10:20
+
+
+Error[E-T_ASGN_NOREL]: Expected char but got bool in here
+at compile/lang_tests/typechecking/literals/bool_literal.rna:11:20:11:25
+  :     let c2: char = false; // E-T_ASGN_NOREL
+  :                    ^^^^^ type mismatch
+  .
+ == note: expected type char based on variable 'c2'
+  :     let c2: char = false; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- bool_literal.rna:11:5
+ == note: got conflicting type bool for here
+  :     let c2: char = false; // E-T_ASGN_NOREL
+  :                    ^^^^^  --- bool_literal.rna:11:20
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got bool in here
+at compile/lang_tests/typechecking/literals/bool_literal.rna:13:24:13:28
+  :     let d1: double64 = true; // E-T_ASGN_NOREL
+  :                        ^^^^ type mismatch
+  .
+ == note: expected type double64 based on variable 'd1'
+  :     let d1: double64 = true; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- bool_literal.rna:13:5
+ == note: got conflicting type bool for here
+  :     let d1: double64 = true; // E-T_ASGN_NOREL
+  :                        ^^^^  --- bool_literal.rna:13:24
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got bool in here
+at compile/lang_tests/typechecking/literals/bool_literal.rna:14:24:14:29
+  :     let d2: double64 = false; // E-T_ASGN_NOREL
+  :                        ^^^^^ type mismatch
+  .
+ == note: expected type double64 based on variable 'd2'
+  :     let d2: double64 = false; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- bool_literal.rna:14:5
+ == note: got conflicting type bool for here
+  :     let d2: double64 = false; // E-T_ASGN_NOREL
+  :                        ^^^^^  --- bool_literal.rna:14:24
+
+
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got bool in here
+at compile/lang_tests/typechecking/literals/bool_literal.rna:16:28:16:32
+  :     let s1: char const * = true; // E-T_ASGN_NOREL
+  :                            ^^^^ pointer type mismatch
+  .
+ == note: expected type char const*<free> based on variable 's1'
+  :     let s1: char const * = true; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- bool_literal.rna:16:5
+ == note: got conflicting type bool for here
+  :     let s1: char const * = true; // E-T_ASGN_NOREL
+  :                            ^^^^  --- bool_literal.rna:16:28
+
+
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got bool in here
+at compile/lang_tests/typechecking/literals/bool_literal.rna:17:28:17:33
+  :     let s2: char const * = false; // E-T_ASGN_NOREL
+  :                            ^^^^^ pointer type mismatch
+  .
+ == note: expected type char const*<free> based on variable 's2'
+  :     let s2: char const * = false; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- bool_literal.rna:17:5
+ == note: got conflicting type bool for here
+  :     let s2: char const * = false; // E-T_ASGN_NOREL
+  :                            ^^^^^  --- bool_literal.rna:17:28

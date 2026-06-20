@@ -533,7 +533,8 @@ namespace arena::parse {
         Literal *parse_literal() {
             Token *tok;
             if (tokens.peek()->type == TokenType::INTEGER ||
-                tokens.peek()->type == TokenType::STRING) {
+                tokens.peek()->type == TokenType::STRING ||
+                tokens.peek()->type == TokenType::TRUE || tokens.peek()->type == TokenType::FALSE) {
                 tok = tokens.take();
             } else {
                 tok = tokens.take_synthetic(TokenType::INTEGER);
@@ -550,7 +551,9 @@ namespace arena::parse {
                     require_take_token(TokenType::CLOSE_PAREN, "to close parenthesized expression");
                 return expr;
             } else if (tokens.peek()->type == TokenType::INTEGER ||
-                       tokens.peek()->type == TokenType::STRING) {
+                       tokens.peek()->type == TokenType::STRING ||
+                       tokens.peek()->type == TokenType::TRUE ||
+                       tokens.peek()->type == TokenType::FALSE) {
                 Literal *literal = parse_literal();
                 return arena->alloc<LiteralExpression>(literal);
             }

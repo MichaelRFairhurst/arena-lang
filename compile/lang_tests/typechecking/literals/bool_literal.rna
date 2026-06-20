@@ -1,0 +1,18 @@
+fun f() {
+    let b1: bool = true;
+    let b2: bool = false;
+}
+
+fun g() {
+    let i1: int = true; // E-T_ASGN_NOREL
+    let i2: int = false; // E-T_ASGN_NOREL
+
+    let c1: char = true; // E-T_ASGN_NOREL
+    let c2: char = false; // E-T_ASGN_NOREL
+
+    let d1: double64 = true; // E-T_ASGN_NOREL
+    let d2: double64 = false; // E-T_ASGN_NOREL
+
+    let s1: char const * = true; // E-T_ASGN_NOREL
+    let s2: char const * = false; // E-T_ASGN_NOREL
+}
