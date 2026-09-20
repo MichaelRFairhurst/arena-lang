@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 #include "query/engine.hpp"
+#include "arena_backend.hpp"
 
 int main(int argc, char **argv) {
     std::vector<std::filesystem::path> files;
@@ -52,6 +53,16 @@ int main(int argc, char **argv) {
             } else {
                 std::cout << errors << "\n";
                 has_errors = true;
+            }
+
+            if (!has_errors) {
+                const auto &typechecked = engine.execute(arena::sema::TypecheckedFileQuery{file});
+                const auto &ftable =
+                    engine.execute(arena::sema::AvailableFunctionsTableQuery{file});
+                const auto &ttable = engine.execute(arena::sema::AvailableTypesTableQuery{file});
+
+                std::cout << "Backend output:\n";
+                std::cout << arena::backend::emit_impl(typechecked, ftable, ttable, file);
             }
         }
 

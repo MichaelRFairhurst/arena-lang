@@ -1,6 +1,11 @@
 # Codegen - backend-agnostic IR and backend API
 add_library(arena-codegen INTERFACE)
 
+target_link_libraries(arena-codegen
+    INTERFACE
+        arena-frontend
+)
+
 target_include_directories(arena-codegen
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

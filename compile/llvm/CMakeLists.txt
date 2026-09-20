@@ -1,9 +1,8 @@
 # LLVM backend implementation
 add_library(arena-backend-llvm
     # Add source files when you implement the LLVM backend:
-    # src/llvm_backend.cpp
-    # src/llvm_codegen.cpp
-    src/main.cpp
+    src/llvm_backend.cpp
+    src/arena_llvm_types.cpp
 )
 
 target_include_directories(arena-backend-llvm
