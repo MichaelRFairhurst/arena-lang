@@ -1,9 +1,9 @@
 {
-  "name": "llvm-project",
+  "name": "arenac",
   "version": "0.1.0",
   "dependencies": [
     "llvm",
-    "boost-parser",
-    "cunit"
+    "cunit",
+    "boost-program-options"
   ]
 }

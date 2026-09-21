@@ -1,3 +1,8 @@
+ ```text
+ ▀▌▛▘█▌▛▌▀▌
+ █▌▌ ▙▖▌▌█▌ - a modernized c
+```
+
 # Arena Compiler
 
 This compiler implements the Arena programming language, a rust-like C alternative for developers who like C.

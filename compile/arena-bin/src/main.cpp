@@ -3,54 +3,111 @@
 #include <chrono>
 #include <thread>
 #include <vector>
+#include <boost/program_options.hpp>
+
 #include "query/engine.hpp"
 #include "arena_backend.hpp"
 
-int main(int argc, char **argv) {
-    std::vector<std::filesystem::path> files;
-    bool keep_alive = false;
-    bool verbose = false;
-    for (int i = 1; i < argc; i++) {
-        std::string arg = argv[i];
-        if (arg == "--keep-alive") {
-            keep_alive = true;
-            continue;
-        }
-        if (arg == "--verbose") {
-            verbose = true;
-            continue;
+namespace po = boost::program_options;
+
+namespace {
+    int command_check(int argc, char **argv) {
+        std::vector<std::filesystem::path> source_files;
+        bool keep_alive = false;
+        bool verbose = false;
+
+        po::options_description desc("Usage: arena check [options] <sources>");
+        // clang-format off
+        desc.add_options()
+            ("help,h", "Show this help message")
+            ("keep-alive,k", po::bool_switch(&keep_alive), "Continuous execution mode")
+            ("verbose,v", po::bool_switch(&verbose), "Enable verbose output")
+            ("sources",
+            po::value<std::vector<std::filesystem::path>>(&source_files),
+            "Source files to load");
+        // clang-format on
+
+        // Define positional arguments (source files)
+        po::positional_options_description pos_desc;
+        pos_desc.add("sources", -1);
+
+        po::variables_map vm;
+        po::store(po::command_line_parser(argc, argv).options(desc).positional(pos_desc).run(), vm);
+        po::notify(vm);
+        if (vm.count("help")) {
+            std::cout << desc << "\n";
+            return 0;
         }
 
-        std::filesystem::path file(argv[i]);
-        files.push_back(file);
+        bool has_errors = false;
+        arena::sema::QueryEngine engine;
+        do {
+            for (const auto &file : source_files) {
+                if (verbose) {
+                    const auto &ast = engine.execute(arena::sema::ParseQuery{file});
+                    auto decl = ast.declarations.at(0);
+                    std::cout << "Parsed AST:\n";
+                    for (const auto &decl : ast.declarations) {
+                        std::cout << decl->to_string() << "\n";
+                    }
+
+                    arena::ast::Token *current = decl->begin();
+                    std::cout << "Tokens: ";
+                    while (current != nullptr) {
+                        std::cout << current->text;
+                        current = current->next;
+                    }
+                    std::cout << "\n";
+                }
+
+                const auto errors = engine.execute(arena::sema::RenderedErrorsQuery{file});
+
+                if (errors.empty()) {
+                    std::cout << file << ": no errors. \n";
+                } else {
+                    std::cout << errors << "\n";
+                    has_errors = true;
+                }
+            }
+
+            if (keep_alive) {
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+            }
+        } while (keep_alive);
+
+        return has_errors ? 1 : 0;
     }
 
-    bool has_errors = false;
-    arena::sema::QueryEngine engine;
-    do {
-        for (const auto &file : files) {
-            if (verbose) {
-                const auto &ast = engine.execute(arena::sema::ParseQuery{file});
-                auto decl = ast.declarations.at(0);
-                std::cout << "Parsed AST:\n";
-                for (const auto &decl : ast.declarations) {
-                    std::cout << decl->to_string() << "\n";
-                }
+    int command_compile(int argc, char **argv) {
+        std::vector<std::filesystem::path> source_files;
+        po::options_description desc("Usage: arena compile [options] <sources>");
+        // clang-format off
+        desc.add_options()
+            ("help,h", "Show this help message")
+            ("sources",
+            po::value<std::vector<std::filesystem::path>>(&source_files),
+            "Source files to load");
+        // clang-format on
 
-                arena::ast::Token *current = decl->begin();
-                std::cout << "Tokens: ";
-                while (current != nullptr) {
-                    std::cout << current->text;
-                    current = current->next;
-                }
-                std::cout << "\n";
-            }
+        // Define positional arguments (source files)
+        po::positional_options_description pos_desc;
+        pos_desc.add("sources", -1);
+
+        po::variables_map vm;
+        po::store(po::command_line_parser(argc, argv).options(desc).positional(pos_desc).run(), vm);
+        po::notify(vm);
+        if (vm.count("help")) {
+            std::cout << desc << "\n";
+            return 0;
+        }
+
+        bool has_errors = false;
+        arena::sema::QueryEngine engine;
+        for (const auto &file : source_files) {
 
             const auto errors = engine.execute(arena::sema::RenderedErrorsQuery{file});
 
-            if (errors.empty()) {
-                std::cout << file << ": no errors. \n";
-            } else {
+            if (!errors.empty()) {
                 std::cout << errors << "\n";
                 has_errors = true;
             }
@@ -66,10 +123,54 @@ int main(int argc, char **argv) {
             }
         }
 
-        if (keep_alive) {
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-        }
-    } while (keep_alive);
+        return has_errors ? 1 : 0;
+    }
 
-    return has_errors ? 1 : 0;
+    void list_valid_subcommands() {
+        std::cout << "  arena compile ...           Compile arena source files\n";
+        std::cout << "  arena check ...             Typecheck arena source files\n";
+        std::cout << "  arena version ...           Show version information\n";
+        std::cout << "  arena help ...              Show help information\n";
+    }
+} // namespace
+
+int main(int argc, char **argv) {
+    if (argc == 1) {
+        // clang-format off
+        std::cout << " ,-''&''-.\n";
+        std::cout << " | |`*`| | "  << "▀▌▛▘█▌▛▌▀▌\n";
+        std::cout << " l  \\:/  j " << "█▌▌ ▙▖▌▌█▌v0.0.1\n";
+        std::cout << "  \\  '  /\n";
+        std::cout << "   '._.'   "  << "       arena cli\n";
+        // clang-format on
+        std::cout << "\n";
+        std::cout << "Please provide a subcommand:\n";
+        list_valid_subcommands();
+        return 1;
+    }
+
+    if (std::string(argv[1]) == "-v" || std::string(argv[1]) == "--version" ||
+        std::string(argv[1]) == "version") {
+        std::cout << "arena version 0.0.1\n";
+        return 0;
+    }
+
+    if (std::string(argv[1]) == "-h" || std::string(argv[1]) == "--help" ||
+        std::string(argv[1]) == "help") {
+        std::cout << "arena cli\n";
+        std::cout << "Available subcommands:\n";
+        list_valid_subcommands();
+        return 0;
+    }
+
+    if (std::string(argv[1]) == "check") {
+        return command_check(argc - 1, argv + 1);
+    }
+    if (std::string(argv[1]) == "compile") {
+        return command_compile(argc - 1, argv + 1);
+    }
+
+    std::cout << "Unknown subcommand: '" << argv[1] << "'\n";
+    std::cout << "Use 'arena --help' to see available subcommands.\n";
+    return 1;
 }

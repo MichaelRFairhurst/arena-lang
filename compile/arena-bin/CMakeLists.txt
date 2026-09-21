@@ -1,3 +1,5 @@
+find_package(boost_program_options CONFIG REQUIRED)
+
 # Arena compiler executable
 add_executable(arena-bin
     src/main.cpp
@@ -12,6 +14,7 @@ target_link_libraries(arena-bin
     PRIVATE
         arena-frontend
         arena-codegen
+        Boost::program_options
 )
 
 # Link LLVM backend if enabled
