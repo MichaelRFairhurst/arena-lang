@@ -23,9 +23,13 @@ namespace {
         llvm::LLVMContext *context;
         llvm::Module *module;
         llvm::IRBuilder<> *builder;
+        const arena::sema::ResolvedExpression *current_expr = nullptr;
         const arena::sema::ResolvedDeclaration *current_decl;
+        llvm::Value *current_value = nullptr;
         const arena::sema::FunctionTable *ftable;
         const arena::sema::TypeTable *ttable;
+        // TODO: use VariableId instead of string for the variable_map key
+        std::unordered_map<std::string, llvm::Value *> variable_map;
 
         llvm::Type *getLLVMType(const arena::sema::TypeId type_id) {
             arena::llvm::TypeResolver type_resolver{builder, ttable, &current_decl->lifetimes};
@@ -64,24 +68,131 @@ namespace {
         void visit(const arena::ast::FunctionDefinition *node) override {
             llvm::Function *function = declare_function(node);
 
+            auto args = function->arg_begin();
+
+            // TODO: get actual variable id from the resolved function.
+            arena::sema::VariableId variable_id{0};
+            for (auto &param : node->get_params()->get_params()) {
+                auto name = param->get_name();
+                args->setName(name);
+                // TODO: Use VariableId instead of string for the variable_map key
+                variable_map[std::string{name}] = &*args;
+                ++variable_id.v_id;
+                ++args;
+            }
+
             // Create a basic block and set the insertion point
             llvm::BasicBlock *entry = llvm::BasicBlock::Create(*context, "entry", function);
             builder->SetInsertPoint(entry);
 
-            // TODO: Set function arguments
-            // auto args = addFunc->arg_begin();
-            // llvm::Value *a = args++;
-            // llvm::Value *b = args;
-            // a->setName("a");
-            // b->setName("b");
+            visitStatement(current_decl->resolved_stmt);
+        }
 
-            // For demonstration, return a constant value (e.g., 42)
-            builder->CreateRet(llvm::ConstantInt::get(builder->getInt32Ty(), 42));
+        void visitExpression(const arena::sema::ResolvedExpression *node) {
+            current_expr = node;
+            node->original->accept(this);
+        }
 
-            // Verify the function
-            if (llvm::verifyFunction(*function, &llvm::errs())) {
-                throw std::runtime_error("Function verification failed for: " +
-                                         std::string(node->get_name()));
+        class ResolvedStatementVisitor {
+        public:
+            ResolvedStatementVisitor(llvm::LLVMContext *context,
+                                     llvm::IRBuilder<> *builder,
+                                     LLVMBackendAstVisitor *visitor)
+                : context(context), builder(builder), visitor(visitor) {}
+
+            void operator()(const arena::sema::ResolvedIfStatement &resolved_stmt) {
+                visitor->visitExpression(resolved_stmt.condition);
+                auto true_block = llvm::BasicBlock::Create(*context, "true_block");
+                auto false_block = llvm::BasicBlock::Create(*context, "false_block");
+                auto merge_block = llvm::BasicBlock::Create(*context, "merge_block");
+
+                builder->CreateCondBr(visitor->current_value, true_block, false_block);
+
+                builder->SetInsertPoint(true_block);
+                visitor->visitStatement(resolved_stmt.then_branch);
+                builder->CreateBr(merge_block);
+
+                builder->SetInsertPoint(false_block);
+                if (resolved_stmt.else_branch) {
+                    visitor->visitStatement(resolved_stmt.else_branch);
+                }
+                builder->CreateBr(merge_block);
+
+                builder->SetInsertPoint(merge_block);
+            }
+
+            void operator()(const arena::sema::ResolvedLetStatement &resolved_stmt) {
+                visitor->visitExpression(resolved_stmt.initializer);
+                auto value = visitor->current_value;
+                // TODO: Use VariableId instead of string for the variable_map key
+                visitor->variable_map[std::string{resolved_stmt.original->get_name()}] = value;
+            }
+
+            void operator()(const arena::sema::ResolvedReturnStatement &resolved_stmt) {
+                visitor->visitExpression(resolved_stmt.expr);
+                builder->CreateRet(visitor->current_value);
+            }
+
+            void operator()(const arena::sema::ResolvedBlockStatement &resolved_stmt) {
+                for (size_t i = 0; i < resolved_stmt.num_statements; ++i) {
+                    visitor->visitStatement(&resolved_stmt.statements[i]);
+                }
+            }
+
+            void operator()(const arena::sema::ResolvedArenaStatement &resolved_stmt) {
+                throw std::runtime_error("ResolvedArenaStatement not implemented");
+            }
+
+            void operator()(const arena::sema::ResolvedExprStatement &resolved_stmt) {
+                visitor->visitExpression(resolved_stmt.expr);
+            }
+
+        private:
+            llvm::LLVMContext *context;
+            llvm::IRBuilder<> *builder;
+            LLVMBackendAstVisitor *visitor;
+        };
+
+        void visitStatement(arena::sema::ResolvedStatement *node) {
+            std::visit(ResolvedStatementVisitor{context, builder, this}, node->info);
+        }
+
+        void visit(const arena::ast::StringLiteral *node) override {
+            throw std::runtime_error("StringLiteral not implemented");
+        }
+
+        void visit(const arena::ast::IntegerLiteral *node) override {
+            throw std::runtime_error("IntegerLiteral not implemented");
+        }
+
+        void visit(const arena::ast::Literal *node) override {
+            auto value = node->begin()->literalValue;
+            if (auto int_value = std::get_if<int64_t>(&value)) {
+                current_value = llvm::ConstantInt::get(*context, llvm::APInt(64, *int_value));
+            } else if (auto string_value = std::get_if<std::string_view>(&value)) {
+                current_value = builder->CreateGlobalStringPtr(*string_value);
+            } else if (node->begin()->type == arena::ast::TokenType::TRUE) {
+                // TODO: use a size of 1 bit
+                current_value = llvm::ConstantInt::get(*context, llvm::APInt(8, 1));
+            } else if (node->begin()->type == arena::ast::TokenType::FALSE) {
+                // TODO: use a size of 1 bit
+                current_value = llvm::ConstantInt::get(*context, llvm::APInt(8, 0));
+            } else {
+                throw std::runtime_error("Expected integer or string literal");
+            }
+        }
+
+        void visit(const arena::ast::LiteralExpression *node) override {
+            node->get_literal()->accept(this);
+        }
+
+        void visit(const arena::ast::IdExpression *node) override {
+            // TODO: Use VariableId instead of string for the variable_map key
+            auto it = variable_map.find(std::string{node->get_id()});
+            if (it != variable_map.end()) {
+                current_value = it->second;
+            } else {
+                throw std::runtime_error("Variable not found in variable_map");
             }
         }
     };
@@ -104,6 +215,7 @@ std::string arena::backend::emit_impl(const arena::sema::ResolvedExpressionsResu
         decl->original->accept(&visitor);
     }
 
+    ::llvm::verifyModule(module, &::llvm::errs());
     std::string out;
     ::llvm::raw_string_ostream ros(out);
     module.print(ros, nullptr);
