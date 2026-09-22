@@ -21,8 +21,6 @@ target_link_libraries(arena-bin
 if(ARENA_ENABLE_LLVM)
     target_link_libraries(arena-bin PRIVATE arena-backend-llvm)
     target_compile_definitions(arena-bin PRIVATE ARENA_HAS_LLVM_BACKEND)
-    target_include_directories(arena-bin PRIVATE ${LLVM_INCLUDE_DIRS})
-    target_compile_definitions(arena-bin PRIVATE ${LLVM_DEFINITIONS})
 endif()
 
 target_compile_features(arena-bin PUBLIC cxx_std_17)

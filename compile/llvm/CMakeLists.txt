@@ -16,17 +16,17 @@ target_include_directories(arena-backend-llvm
 target_link_libraries(arena-backend-llvm
     PUBLIC
         arena-codegen
-    PRIVATE
-        ${LLVM_LIBRARIES}
 )
 
 target_compile_definitions(arena-backend-llvm
     PRIVATE
         ${LLVM_DEFINITIONS}
 )
+target_include_directories(arena-backend-llvm PRIVATE ${LLVM_INCLUDE_DIRS})
+target_compile_definitions(arena-backend-llvm PRIVATE ${LLVM_DEFINITIONS})
 
 target_compile_features(arena-backend-llvm PUBLIC cxx_std_17)
 
 # Map LLVM components to libraries
-llvm_map_components_to_libnames(llvm_libs support core irreader)
+llvm_map_components_to_libnames(llvm_libs support core irreader nativecodegen)
 target_link_libraries(arena-backend-llvm PRIVATE ${llvm_libs})

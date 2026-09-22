@@ -1,8 +1,14 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Verifier.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/TargetParser/Host.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "arena_backend.hpp"
 #include "ast/visitor.hpp"
 #include "arena_llvm_types.hpp"
@@ -197,27 +203,72 @@ namespace {
         }
     };
 
-} // namespace
+    void output_ir_to_file(::llvm::Module &module, const std::string &output_path) {
+        auto targetTriple = ::llvm::sys::getDefaultTargetTriple();
+        ::llvm::InitializeNativeTarget();
+        ::llvm::InitializeNativeTargetAsmPrinter();
 
-std::string arena::backend::emit_impl(const arena::sema::ResolvedExpressionsResult &resolved,
-                                      const arena::sema::FunctionTable &ftable,
-                                      const arena::sema::TypeTable &ttable,
-                                      const std::filesystem::path &source_path) {
-    ::llvm::LLVMContext context;
-    ::llvm::Module module(source_path.string(), context);
+        std::string error;
+        auto target = ::llvm::TargetRegistry::lookupTarget(targetTriple, error);
+        if (!target) {
+            throw std::runtime_error("Failed to lookup target: " + error);
+        }
 
-    // Create an IR builder
-    ::llvm::IRBuilder<> builder(context);
+        auto cpu = "generic";
+        auto features = "";
+        ::llvm::TargetOptions opt;
+        auto target_machine = target->createTargetMachine(targetTriple, cpu, features, opt, ::llvm::Reloc::Model::PIC_);
+        module.setDataLayout(target_machine->createDataLayout());
+        module.setTargetTriple(targetTriple);
 
-    for (const auto decl : resolved.get_resolved_decls()) {
-        LLVMBackendAstVisitor visitor(context, module, builder, decl, &ftable, &ttable);
-        // TODO: don't require visiting the original AST node directly
-        decl->original->accept(&visitor);
+        std::error_code ec;
+        ::llvm::raw_fd_ostream fd_os(output_path, ec);
+
+        if (ec) {
+            throw std::runtime_error("Failed to open output file: " + ec.message());
+        }
+
+        ::llvm::legacy::PassManager pass_manager;
+        auto object_file_type = ::llvm::CodeGenFileType::ObjectFile;
+        if (target_machine->addPassesToEmitFile(pass_manager, fd_os, nullptr, object_file_type)) {
+            throw std::runtime_error("Target machine can't emit a file of this type");
+        }
+        pass_manager.run(module);
+        fd_os.flush();
     }
 
-    ::llvm::verifyModule(module, &::llvm::errs());
-    std::string out;
-    ::llvm::raw_string_ostream ros(out);
-    module.print(ros, nullptr);
-    return out;
+} // namespace
+
+void arena::backend::emit_impl(const std::vector<arena::backend::ResolvedCompilationUnit> &resolved,
+                               const arena::backend::BackendOptions &options) {
+    std::string module_name;
+    for (const auto &unit : resolved) {
+        module_name += unit.source_path.stem().string();
+    }
+
+    ::llvm::LLVMContext context;
+    ::llvm::Module module(module_name, context);
+    ::llvm::IRBuilder<> builder(context);
+
+    for (const auto &unit : resolved) {
+        auto ftable = unit.ftable;
+        auto ttable = unit.ttable;
+        for (const auto decl : unit.resolved->get_resolved_decls()) {
+            LLVMBackendAstVisitor visitor(context, module, builder, decl, ftable, ttable);
+            // TODO: don't require visiting the original AST node directly
+            decl->original->accept(&visitor);
+        }
+    }
+
+    if (options.print_ir) {
+        ::llvm::outs() << "LLVM IR:\n";
+        module.print(::llvm::outs(), nullptr);
+    }
+
+    if (options.validate_ir) {
+        ::llvm::verifyModule(module, &::llvm::errs());
+        ::llvm::outs() << "IR validation successful.\n";
+    }
+
+    output_ir_to_file(module, options.output_path.string());
 }

@@ -80,13 +80,23 @@ namespace {
 
     int command_compile(int argc, char **argv) {
         std::vector<std::filesystem::path> source_files;
+        arena::backend::BackendOptions backend_options;
         po::options_description desc("Usage: arena compile [options] <sources>");
         // clang-format off
         desc.add_options()
             ("help,h", "Show this help message")
             ("sources",
-            po::value<std::vector<std::filesystem::path>>(&source_files),
-            "Source files to load");
+             po::value<std::vector<std::filesystem::path>>(&source_files),
+             "Source files to load")
+            ("validate-ir",
+             po::bool_switch(&backend_options.validate_ir),
+             "Validate the generated IR before assembling")
+            ("print-ir",
+             po::bool_switch(&backend_options.print_ir),
+             "Print the generated IR before assembling")
+            ("output-path,o",
+             po::value<std::filesystem::path>(&backend_options.output_path)->default_value("a.out"),
+             "Output path for the generated backend output");
         // clang-format on
 
         // Define positional arguments (source files)
@@ -103,24 +113,31 @@ namespace {
 
         bool has_errors = false;
         arena::sema::QueryEngine engine;
-        for (const auto &file : source_files) {
+        std::vector<arena::backend::ResolvedCompilationUnit> compilation_units;
 
+        for (const auto &file : source_files) {
             const auto errors = engine.execute(arena::sema::RenderedErrorsQuery{file});
 
             if (!errors.empty()) {
                 std::cout << errors << "\n";
                 has_errors = true;
-            }
-
-            if (!has_errors) {
+            } else {
                 const auto &typechecked = engine.execute(arena::sema::TypecheckedFileQuery{file});
                 const auto &ftable =
                     engine.execute(arena::sema::AvailableFunctionsTableQuery{file});
                 const auto &ttable = engine.execute(arena::sema::AvailableTypesTableQuery{file});
 
-                std::cout << "Backend output:\n";
-                std::cout << arena::backend::emit_impl(typechecked, ftable, ttable, file);
+                compilation_units.push_back(arena::backend::ResolvedCompilationUnit{
+                    .source_path = file,
+                    .resolved = &typechecked,
+                    .ftable = &ftable,
+                    .ttable = &ttable,
+                });
             }
+        }
+
+        if (!has_errors) {
+            arena::backend::emit_impl(compilation_units, backend_options);
         }
 
         return has_errors ? 1 : 0;
