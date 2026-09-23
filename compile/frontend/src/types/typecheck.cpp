@@ -402,6 +402,7 @@ ResolvedExpressionsResult TypeChecker::type_check(
     for (auto decl : decls) {
         auto resolved = arena.alloc<ResolvedDeclaration>();
         resolved->original = decl->original;
+        resolved->info = decl->info;
 
         if (!decl->resolved_stmt) {
             resolved->lifetimes = decl->lifetimes;

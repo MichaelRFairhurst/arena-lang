@@ -88,8 +88,16 @@ namespace arena::sema {
         ResolvedStatementType info;
     };
 
+    struct ResolvedFunctionDeclaration {
+        size_t num_parameters = 0;
+        VariableId *parameters = nullptr;
+    };
+
+    using ResolvedDeclarationInfo = std::variant<ResolvedFunctionDeclaration>;
+
     struct ResolvedDeclaration {
         const ast::Declaration *original = nullptr;
+        ResolvedDeclarationInfo info;
         ResolvedStatement *resolved_stmt = nullptr;
         LifetimeGroup lifetimes;
     };

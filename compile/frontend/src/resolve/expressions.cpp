@@ -147,7 +147,7 @@ namespace {
             resolve_inner();
             variable_scope = outer;
         }
-        
+
         void operator()(ResolvedArenaStatement &arena_stmt) {
             auto scoped_arena_lifetime = lifetimes->push_arena(arena_stmt.original);
             arena_stmt.arena_lifetime = lifetimes->get_arena_lifetime();
@@ -171,16 +171,28 @@ namespace {
                                       const TypeSymbolSet *type_symbols,
                                       const TypeSymbolRegistry *registry,
                                       VariableScope *variable_scope,
-                                      LifetimeTable *lifetimes)
+                                      LifetimeTable *lifetimes,
+                                      ResolvedDeclaration *resolved_decl)
             : arena(arena), type_symbols(type_symbols), symbolizer(registry, lifetimes),
-              variable_scope(variable_scope), lifetimes(lifetimes) {}
+              variable_scope(variable_scope), lifetimes(lifetimes), resolved_decl(resolved_decl) {}
 
         void visit(const ast::FunctionDefinition *func_def) override {
-            auto scoped_stack_lifetime = lifetimes->push_stack(func_def->get_body());
+            visit(static_cast<const ast::FunctionDeclaration *>(func_def));
+        }
 
-            auto param_list = func_def->get_params()->get_params();
+        void visit(const ast::FunctionDeclaration *func_decl) override {
+            auto param_list = func_decl->get_params()->get_params();
+            auto num_params = param_list.size();
+
+            resolved_decl->info = ResolvedFunctionDeclaration{
+                .num_parameters = num_params,
+                .parameters = arena->alloc_array<VariableId>(num_params),
+            };
+
+            auto p_resolved_param =
+                std::get<ResolvedFunctionDeclaration>(resolved_decl->info).parameters;
+
             for (const auto &param : param_list) {
-
                 std::optional<TypeId> param_type;
 
                 if (param->get_type() != nullptr) {
@@ -188,15 +200,17 @@ namespace {
                     param_type = type_symbols->get_id(symbol);
                 }
 
-                variable_scope
-                    ->add_variable(param->get_name(),
-                                   arena->alloc<ResolvedVariable>(param->get_name(),
-                                                                  param,
-                                                                  lifetimes->get_stack_lifetime(),
-                                                                  param_type,
-                                                                  std::nullopt // No inferred type
-                                                                               // for parameters
-                                                                  ));
+                auto variable = arena->alloc<ResolvedVariable>( // force line break
+                    param->get_name(),
+                    param,
+                    lifetimes->get_stack_lifetime(),
+                    param_type,
+                    std::nullopt // No inferred type for parameters
+                );
+
+                auto variable_id = variable_scope->add_variable(param->get_name(), variable);
+                *p_resolved_param = variable_id;
+                ++p_resolved_param;
             }
         }
 
@@ -207,6 +221,7 @@ namespace {
         const TypeSymbolSet *type_symbols;
         TypeSymbolResolver symbolizer;
         LifetimeTable *lifetimes;
+        ResolvedDeclaration *resolved_decl;
     };
 
 } // namespace
@@ -255,20 +270,21 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
             continue;
         }
 
+        VariableScope variable_scope{&variable_registry};
+
         resolved_decls.push_back(tree);
+        // Resolve parameters into the scope
+        LifetimeTable public_lifetimes(&tree->lifetimes, true);
+        FunctionScopeVisitor func_scope_visitor{&arena,
+                                                types,
+                                                registry,
+                                                &variable_scope,
+                                                &public_lifetimes,
+                                                tree};
+
+        decl->accept(&func_scope_visitor);
+
         if (tree->resolved_stmt) {
-            VariableScope variable_scope{&variable_registry};
-
-            // Resolve parameters into the scope
-            LifetimeTable public_lifetimes(&tree->lifetimes, true);
-            FunctionScopeVisitor func_scope_visitor{&arena,
-                                                    types,
-                                                    registry,
-                                                    &variable_scope,
-                                                    &public_lifetimes};
-
-            decl->accept(&func_scope_visitor);
-
             // Resolve expressions in the function body
             LifetimeTable local_lifetimes(&tree->lifetimes, false);
             ExpressionResolverVisitor expr_resolver{&arena,
