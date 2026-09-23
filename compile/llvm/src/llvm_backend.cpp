@@ -42,6 +42,18 @@ namespace {
             return type_resolver.getLLVMType(type_id);
         }
 
+        llvm::FunctionType *getLLVMFunctionType(const arena::sema::ResolvedFunction &func) {
+            llvm::Type *return_type = getLLVMType(func.get_return_type().value_or(
+                ttable->get_type_id(arena::sema::VoidTypeSymbol{})));
+
+            std::vector<llvm::Type *> param_types;
+            for (const auto &param_type_id : *func.get_param_types()) {
+                param_types.push_back(getLLVMType(param_type_id));
+            }
+
+            return llvm::FunctionType::get(return_type, param_types, false);
+        }
+
         llvm::Function *declare_function(const arena::ast::FunctionDeclaration *node) {
             // TODO: Don't require looking up the function via the function table; we should have
             // this information available directly from the resolved declaration.
@@ -51,16 +63,7 @@ namespace {
                                          std::string(node->get_name()));
             }
 
-            llvm::Type *return_type = getLLVMType(func->get_return_type().value_or(
-                ttable->get_type_id(arena::sema::VoidTypeSymbol{})));
-
-            std::vector<llvm::Type *> param_types;
-            for (const auto &param_type_id : *func->get_param_types()) {
-                param_types.push_back(getLLVMType(param_type_id));
-            }
-
-            llvm::FunctionType *func_type =
-                llvm::FunctionType::get(return_type, param_types, false);
+            auto func_type = getLLVMFunctionType(*func);
 
             llvm::Function *function = llvm::Function::Create(func_type,
                                                               llvm::Function::ExternalLinkage,
@@ -200,6 +203,33 @@ namespace {
             } else {
                 throw std::runtime_error("Variable not found in variable_map");
             }
+        }
+
+        void visit(const arena::ast::CallExpression *node) override {
+            auto &resolved_callee = current_expr->children[0];
+            auto func_info = std::get_if<arena::sema::ResolvedFunctionInfo>(&resolved_callee.info);
+            if (func_info == nullptr) {
+                throw std::runtime_error("Expected function info for call expression");
+            }
+
+            auto func = ftable->get_function(func_info->function_id);
+            if (!func.has_value()) {
+                throw std::runtime_error("Function not found in function table");
+            }
+            auto func_type = getLLVMFunctionType(*func);
+
+            std::vector<::llvm::Value *> args;
+            for (int i = 1; i < current_expr->num_children; ++i) {
+                visitExpression(&current_expr->children[i]);
+                args.push_back(current_value);
+            }
+
+            auto callee = module->getFunction(func->get_symbol().name);
+            if (!callee) {
+                throw std::runtime_error("Callee function not found in module");
+            }
+
+            current_value = builder->CreateCall(callee, args, "calltmp");
         }
     };
 
