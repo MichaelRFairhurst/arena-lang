@@ -34,8 +34,7 @@ namespace {
         llvm::Value *current_value = nullptr;
         const arena::sema::FunctionTable *ftable;
         const arena::sema::TypeTable *ttable;
-        // TODO: use VariableId instead of string for the variable_map key
-        std::unordered_map<std::string, llvm::Value *> variable_map;
+        std::unordered_map<arena::sema::VariableId, llvm::Value *> variable_map;
 
         llvm::Type *getLLVMType(const arena::sema::TypeId type_id) {
             arena::llvm::TypeResolver type_resolver{builder, ttable, &current_decl->lifetimes};
@@ -76,17 +75,19 @@ namespace {
 
         void visit(const arena::ast::FunctionDefinition *node) override {
             llvm::Function *function = declare_function(node);
+            auto func_info =
+                std::get_if<arena::sema::ResolvedFunctionDeclaration>(&current_decl->info);
+            if (!func_info) {
+                throw std::runtime_error("Failed to get function info from resolved declaration");
+            }
 
             auto args = function->arg_begin();
 
-            // TODO: get actual variable id from the resolved function.
-            arena::sema::VariableId variable_id{0};
-            for (auto &param : node->get_params()->get_params()) {
-                auto name = param->get_name();
-                args->setName(name);
-                // TODO: Use VariableId instead of string for the variable_map key
-                variable_map[std::string{name}] = &*args;
-                ++variable_id.v_id;
+            for (int i = 0; i < func_info->num_parameters; ++i) {
+                auto variable_id = func_info->parameters[i];
+                ::llvm::errs() << "Mapping variable_id " << variable_id.v_id << " to argument\n";
+                // args->setName(name);
+                variable_map[variable_id] = &*args;
                 ++args;
             }
 
@@ -131,10 +132,10 @@ namespace {
             }
 
             void operator()(const arena::sema::ResolvedLetStatement &resolved_stmt) {
+                auto variable_id = resolved_stmt.variable_id;
                 visitor->visitExpression(resolved_stmt.initializer);
                 auto value = visitor->current_value;
-                // TODO: Use VariableId instead of string for the variable_map key
-                visitor->variable_map[std::string{resolved_stmt.original->get_name()}] = value;
+                visitor->variable_map[variable_id] = value;
             }
 
             void operator()(const arena::sema::ResolvedReturnStatement &resolved_stmt) {
@@ -196,8 +197,14 @@ namespace {
         }
 
         void visit(const arena::ast::IdExpression *node) override {
-            // TODO: Use VariableId instead of string for the variable_map key
-            auto it = variable_map.find(std::string{node->get_id()});
+            auto info = std::get_if<arena::sema::ResolvedVariableInfo>(&current_expr->info);
+            if (!info) {
+                throw std::runtime_error("Expected variable info for id expression");
+            }
+
+            auto it = variable_map.find(info->variable_id);
+            ::llvm::errs() << "Looking up variable_id " << info->variable_id.v_id
+                           << " in variable_map\n";
             if (it != variable_map.end()) {
                 current_value = it->second;
             } else {
@@ -247,7 +254,11 @@ namespace {
         auto cpu = "generic";
         auto features = "";
         ::llvm::TargetOptions opt;
-        auto target_machine = target->createTargetMachine(targetTriple, cpu, features, opt, ::llvm::Reloc::Model::PIC_);
+        auto target_machine = target->createTargetMachine(targetTriple,
+                                                          cpu,
+                                                          features,
+                                                          opt,
+                                                          ::llvm::Reloc::Model::PIC_);
         module.setDataLayout(target_machine->createDataLayout());
         module.setTargetTriple(targetTriple);
 
