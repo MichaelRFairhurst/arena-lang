@@ -28,8 +28,8 @@ namespace {
             this->inference_ctx = nullptr;
             return expr;
         }
-        TypeId set_resolved_info(ResolvedExpressionInfo &info,
-                                 ResolvedValueCategory value_category) {
+        TypeId set_type_info(std::optional<ResolvedTypeInfo> &info,
+                             ResolvedValueCategory value_category) {
             auto type_id = inference_ctx->get_inferred_context_type();
             info = ResolvedTypeInfo{type_id, value_category};
             return type_id;
@@ -38,7 +38,7 @@ namespace {
         TypeId set_type(ResolvedExpression *expr,
                         TypeId type_id,
                         ResolvedValueCategory value_category) {
-            expr->info = ResolvedTypeInfo{type_id, value_category};
+            expr->type = ResolvedTypeInfo{type_id, value_category};
             inference_ctx->constrain_context_type(type_id,
                                                   error::LocatedText(expr->original, "here"));
             return type_id;
@@ -79,7 +79,7 @@ namespace {
 
             auto variable = ops.get_variables().resolve_variable(var_info->variable_id);
             inference_ctx->constrain_context_type(var_info->variable_id);
-            return set_resolved_info(step.out_info(), ResolvedLValue{variable->lifetime});
+            return set_type_info(step.type_out(), ResolvedLValue{variable->lifetime});
         }
 
         TypeId operator()(ExprTransformStep<ast::LiteralExpression> step) {
@@ -146,8 +146,8 @@ namespace {
         TypeId handle_assignment(ExprTransformStep<ast::BinaryExpression> step) {
             auto left_inference_ctx = make_child_context(step, 0);
             auto left_type_id = resolve_child(step, 0, &left_inference_ctx);
-            auto left_info = std::get<ResolvedTypeInfo>(step.out->children[0].info);
-            if (!std::holds_alternative<ResolvedLValue>(left_info.value_category)) {
+            auto left_type_info = step.out->children[0].type.value();
+            if (!std::holds_alternative<ResolvedLValue>(left_type_info.value_category)) {
                 ops.get_errors().E_T_ASGN_RV(step.ast, step.ast->get_left());
             }
 
@@ -161,11 +161,12 @@ namespace {
 
             inference_ctx->constrain_context_type(left_type_id,
                                                   error::LocatedText{step.ast, "assignment"});
-            return set_resolved_info(step.out_info(), ResolvedRValue{});
+            return set_type_info(step.type_out(), ResolvedRValue{});
         }
 
         TypeId operator()(ExprTransformStep<ast::CallExpression> step) {
             auto callee = step.original->children[0];
+            step.out->children[0].info = callee.info;
             auto finfo = std::get_if<ResolvedFunctionInfo>(&callee.info);
             if (!finfo) {
                 // For now, the callee must be a function. Soon we'll add function types.
@@ -224,7 +225,7 @@ namespace {
                                                       error::LocatedText(step.ast, "return type"));
             }
 
-            return set_resolved_info(step.out_info(), ResolvedRValue{});
+            return set_type_info(step.type_out(), ResolvedRValue{});
         }
 
         TypeId operator()(ExprTransformStep<ast::DotOperatorExpression> step) {
@@ -243,7 +244,7 @@ namespace {
                                          InferenceContext::ConstraintKind::Suggestion);
                 resolve_child(step, 0, &operand_inference_ctx);
                 inference_ctx_parent->constrain_dereferences(&operand_inference_ctx, step.ast);
-                auto child_info = std::get<ResolvedTypeInfo>(step.out->children[0].info);
+                auto child_info = step.out->children[0].type.value();
                 auto ptr_type = ops.get_type(child_info.type_id);
                 auto lifetime = ops.pointed_lifetime(child_info.type_id);
                 if (lifetime.has_value()) {
@@ -256,7 +257,7 @@ namespace {
             case ast::TokenType::AMP: {
                 operand_inference_ctx.constrain_dereferences(inference_ctx_parent, step.ast);
                 resolve_child(step, 0, &operand_inference_ctx);
-                auto child_info = std::get<ResolvedTypeInfo>(step.out->children[0].info);
+                auto child_info = step.out->children[0].type.value();
                 LifetimeId lifetime = ops.get_lifetimes().get_unsafe_lifetime();
                 if (auto lvalue_info = std::get_if<ResolvedLValue>(&child_info.value_category)) {
                     lifetime = lvalue_info->lifetime;
@@ -276,7 +277,7 @@ namespace {
                                          std::string(step.ast->get_operator_token()->text));
             }
 
-            return set_resolved_info(step.out_info(), value_category);
+            return set_type_info(step.type_out(), value_category);
         }
 
         TypeId operator()(ExprTransformStep<ast::CastExpression> step) {
@@ -288,7 +289,7 @@ namespace {
             auto operand_type = resolve_child(step, 0, &uncast_inference_ctx);
             // TODO: check that cast is valid (e.g., cannot cast bool to struct)
 
-            return set_resolved_info(step.out_info(), ResolvedRValue{});
+            return set_type_info(step.type_out(), ResolvedRValue{});
         }
 
         TypeId operator()(ExprTransformStep<ast::MemberAccessExpression> step) {
@@ -311,7 +312,7 @@ namespace {
             inference_ctx->constrain_context_type(bool_id,
                                                   error::LocatedText(step.ast, "result of '!'"));
             resolve_child(step, 0, &operand_inference_ctx);
-            return set_resolved_info(step.out_info(), ResolvedRValue{});
+            return set_type_info(step.type_out(), ResolvedRValue{});
         }
 
         LifetimeId current_arena_lifetime;
@@ -399,7 +400,12 @@ ResolvedExpressionsResult TypeChecker::type_check(
     error::Reporter errors;
 
     for (auto decl : decls) {
+        auto resolved = arena.alloc<ResolvedDeclaration>();
+        resolved->original = decl->original;
+
         if (!decl->resolved_stmt) {
+            resolved->lifetimes = decl->lifetimes;
+            resolved_decls.push_back(resolved);
             continue;
         }
 
@@ -417,8 +423,6 @@ ResolvedExpressionsResult TypeChecker::type_check(
         LifetimeSolver solver(&errors);
         solver.solve(lifetime_group);
 
-        auto resolved = arena.alloc<ResolvedDeclaration>();
-        resolved->original = decl->original;
         resolved->resolved_stmt = result;
         resolved->lifetimes = std::move(lifetime_group);
         resolved_decls.push_back(resolved);

@@ -251,8 +251,12 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
         decl->accept(&builder);
         auto tree = builder.get_resolved_decl();
 
-        if (tree && tree->resolved_stmt) {
-            resolved_decls.push_back(tree);
+        if (!tree) {
+            continue;
+        }
+
+        resolved_decls.push_back(tree);
+        if (tree->resolved_stmt) {
             VariableScope variable_scope{&variable_registry};
 
             // Resolve parameters into the scope

@@ -12,6 +12,7 @@ namespace arena::sema {
 
         const ResolvedExpressionInfo &original_info() const { return original->info; }
         ResolvedExpressionInfo &out_info() { return out->info; }
+        std::optional<ResolvedTypeInfo> &type_out() { return out->type; }
     };
 
     class ExprTransformMiddleware {
@@ -33,6 +34,7 @@ namespace arena::sema {
 
             template <typename Ast>
             void handle(const Ast *ast) {
+                out->info = in->info;
                 auto step = ExprTransformStep<Ast>{.ast = ast, .original = in, .out = out};
                 if constexpr (std::is_same_v<Return, void>) {
                     transform_func(step);

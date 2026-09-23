@@ -35,8 +35,8 @@ namespace arena::sema {
 
     struct UnresolvedExprInfo {};
 
-    using ResolvedExpressionInfo = std::
-        variant<UnresolvedExprInfo, ResolvedFunctionInfo, ResolvedVariableInfo, ResolvedTypeInfo>;
+    using ResolvedExpressionInfo =
+        std::variant<UnresolvedExprInfo, ResolvedFunctionInfo, ResolvedVariableInfo>;
 
     struct ResolvedExpression;
 
@@ -97,6 +97,7 @@ namespace arena::sema {
     struct ResolvedExpression {
         const ast::Expression *original = nullptr;
         ResolvedExpressionInfo info = UnresolvedExprInfo{};
+        std::optional<ResolvedTypeInfo> type;
         ResolvedExpression *parent = nullptr;
         ResolvedExpression *children = nullptr;
         size_t num_children = 0;
@@ -301,11 +302,16 @@ namespace arena::sema {
 
     class ResolvedDeclarationBuilder : public ast::Visitor {
     public:
-        ResolvedDeclarationBuilder(util::Arena &arena, const FunctionTable &ftable) : arena(&arena), ftable(&ftable) {}
+        ResolvedDeclarationBuilder(util::Arena &arena, const FunctionTable &ftable)
+            : arena(&arena), ftable(&ftable) {}
 
         void visit(const ast::FunctionDeclaration *func_decl) override {
             result = arena->alloc<ResolvedDeclaration>();
             result->original = func_decl;
+
+            auto resolved_func = ftable->resolve(func_decl->get_name());
+            result->lifetimes = resolved_func->get_lifetimes();
+
             result->resolved_stmt = nullptr;
         }
 
