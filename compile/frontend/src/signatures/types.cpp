@@ -26,8 +26,9 @@ namespace {
                                    ? "<unknown>"
                                    : std::string(element_type.get_name());
             name += "[" + std::to_string(symbol.size) + "]";
-            auto tmp_symbol = registry->get_interned(NamedTypeSymbol{name});
-            std::string_view interned_name = std::get<NamedTypeSymbol>(tmp_symbol).name;
+            auto tmp_symbol_id = registry->get_type_id(NamedTypeSymbol{name});
+            auto interned = registry->get_type_symbol(tmp_symbol_id);
+            std::string_view interned_name = std::get<NamedTypeSymbol>(interned).name;
 
             return ResolvedType{type_id, ArrayType{element_id, symbol.size}, symbol, interned_name};
         }
