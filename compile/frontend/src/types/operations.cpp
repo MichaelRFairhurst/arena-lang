@@ -225,13 +225,15 @@ error::Error *TypeOperations::require_assignable(TypeId lhs,
             return &errors->E_T_ARR_SZ_MIS(node, message, lhs_array->size, rhs_array->size);
         }
 
-        auto err = require_assignable(lhs_type.get_id(), rhs_type.get_id(), node, message, context);
+        auto err = require_assignable(lhs_array->element_type, rhs_array->element_type, node, message, context);
         if (err != nullptr) {
             err->add_cause("Array element type mismatch",
                            "Array elements of " + get_type_name(lhs) + " must be compatible with " +
                                get_type_name(rhs));
             return err;
         }
+
+        return err;
     } else if (auto left_ptr = std::get_if<PointerType>(&lhs_type.get_program_type())) {
         auto lhs_pointee_id = left_ptr->pointee_type;
         auto right_ptr = std::get_if<PointerType>(&rhs_type.get_program_type());
