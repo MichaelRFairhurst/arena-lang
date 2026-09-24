@@ -925,9 +925,6 @@ namespace arena::parse {
             } else {
                 std::string context_message_spaced =
                     context_message.empty() ? "" : " " + std::string(context_message) + " ";
-                std::string message = "Expected " + std::string(token_type_to_string(expected)) +
-                                      context_message_spaced + " but got '" +
-                                      std::string(tokens.peek()->text) + "'";
                 errors.E_P_UNEXP(tokens.peek(),
                                  token_type_to_string(expected),
                                  tokens.peek()->text);
