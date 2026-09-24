@@ -91,6 +91,21 @@ void InferenceContext::constrain_points_to(InferenceContext *other,
     constrain_context_type(pointer_to_other, link, kind);
 }
 
+void InferenceContext::constrain_integral_literal(sema::TypeId default_type, const ast::Node *origin) {
+    if (!context_type.has_value()) {
+        context_type = default_type;
+        context_kind = ConstraintKind::Assignee;
+        why_constraint = error::LocatedText{origin, "integral literal without a size context"};
+        return;
+    }
+
+    auto type = ops->get_type(*context_type);
+    auto integral_type = std::get_if<IntegralType>(&type.get_program_type());
+    if (integral_type == nullptr || integral_type->literal_kind != IntegralLiteralKind::Int) {
+        ops->get_errors().E_T_NOT_INTGL(origin, {context_node, ops->get_type_name(*context_type)});
+    }
+}
+
 TypeId InferenceContext::get_inferred_context_type() {
     if (context_type.has_value()) {
         return *context_type;

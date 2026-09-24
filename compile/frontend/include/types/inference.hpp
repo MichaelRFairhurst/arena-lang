@@ -30,7 +30,9 @@ namespace arena::sema {
                                  LifetimeId lifetime,
                                  const ast::Node *origin,
                                  ConstraintKind kind = ConstraintKind::Assignee);
+        void constrain_integral_literal(sema::TypeId id, const ast::Node *origin);
         sema::TypeId get_inferred_context_type();
+        error::LocatedText get_why_constraint() const { return why_constraint; }
 
     private:
         std::optional<TypeId> context_type;

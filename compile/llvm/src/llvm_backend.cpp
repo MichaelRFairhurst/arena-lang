@@ -178,7 +178,22 @@ namespace {
         void visit(const arena::ast::Literal *node) override {
             auto value = node->begin()->literalValue;
             if (auto int_value = std::get_if<int64_t>(&value)) {
-                current_value = llvm::ConstantInt::get(*context, llvm::APInt(64, *int_value));
+                auto type_info = current_expr->type;
+                if (!type_info.has_value()) {
+                    throw std::runtime_error("Expected type information for integer literal");
+                }
+
+                auto type =
+                    ttable->get_type(type_info.value().type_id, &this->current_decl->lifetimes);
+                auto integral = std::get_if<arena::sema::IntegralType>(&type.get_program_type());
+
+                if (!integral) {
+                    throw std::runtime_error("Expected integral type for integer literal");
+                }
+
+                auto apint =
+                    ::llvm::APInt(integral->size_bytes * 8, *int_value, integral->is_signed);
+                current_value = llvm::ConstantInt::get(*context, apint);
             } else if (auto string_value = std::get_if<std::string_view>(&value)) {
                 current_value = builder->CreateGlobalStringPtr(*string_value);
             } else if (node->begin()->type == arena::ast::TokenType::TRUE) {
@@ -307,7 +322,11 @@ void arena::backend::emit_impl(const std::vector<arena::backend::ResolvedCompila
     }
 
     if (options.validate_ir) {
-        ::llvm::verifyModule(module, &::llvm::errs());
+        if (::llvm::verifyModule(module, &::llvm::errs())) {
+            ::llvm::outs() << "IR validation failed.\n";
+            return;
+        }
+
         ::llvm::outs() << "IR validation successful.\n";
     }
 

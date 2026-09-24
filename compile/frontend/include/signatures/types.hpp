@@ -20,10 +20,33 @@ namespace arena::sema {
         std::string_view name;
     };
 
+    enum class IntegralLiteralKind {
+        Int,
+        Char,
+        Bool
+    };
+
     struct IntegralType {
         bool is_signed;
         size_t size_bytes;
         std::string_view name;
+        IntegralLiteralKind literal_kind;
+
+        uint64_t max_value() const {
+            // Be careful to avoid UB by shifting a 64-bit value by 64 or more bits
+            auto max64 = std::numeric_limits<uint64_t>::max();
+            auto shift_amount = (8 - size_bytes) * 8 + (is_signed ? 1 : 0);
+            return max64 >> shift_amount;
+        }
+
+        uint64_t min_value_abs() const {
+            // This will not ever shift by more than 63 bits.
+            if (is_signed) {
+                return 1ULL << (size_bytes * 8 - 1);
+            } else {
+                return 0;
+            }
+        }
     };
 
     struct FloatingType {

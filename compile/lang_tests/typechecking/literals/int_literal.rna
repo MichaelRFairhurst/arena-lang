@@ -31,13 +31,66 @@ fun hex_under_space() {
 }
 
 fun bad() {
-    let b1: bool = 0;
-    let b2: bool = 1;
-    let b3: bool = 123;
-    let b4: bool = 0x123;
-    let b5: bool = 8x123;
-    let b6: bool = 0b01;
+    let b1: bool = 0; // E-T_NOT_INTGL
+    let b2: bool = 1; // E-T_NOT_INTGL
+    let b3: bool = 123; // E-T_NOT_INTGL
+    let b4: bool = 0x123; // E-T_NOT_INTGL
+    let b5: bool = 8x123; // E-T_NOT_INTGL
+    let b6: bool = 0b01; // E-T_NOT_INTGL
 
-    let d1: double64 = 1;
-    let c1: char const* = 1;
+    let d1: double64 = 1; // E-T_NOT_INTGL
+    let c1: char const* = 1; // E-T_NOT_INTGL
+    let c2: char = 1; // E-T_NOT_INTGL
+}
+
+fun int_max() {
+    let i1: int = 0;
+    let i2: int = 2'147'483'647;
+    let i3: int = 2'147'483'648; // E-T_LIT_OOR
+    // let i4: int = -2'147'483'648;
+    // let i5: int = -2'147'483'649; // E-T_LIT_OOR
+
+    let u1: uint = 0;
+    let u1: uint = 0;
+}
+
+fun other_int_types() {
+    let b1: byte = 0;
+    let b2: byte = 10;
+    let b3: byte = 255;
+    let b4: byte = 256; // E-T_LIT_OOR
+    // let b5: byte = -1; // E-T_LIT_OOR
+    let s1: short = 0;
+    let s2: short = 10;
+    let s3: short = 32767;
+    let s4: short = 32768; // E-T_LIT_OOR
+    // let s5: short = -32768;
+    // let s5: short = -32769; // E-T_LIT_OOR
+    let us1: ushort = 0;
+    let us2: ushort = 10;
+    let us3: ushort = 65535;
+    let us4: ushort = 65536; // E-T_LIT_OOR
+    // let us5: ushort = -1; // E-T_LIT_OOR
+    let l1: long = 0;
+    let l2: long = 10;
+    let l3: long = 9'223'372'036'854'775'807;
+    let l4: long = 9'223'372'036'854'775'808; // E-T_LIT_OOR
+    // let l5: long = -9'223'372'036'854'775'808;
+    // let l6: long = -9'223'372'036'854'775'809; // E-T_LIT_OOR
+    let ul1: ulong = 0;
+    let ul2: ulong = 10;
+    let ul3: ulong = 18'446'744'073'709'551'615;
+    let ul4: ulong = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+    // let ul5: ulong = -1; // E-T_LIT_OOR
+    let z1: ssize = 0;
+    let z2: ssize = 10;
+    let z3: ssize = 9'223'372'036'854'775'807;
+    let z4: ssize = 9'223'372'036'854'775'808; // E-T_LIT_OOR
+    // let z5: ssize = -9'223'372'036'854'775'808;
+    // let z6: ssize = -9'223'372'036'854'775'809; // E-T_LIT_OOR
+    let uz1: usize = 0;
+    let uz2: usize = 10;
+    let uz3: usize = 18'446'744'073'709'551'615;
+    let uz4: usize = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+    // let uz5: usize = -1; // E-T_LIT_OOR
 }

@@ -87,7 +87,27 @@ namespace {
             if (token->type == ast::TokenType::TRUE || token->type == ast::TokenType::FALSE) {
                 return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
             } else if (std::holds_alternative<int64_t>(token->literalValue)) {
-                return set_type(step.out, NamedTypeSymbol{"int"}, ResolvedRValue{});
+                auto int_type = ops.get_types().get_type_id(NamedTypeSymbol{"int"});
+                inference_ctx->constrain_integral_literal(int_type, step.ast);
+                auto result_id = set_type_info(step.type_out(), ResolvedRValue{});
+
+                auto actual_type = ops.get_type(result_id);
+                if (auto integral_type =
+                        std::get_if<IntegralType>(&actual_type.get_program_type())) {
+
+                    auto name = std::string{actual_type.get_name()};
+                    auto value = std::get<int64_t>(token->literalValue);
+                    if (integral_type->literal_kind == IntegralLiteralKind::Int &&
+                        value > integral_type->max_value()) {
+                        // TODO: Handle negative values for signed types, and literals that can't be
+                        // represented in 64 bits.
+                        ops.get_errors().E_T_LIT_OOR(step.ast,
+                                                     name,
+                                                     inference_ctx->get_why_constraint());
+                    }
+                }
+
+                return result_id;
             } else if (std::holds_alternative<std::string_view>(token->literalValue)) {
                 if (token->text[0] == '"') {
                     auto char_type = ops.get_types().get_type_id(NamedTypeSymbol{"char"});

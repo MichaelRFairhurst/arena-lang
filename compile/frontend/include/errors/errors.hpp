@@ -285,6 +285,21 @@ namespace arena::error {
             });
         }
 
+        Error &E_T_NOT_INTGL(Location l, LocatedText operand) {
+            return report({
+                "E-T_NOT_INTGL",
+                l,
+                "Type is not an integral type",
+                std::vector<Chunk>{
+                    "Expected an integral type, but got ",
+                    Link{.link_text = operand.second,
+                         .label_text = "expression has type " + operand.second,
+                         .location = operand.first},
+                },
+            });
+        }
+
+
         Error &E_T_CANT_INFER_V(Location l, std::string_view variable_name) {
             return report({
                 "E-T_CANT_INFER_V",
@@ -352,6 +367,19 @@ namespace arena::error {
                     std::to_string(expected),
                     " but got ",
                     std::to_string(actual),
+                },
+            });
+        }
+
+        Error &E_T_LIT_OOR(Location l, std::string integral_type, LocatedText context) {
+            return report({
+                "E-T_LIT_OOR",
+                l,
+                "Literal out of range here",
+                std::vector<Chunk>{"Literal value can not be represented as ", integral_type, " for ",
+                                    Link{.link_text = context.second,
+                                        .label_text = "required by " + context.second,
+                                        .location = context.first},
                 },
             });
         }
