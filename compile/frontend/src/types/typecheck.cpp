@@ -75,6 +75,7 @@ namespace {
                                                           ErrorTypeSymbol{}),
                                                       error::LocatedText{step.original->original,
                                                                          "unknown identifier"});
+                return set_type_info(step.type_out(), ResolvedRValue{});
             }
 
             auto variable = ops.get_variables().resolve_variable(var_info->variable_id);
