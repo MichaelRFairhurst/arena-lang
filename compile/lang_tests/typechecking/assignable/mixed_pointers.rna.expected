@@ -56,7 +56,7 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:12:9:12:10
   :     x = y;
   :         ^ array element type mismatch
   .
- == note: expected type int[10] based on lvalue in assignment here
+ == note: expected type int[1] based on lvalue in assignment here
   :     x = y;
   :     ^^^^^  --- mixed_pointers.rna:12:5
  == note: got conflicting type int*<free> for variable 'y'
@@ -64,7 +64,7 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:12:9:12:10
   :                  ^^^^^^  --- mixed_pointers.rna:11:18
 
 
-Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int[10] in variable 'x'
+Error[E-T_PTR_NONPTR]: Expected a compatible pointer type, but got int[1] in variable 'x'
 at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:13:9:13:10
   :     y = x;
   :         ^ pointer type mismatch
@@ -72,7 +72,7 @@ at compile/lang_tests/typechecking/assignable/mixed_pointers.rna:13:9:13:10
  == note: expected type int*<free> based on lvalue in assignment here
   :     y = x;
   :     ^^^^^  --- mixed_pointers.rna:13:5
- == note: got conflicting type int[10] for variable 'x'
+ == note: got conflicting type int[1] for variable 'x'
   : fun h(x: int[1], y: int*) {
   :       ^^^^^^^^^  --- mixed_pointers.rna:11:7
 

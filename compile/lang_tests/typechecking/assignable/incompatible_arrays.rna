@@ -1,0 +1,53 @@
+fun f() {
+    let x: int[4]*;
+    let y: int[5]*;
+
+    // Invalid: y is a longer array than x.
+    y = x; // E-T_ARR_SZ_MIS
+}
+
+fun g() {
+    let x: int[4]*;
+    let y: bool[4]*;
+
+    // Invalid: bool vs int
+    y = x; // E-T_ASGN_NOREL
+}
+
+fun h() {
+    let x: int const[4]*;
+    let y: int[4]*;
+
+    // Invalid: constness is lost
+    y = x; // E-T_ASGN_NOCNST
+}
+
+fun i() {
+    let x: int*[4]*;
+    let y: bool*[4]*;
+
+    // Invalid: element pointers have incompatible pointees
+    y = x; // E-T_ASGN_NOREL
+}
+
+fun j() {
+    let x: int[3][4]*;
+    let y: int[2][4]*;
+
+    x = y; // E-T_ARR_SZ_MIS
+}
+
+fun k() {
+    let x: int[1]*;
+    let y: int*;
+
+    x = y; // E-T_ARR_NONARR
+}
+
+fun l() {
+    let x: int [4] const*;
+    let y: int const[4]*;
+
+    // Invalid: constness is lost
+    y = x; // E-T_ASGN_NOCNST
+}

@@ -28,9 +28,14 @@ namespace {
         void visit(const ast::ArrayType *array_type) override {
             array_type->get_element_type()->accept(this);
             auto element_id = registry->get_type_id(result);
-            // TODO: use size literal
-            // auto size_literal = array_type->get_size_literal();
-            result = registry->get_interned(ArrayTypeSymbol{element_id, 10});
+            auto size_literal = array_type->get_size_literal();
+            auto value = size_literal->begin()->literalValue;
+
+            size_t size = 0;
+            if (std::holds_alternative<int64_t>(value)) {
+                size = std::get<int64_t>(value);
+            }
+            result = registry->get_interned(ArrayTypeSymbol{element_id, size});
         }
 
         void visit(const ast::PointerType *pointer_type) override {

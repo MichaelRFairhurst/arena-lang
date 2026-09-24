@@ -1,0 +1,145 @@
+
+Error[E-T_ARR_SZ_MIS]: Expected an array of size at least 5, but got 4 in 'int[4]*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/incompatible_arrays.rna:6:9:6:10
+  :     y = x; // E-T_ARR_SZ_MIS
+  :         ^ array size mismatch
+  .
+ == note: expected type int[5]*<free> based on lvalue in assignment here
+  :     y = x; // E-T_ARR_SZ_MIS
+  :     ^^^^^  --- incompatible_arrays.rna:6:5
+ == note: got conflicting type int[4]*<free> for variable 'x'
+  :     let x: int[4]*;
+  :     ^^^^^^^^^^^^^^^  --- incompatible_arrays.rna:2:5
+  .
+ ... caused by:
+  -> Pointee type of int[5]*<free> must be compatible with pointee type of int[4]*<free>
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got int in 'int[4]*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/incompatible_arrays.rna:14:9:14:10
+  :     y = x; // E-T_ASGN_NOREL
+  :         ^ type mismatch
+  .
+ == note: expected type bool[4]*<free> based on lvalue in assignment here
+  :     y = x; // E-T_ASGN_NOREL
+  :     ^^^^^  --- incompatible_arrays.rna:14:5
+ == note: got conflicting type int[4]*<free> for variable 'x'
+  :     let x: int[4]*;
+  :     ^^^^^^^^^^^^^^^  --- incompatible_arrays.rna:10:5
+  :
+  : Conflicting types:
+  : 1. Array element type mismatch
+  : 2. Pointee type mismatch
+  .
+ ... caused by 1.
+  -> Array elements of bool[4] must be compatible with int[4]
+  .
+ ... caused by 2.
+  -> Pointee type of bool[4]*<free> must be compatible with pointee type of int[4]*<free>
+
+
+Error[E-T_ASGN_NOCNST]: Expected int but got non-const qualified type int const in 'int const[4]*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/incompatible_arrays.rna:22:9:22:10
+  :     y = x; // E-T_ASGN_NOCNST
+  :         ^ const qualifier would be dropped here
+  .
+ == help: try copying the underlying value, or ensure both sides are equally const-qualified
+ == note: expected type int[4]*<free> based on lvalue in assignment here
+  :     y = x; // E-T_ASGN_NOCNST
+  :     ^^^^^  --- incompatible_arrays.rna:22:5
+ == note: got conflicting type int const[4]*<free> for variable 'x'
+  :     let x: int const[4]*;
+  :     ^^^^^^^^^^^^^^^^^^^^^  --- incompatible_arrays.rna:18:5
+  :
+  : Conflicting types:
+  : 1. Array element type mismatch
+  : 2. Pointee type mismatch
+  .
+ ... caused by 1.
+  -> Array elements of int[4] must be compatible with int const[4]
+  .
+ ... caused by 2.
+  -> Pointee type of int[4]*<free> must be compatible with pointee type of int const[4]*<free>
+
+
+Error[E-T_ASGN_NOREL]: Expected bool but got int in 'int*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/incompatible_arrays.rna:30:9:30:10
+  :     y = x; // E-T_ASGN_NOREL
+  :         ^ type mismatch
+  .
+ == note: expected type bool*<free>[4]*<free> based on lvalue in assignment here
+  :     y = x; // E-T_ASGN_NOREL
+  :     ^^^^^  --- incompatible_arrays.rna:30:5
+ == note: got conflicting type int*<free>[4]*<free> for variable 'x'
+  :     let x: int*[4]*;
+  :     ^^^^^^^^^^^^^^^^  --- incompatible_arrays.rna:26:5
+  :
+  : Conflicting types:
+  : 1. Pointee type mismatch
+  : 2. Array element type mismatch
+  : 3. Pointee type mismatch
+  .
+ ... caused by 1.
+  -> Pointee type of bool*<free> must be compatible with pointee type of int*<free>
+  .
+ ... caused by 2.
+  -> Array elements of bool*<free>[4] must be compatible with int*<free>[4]
+  .
+ ... caused by 3.
+  -> Pointee type of bool*<free>[4]*<free> must be compatible with pointee type of int*<free>[4]*<free>
+
+
+Error[E-T_ARR_SZ_MIS]: Expected an array of size at least 3, but got 2 in 'int[2][4]*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/incompatible_arrays.rna:37:9:37:10
+  :     x = y; // E-T_ARR_SZ_MIS
+  :         ^ array size mismatch
+  .
+ == note: expected type int[3][4]*<free> based on lvalue in assignment here
+  :     x = y; // E-T_ARR_SZ_MIS
+  :     ^^^^^  --- incompatible_arrays.rna:37:5
+ == note: got conflicting type int[2][4]*<free> for variable 'y'
+  :     let y: int[2][4]*;
+  :     ^^^^^^^^^^^^^^^^^^  --- incompatible_arrays.rna:35:5
+  :
+  : Conflicting types:
+  : 1. Array element type mismatch
+  : 2. Pointee type mismatch
+  .
+ ... caused by 1.
+  -> Array elements of int[3][4] must be compatible with int[2][4]
+  .
+ ... caused by 2.
+  -> Pointee type of int[3][4]*<free> must be compatible with pointee type of int[2][4]*<free>
+
+
+Error[E-T_ARR_NONARR]: Expected a compatible array type, but got int in 'int*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/incompatible_arrays.rna:44:9:44:10
+  :     x = y; // E-T_ARR_NONARR
+  :         ^ array element type mismatch
+  .
+ == note: expected type int[1]*<free> based on lvalue in assignment here
+  :     x = y; // E-T_ARR_NONARR
+  :     ^^^^^  --- incompatible_arrays.rna:44:5
+ == note: got conflicting type int*<free> for variable 'y'
+  :     let y: int*;
+  :     ^^^^^^^^^^^^  --- incompatible_arrays.rna:42:5
+  .
+ ... caused by:
+  -> Pointee type of int[1]*<free> must be compatible with pointee type of int*<free>
+
+
+Error[E-T_ASGN_NOCNST]: Expected int const[4] but got non-const qualified type int[4] const in 'int[4] const*<free>' assigned to pointer with lifetime '*<free>'
+at compile/lang_tests/typechecking/assignable/incompatible_arrays.rna:52:9:52:10
+  :     y = x; // E-T_ASGN_NOCNST
+  :         ^ const qualifier would be dropped here
+  .
+ == help: try copying the underlying value, or ensure both sides are equally const-qualified
+ == note: expected type int const[4]*<free> based on lvalue in assignment here
+  :     y = x; // E-T_ASGN_NOCNST
+  :     ^^^^^  --- incompatible_arrays.rna:52:5
+ == note: got conflicting type int[4] const*<free> for variable 'x'
+  :     let x: int [4] const*;
+  :     ^^^^^^^^^^^^^^^^^^^^^^  --- incompatible_arrays.rna:48:5
+  .
+ ... caused by:
+  -> Pointee type of int const[4]*<free> must be compatible with pointee type of int[4] const*<free>

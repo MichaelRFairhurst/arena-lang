@@ -1,0 +1,55 @@
+fun f() {
+    let x: int[4]*;
+    let y: int[4]*;
+
+    // Valid: Exact match
+    x = y; // OK
+}
+
+fun g() {
+    let x: int[4]*;
+    let y: int[5]*;
+
+    // Valid: treating int[5] as int[4].
+    x = y; // OK
+}
+
+fun h() {
+    let x: int const [4]*;
+    let y: int[5]*;
+
+    // Valid: treating int[4] as int const[4].
+    x = y; // OK
+}
+
+fun i() {
+    let x: int*[4]*;
+    let y: int*[4]*;
+
+    // Valid: Exact matching pointer types
+    x = y; // OK
+}
+
+fun j() {
+    let x: int[2][4]*;
+    let y: int[3][4]*;
+
+    // Valid: Treating int[2] as int[3]
+    x = y; // OK
+}
+
+fun k() {
+    let x: int[4][4]*;
+    let y: int[4][8]*;
+
+    // Valid: Treating int[...][8] as int[...][4]
+    x = y; // OK
+}
+
+fun h() {
+    let x: int[4] const *;
+    let y: int const[5] *;
+
+    // Valid: all const inner types maintain constness
+    x = y; // OK
+}
