@@ -2,6 +2,8 @@
 #include "signatures/functions.hpp"
 #include "signatures/types.hpp"
 #include "signatures/lifetimes.hpp"
+
+#include <string_view>
 #include <iostream>
 
 using namespace arena::sema;
@@ -14,6 +16,12 @@ namespace {
             : registry(&registry), lifetimes(lifetimes) {}
 
         void visit(const ast::NamedType *named_type) override {
+            using namespace std::string_view_literals;
+            if (named_type->get_name() == "void"sv) {
+                result = registry->get_interned(VoidTypeSymbol{});
+                return;
+            }
+
             result = registry->get_interned(NamedTypeSymbol{named_type->get_name()});
         }
 
