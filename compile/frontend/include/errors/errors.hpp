@@ -256,15 +256,19 @@ namespace arena::error {
         }
 
         Error &E_T_ASGN_NOCNST(Location l,
-                              std::string message,
-                              std::string expected,
-                              std::string actual_type) {
+                               std::string message,
+                               std::string expected,
+                               std::string actual_type) {
             return report({
                 "E-T_ASGN_NOCNST",
                 l,
                 "const qualifier would be dropped here",
-                std::vector<
-                    Chunk>{"Expected ", expected, " but got non-const qualified type ", actual_type, " in ", message},
+                std::vector<Chunk>{"Expected ",
+                                   expected,
+                                   " but got non-const qualified type ",
+                                   actual_type,
+                                   " in ",
+                                   message},
             });
         }
 
@@ -582,11 +586,11 @@ namespace arena::error {
 
 } // namespace arena::error
 
-template<>
+template <>
 struct std::hash<arena::error::Location> {
     size_t operator()(const arena::error::Location &loc) const {
-        return std::hash<const char*>()(loc.begin->text.data()) ^
-               (std::hash<const char*>()(loc.end->text.data()) << 1);
+        return std::hash<const char *>()(loc.begin->text.data()) ^
+               (std::hash<const char *>()(loc.end->text.data()) << 1);
     }
 };
 #endif
