@@ -304,6 +304,116 @@ namespace {
 
             set_current_reg(builder->CreateCall(callee, args, "calltmp"));
         }
+
+        void visit(const arena::ast::BinaryExpression *node) override {
+            auto &info = current_expr->type;
+            if (!info.has_value()) {
+                throw std::runtime_error("Binary expression has no type information");
+            }
+
+            auto type = ttable->get_type(info->type_id, &this->current_decl->lifetimes);
+
+            auto integral_type = std::get_if<arena::sema::IntegralType>(&type.get_program_type());
+            auto floating_type = std::get_if<arena::sema::FloatingType>(&type.get_program_type());
+
+            if (node->get_operator() == arena::ast::TokenType::EQUAL) {
+                visitExpression(&current_expr->children[0]);
+                auto lhs = current_value.mem;
+                if (lhs == nullptr) {
+                    throw std::runtime_error("Left-hand side of assignment is not a valid memory location");
+                }
+                visitExpression(&current_expr->children[1]);
+                auto rhs = read_current_value();
+                builder->CreateStore(rhs, lhs->alloca);
+                return;
+            }
+
+            visitExpression(&current_expr->children[0]);
+            auto lhs = read_current_value();
+            visitExpression(&current_expr->children[1]);
+            auto rhs = read_current_value();
+
+            switch (node->get_operator()) {
+            case arena::ast::TokenType::PLUS:
+                if (integral_type != nullptr) {
+                    set_current_reg(builder->CreateAdd(lhs, rhs, "addtmp"));
+                } else if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFAdd(lhs, rhs, "addtmp"));
+                } else {
+                    throw std::runtime_error("Unsupported addition operation for given types");
+                }
+                break;
+            case arena::ast::TokenType::MINUS:
+                if (integral_type != nullptr) {
+                    set_current_reg(builder->CreateSub(lhs, rhs, "subtmp"));
+                } else if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFSub(lhs, rhs, "subtmp"));
+                }
+                break;
+            case arena::ast::TokenType::STAR:
+                if (integral_type != nullptr) {
+                    set_current_reg(builder->CreateMul(lhs, rhs, "multmp"));
+                } else if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFMul(lhs, rhs, "multmp"));
+                }
+                break;
+            case arena::ast::TokenType::SLASH:
+                if (integral_type != nullptr && integral_type->is_signed) {
+                    set_current_reg(builder->CreateSDiv(lhs, rhs, "divtmp"));
+                } else if (integral_type != nullptr) {
+                    set_current_reg(builder->CreateUDiv(lhs, rhs, "divtmp"));
+                } else if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFDiv(lhs, rhs, "divtmp"));
+                } else {
+                    throw std::runtime_error("Unsupported division operation for given types");
+                }
+                break;
+            case arena::ast::TokenType::EQUAL_EQUAL:
+                if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFCmpOEQ(lhs, rhs, "eqtmp"));
+                } else {
+                    set_current_reg(builder->CreateICmpEQ(lhs, rhs, "eqtmp"));
+                }
+                break;
+            case arena::ast::TokenType::NOT_EQUAL:
+                if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFCmpONE(lhs, rhs, "netmp"));
+                } else {
+                    set_current_reg(builder->CreateICmpNE(lhs, rhs, "netmp"));
+                }
+                break;
+            case arena::ast::TokenType::GREATER:
+                if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFCmpOGT(lhs, rhs, "gttmp"));
+                } else {
+                    set_current_reg(builder->CreateICmpSGT(lhs, rhs, "gttmp"));
+                }
+                break;
+            case arena::ast::TokenType::LESS:
+                if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFCmpOLT(lhs, rhs, "lttmp"));
+                } else {
+                    set_current_reg(builder->CreateICmpSLT(lhs, rhs, "lttmp"));
+                }
+                break;
+            case arena::ast::TokenType::GREATER_EQUAL:
+                if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFCmpOGE(lhs, rhs, "getmp"));
+                } else {
+                    set_current_reg(builder->CreateICmpSGE(lhs, rhs, "getmp"));
+                }
+                break;
+            case arena::ast::TokenType::LESS_EQUAL:
+                if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFCmpOLE(lhs, rhs, "letmp"));
+                } else {
+                    set_current_reg(builder->CreateICmpSLE(lhs, rhs, "letmp"));
+                }
+                break;
+            default:
+                throw std::runtime_error("Unsupported binary operator");
+            }
+        }
     };
 
     void output_ir_to_file(::llvm::Module &module, const std::string &output_path) {
