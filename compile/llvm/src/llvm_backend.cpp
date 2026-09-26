@@ -26,7 +26,7 @@ namespace {
               ftable(ftable), ttable(ttable) {}
 
     private:
-        struct StackValue {
+        struct InMemoryValue {
             llvm::Value *alloca = nullptr;
             size_t alignment = 0;
             ::llvm::Type *type = nullptr;
@@ -35,7 +35,7 @@ namespace {
 
         struct CurrentValue {
             llvm::Value *reg = nullptr;
-            StackValue *mem = nullptr;
+            std::optional<InMemoryValue> mem = std::nullopt;
         };
 
         llvm::LLVMContext *context;
@@ -46,7 +46,7 @@ namespace {
         CurrentValue current_value;
         const arena::sema::FunctionTable *ftable;
         const arena::sema::TypeTable *ttable;
-        std::unordered_map<arena::sema::VariableId, StackValue> variable_map;
+        std::unordered_map<arena::sema::VariableId, InMemoryValue> variable_map;
 
         llvm::Type *getLLVMType(const arena::sema::TypeId type_id) {
             arena::llvm::TypeResolver type_resolver{builder, ttable, &current_decl->lifetimes};
@@ -103,11 +103,13 @@ namespace {
                 auto variable_id = func_info->parameters[i];
                 // TODO: get variable name
 
-                auto &stack_var = variable_map[variable_id];
+
+                auto stack_var = InMemoryValue{};
                 stack_var.alignment = 1; // TODO: Determine proper alignment based on type
                 stack_var.alloca = builder->CreateAlloca(args->getType(), nullptr, args->getName());
                 stack_var.type = args->getType();
                 stack_var.name = "arg"; // TODO: get variable name
+                variable_map[variable_id] = stack_var;
 
                 builder->CreateStore(&*args, stack_var.alloca);
                 ++args;
@@ -125,15 +127,16 @@ namespace {
 
         void set_current_reg(::llvm::Value *value) {
             current_value.reg = value;
-            current_value.mem = nullptr;
+            current_value.mem.reset();
         }
 
         ::llvm::Value *read_current_value() {
-            if (current_value.mem != nullptr) {
+            if (current_value.mem.has_value()) {
                 return builder->CreateAlignedLoad(current_value.mem->type,
                                                   current_value.mem->alloca,
                                                   ::llvm::MaybeAlign{current_value.mem->alignment},
-                                                  ::llvm::Twine{"loadtmp"} + current_value.mem->name);
+                                                  ::llvm::Twine{"loadtmp"} +
+                                                      current_value.mem->name);
             } else {
                 return current_value.reg;
             }
@@ -176,12 +179,13 @@ namespace {
                 // TODO: get the type from the variable declaration instead of the initializer
                 auto type = visitor->getLLVMType(resolved_stmt.initializer->type->type_id);
 
-                auto &stack_var = visitor->variable_map[variable_id];
+                auto stack_var = InMemoryValue{};
                 // TODO: get the variable name
                 stack_var.alloca = builder->CreateAlloca(type, nullptr, "alloca_tmp");
                 stack_var.alignment = 1; // TODO: Determine proper alignment based on type
                 stack_var.type = type;
                 stack_var.name = {"alloca_tmp"};
+                visitor->variable_map[variable_id] = stack_var;
 
                 visitor->visitExpression(resolved_stmt.initializer);
                 auto value = visitor->read_current_value();
@@ -271,7 +275,7 @@ namespace {
             ::llvm::errs() << "Looking up variable_id " << info->variable_id.v_id
                            << " in variable_map\n";
             if (it != variable_map.end()) {
-                current_value.mem = &it->second;
+                current_value.mem = it->second;
                 current_value.reg = nullptr;
             } else {
                 throw std::runtime_error("Variable not found in variable_map");
@@ -319,8 +323,9 @@ namespace {
             if (node->get_operator() == arena::ast::TokenType::EQUAL) {
                 visitExpression(&current_expr->children[0]);
                 auto lhs = current_value.mem;
-                if (lhs == nullptr) {
-                    throw std::runtime_error("Left-hand side of assignment is not a valid memory location");
+                if (!lhs.has_value()) {
+                    throw std::runtime_error(
+                        "Left-hand side of assignment is not a valid memory location");
                 }
                 visitExpression(&current_expr->children[1]);
                 auto rhs = read_current_value();
@@ -412,6 +417,66 @@ namespace {
                 break;
             default:
                 throw std::runtime_error("Unsupported binary operator");
+            }
+        }
+
+        void visit(const arena::ast::DotOperatorExpression *node) override {
+            switch (node->get_operator()) {
+            case arena::ast::TokenType::AMP: {
+                visitExpression(&current_expr->children[0]);
+                if (!current_value.mem) {
+                    // TODO: This will need to properly handle addressing members etc.
+                    throw std::runtime_error("Unsupported address-of operation");
+                }
+
+                set_current_reg(current_value.mem->alloca);
+                return;
+            }
+
+            case arena::ast::TokenType::STAR: {
+                visitExpression(&current_expr->children[0]);
+                auto operand_type_info = current_expr->children[0].type;
+
+                if (!operand_type_info) {
+                    throw std::runtime_error(
+                        "Dot operator used on an expression with no type information");
+                }
+
+                auto type = ttable->get_type(operand_type_info->type_id, &current_decl->lifetimes);
+                auto pointer_type = std::get_if<arena::sema::PointerType>(&type.get_program_type());
+
+                if (!pointer_type) {
+                    throw std::runtime_error("Dot operator used on a non-pointer type");
+                }
+
+                auto pointee_type = getLLVMType(pointer_type->pointee_type);
+                // If .* produces an l-value, our "current value" after visiting this node
+                // should be an l-value representing the address of the pointee.
+                ::llvm::Value *dereferenced_value = nullptr;
+                if (current_value.mem) {
+                    // If our "current value" backed by memory, we have to find the value of
+                    // that memory.
+                    dereferenced_value =
+                        builder->CreateLoad(builder->getPtrTy(), current_value.mem->alloca);
+                } else {
+                    // If our "current value" is in a register, we want to use that value which
+                    // points to the lvalue.
+                    dereferenced_value = current_value.reg;
+                }
+
+                // Either way, we now want the current value to represent the pointed-to
+                // address found above.
+                current_value.reg = nullptr;
+                current_value.mem = InMemoryValue{};
+                current_value.mem->alloca = dereferenced_value;
+                current_value.mem->name = "deref_tmp";
+                current_value.mem->alignment = 1; // TODO: get actual alignment
+                current_value.mem->type = pointee_type;
+                return;
+            }
+
+            default:
+                throw std::runtime_error("Unsupported dot operator");
             }
         }
     };
