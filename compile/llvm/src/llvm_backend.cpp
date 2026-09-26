@@ -26,15 +26,27 @@ namespace {
               ftable(ftable), ttable(ttable) {}
 
     private:
+        struct StackValue {
+            llvm::Value *alloca = nullptr;
+            size_t alignment = 0;
+            ::llvm::Type *type = nullptr;
+            const char *name;
+        };
+
+        struct CurrentValue {
+            llvm::Value *reg = nullptr;
+            StackValue *mem = nullptr;
+        };
+
         llvm::LLVMContext *context;
         llvm::Module *module;
         llvm::IRBuilder<> *builder;
         const arena::sema::ResolvedExpression *current_expr = nullptr;
         const arena::sema::ResolvedDeclaration *current_decl;
-        llvm::Value *current_value = nullptr;
+        CurrentValue current_value;
         const arena::sema::FunctionTable *ftable;
         const arena::sema::TypeTable *ttable;
-        std::unordered_map<arena::sema::VariableId, llvm::Value *> variable_map;
+        std::unordered_map<arena::sema::VariableId, StackValue> variable_map;
 
         llvm::Type *getLLVMType(const arena::sema::TypeId type_id) {
             arena::llvm::TypeResolver type_resolver{builder, ttable, &current_decl->lifetimes};
@@ -83,24 +95,48 @@ namespace {
 
             auto args = function->arg_begin();
 
-            for (int i = 0; i < func_info->num_parameters; ++i) {
-                auto variable_id = func_info->parameters[i];
-                ::llvm::errs() << "Mapping variable_id " << variable_id.v_id << " to argument\n";
-                // args->setName(name);
-                variable_map[variable_id] = &*args;
-                ++args;
-            }
-
             // Create a basic block and set the insertion point
             llvm::BasicBlock *entry = llvm::BasicBlock::Create(*context, "entry", function);
             builder->SetInsertPoint(entry);
+
+            for (int i = 0; i < func_info->num_parameters; ++i) {
+                auto variable_id = func_info->parameters[i];
+                // TODO: get variable name
+
+                auto &stack_var = variable_map[variable_id];
+                stack_var.alignment = 1; // TODO: Determine proper alignment based on type
+                stack_var.alloca = builder->CreateAlloca(args->getType(), nullptr, args->getName());
+                stack_var.type = args->getType();
+                stack_var.name = "arg"; // TODO: get variable name
+
+                builder->CreateStore(&*args, stack_var.alloca);
+                ++args;
+            }
 
             visitStatement(current_decl->resolved_stmt);
         }
 
         void visitExpression(const arena::sema::ResolvedExpression *node) {
+            auto prev_expr = current_expr;
             current_expr = node;
             node->original->accept(this);
+            current_expr = prev_expr;
+        }
+
+        void set_current_reg(::llvm::Value *value) {
+            current_value.reg = value;
+            current_value.mem = nullptr;
+        }
+
+        ::llvm::Value *read_current_value() {
+            if (current_value.mem != nullptr) {
+                return builder->CreateAlignedLoad(current_value.mem->type,
+                                                  current_value.mem->alloca,
+                                                  ::llvm::MaybeAlign{current_value.mem->alignment},
+                                                  ::llvm::Twine{"loadtmp"} + current_value.mem->name);
+            } else {
+                return current_value.reg;
+            }
         }
 
         class ResolvedStatementVisitor {
@@ -116,7 +152,7 @@ namespace {
                 auto false_block = llvm::BasicBlock::Create(*context, "false_block");
                 auto merge_block = llvm::BasicBlock::Create(*context, "merge_block");
 
-                builder->CreateCondBr(visitor->current_value, true_block, false_block);
+                builder->CreateCondBr(visitor->read_current_value(), true_block, false_block);
 
                 builder->SetInsertPoint(true_block);
                 visitor->visitStatement(resolved_stmt.then_branch);
@@ -132,15 +168,29 @@ namespace {
             }
 
             void operator()(const arena::sema::ResolvedLetStatement &resolved_stmt) {
+                if (resolved_stmt.initializer == nullptr) {
+                    throw std::runtime_error("Not yet implemented: let without initializer.");
+                }
+
                 auto variable_id = resolved_stmt.variable_id;
+                // TODO: get the type from the variable declaration instead of the initializer
+                auto type = visitor->getLLVMType(resolved_stmt.initializer->type->type_id);
+
+                auto &stack_var = visitor->variable_map[variable_id];
+                // TODO: get the variable name
+                stack_var.alloca = builder->CreateAlloca(type, nullptr, "alloca_tmp");
+                stack_var.alignment = 1; // TODO: Determine proper alignment based on type
+                stack_var.type = type;
+                stack_var.name = {"alloca_tmp"};
+
                 visitor->visitExpression(resolved_stmt.initializer);
-                auto value = visitor->current_value;
-                visitor->variable_map[variable_id] = value;
+                auto value = visitor->read_current_value();
+                builder->CreateStore(value, stack_var.alloca);
             }
 
             void operator()(const arena::sema::ResolvedReturnStatement &resolved_stmt) {
                 visitor->visitExpression(resolved_stmt.expr);
-                builder->CreateRet(visitor->current_value);
+                builder->CreateRet(visitor->read_current_value());
             }
 
             void operator()(const arena::sema::ResolvedBlockStatement &resolved_stmt) {
@@ -193,15 +243,15 @@ namespace {
 
                 auto apint =
                     ::llvm::APInt(integral->size_bytes * 8, *int_value, integral->is_signed);
-                current_value = llvm::ConstantInt::get(*context, apint);
+                set_current_reg(llvm::ConstantInt::get(*context, apint));
             } else if (auto string_value = std::get_if<std::string_view>(&value)) {
-                current_value = builder->CreateGlobalStringPtr(*string_value);
+                set_current_reg(builder->CreateGlobalStringPtr(*string_value));
             } else if (node->begin()->type == arena::ast::TokenType::TRUE) {
                 // TODO: use a size of 1 bit
-                current_value = llvm::ConstantInt::get(*context, llvm::APInt(8, 1));
+                set_current_reg(llvm::ConstantInt::get(*context, llvm::APInt(8, 1)));
             } else if (node->begin()->type == arena::ast::TokenType::FALSE) {
                 // TODO: use a size of 1 bit
-                current_value = llvm::ConstantInt::get(*context, llvm::APInt(8, 0));
+                set_current_reg(llvm::ConstantInt::get(*context, llvm::APInt(8, 0)));
             } else {
                 throw std::runtime_error("Expected integer or string literal");
             }
@@ -221,7 +271,8 @@ namespace {
             ::llvm::errs() << "Looking up variable_id " << info->variable_id.v_id
                            << " in variable_map\n";
             if (it != variable_map.end()) {
-                current_value = it->second;
+                current_value.mem = &it->second;
+                current_value.reg = nullptr;
             } else {
                 throw std::runtime_error("Variable not found in variable_map");
             }
@@ -243,7 +294,7 @@ namespace {
             std::vector<::llvm::Value *> args;
             for (int i = 1; i < current_expr->num_children; ++i) {
                 visitExpression(&current_expr->children[i]);
-                args.push_back(current_value);
+                args.push_back(read_current_value());
             }
 
             auto callee = module->getFunction(func->get_symbol().name);
@@ -251,7 +302,7 @@ namespace {
                 throw std::runtime_error("Callee function not found in module");
             }
 
-            current_value = builder->CreateCall(callee, args, "calltmp");
+            set_current_reg(builder->CreateCall(callee, args, "calltmp"));
         }
     };
 
