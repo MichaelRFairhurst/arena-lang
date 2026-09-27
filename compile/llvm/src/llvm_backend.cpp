@@ -314,8 +314,6 @@ namespace {
             }
 
             auto it = variable_map.find(info->variable_id);
-            ::llvm::errs() << "Looking up variable_id " << info->variable_id.v_id
-                           << " in variable_map\n";
             if (it != variable_map.end()) {
                 current_value.mem = it->second;
                 current_value.reg = nullptr;
