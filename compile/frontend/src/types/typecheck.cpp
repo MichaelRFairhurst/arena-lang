@@ -187,6 +187,11 @@ namespace {
 
         TypeId operator()(ExprTransformStep<ast::CallExpression> step) {
             auto callee = step.original->children[0];
+            if (std::holds_alternative<UnresolvedExprInfo>(callee.info)) {
+                // The callee has already be reported as unresolved, so we just return an error type.
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
             step.out->children[0].info = callee.info;
             auto finfo = std::get_if<ResolvedFunctionInfo>(&callee.info);
             if (!finfo) {
@@ -197,8 +202,7 @@ namespace {
 
             auto func = ops.get_functions().get_function(finfo->function_id);
             if (!func) {
-                ops.get_errors().E_R_UNKN_FUNC(step.ast, callee.original);
-                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+                throw std::runtime_error("Function not found");
             }
 
             auto params = func->get_param_types();

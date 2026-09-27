@@ -1,0 +1,5 @@
+
+Error[E-R_ID_UNKN]: Unresolved identifier x
+at compile/lang_tests/resolve/variables/unknown_var.rna:2:5:2:6
+  :     x; // E-R_ID_UNKN
+  :     ^ For this identifier expression

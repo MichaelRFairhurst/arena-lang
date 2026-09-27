@@ -175,9 +175,13 @@ std::vector<error::Error> arena::sema::compute_query_result(const QueryEngineCon
                                                             ErrorsQuery query) {
     const auto &path = query.input;
     auto &typechecked_file = ctx.run_query(TypecheckedFileQuery{path});
+    auto &resolved_expressions = ctx.run_query(ResolvedCallsQuery{path});
     auto &ast = ctx.run_query(ParseQuery{path});
 
     std::vector<error::Error> all_errors = ast.errors;
+    all_errors.insert(all_errors.end(),
+                      resolved_expressions.get_errors().begin(),
+                      resolved_expressions.get_errors().end());
     all_errors.insert(all_errors.end(),
                       typechecked_file.get_errors().begin(),
                       typechecked_file.get_errors().end());
