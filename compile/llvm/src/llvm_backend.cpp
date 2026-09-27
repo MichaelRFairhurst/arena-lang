@@ -41,6 +41,7 @@ namespace {
         llvm::LLVMContext *context;
         llvm::Module *module;
         llvm::IRBuilder<> *builder;
+        llvm::Function *current_function = nullptr;
         const arena::sema::ResolvedExpression *current_expr = nullptr;
         const arena::sema::ResolvedDeclaration *current_decl;
         CurrentValue current_value;
@@ -86,17 +87,17 @@ namespace {
         void visit(const arena::ast::FunctionDeclaration *node) override { declare_function(node); }
 
         void visit(const arena::ast::FunctionDefinition *node) override {
-            llvm::Function *function = declare_function(node);
+            current_function = declare_function(node);
             auto func_info =
                 std::get_if<arena::sema::ResolvedFunctionDeclaration>(&current_decl->info);
             if (!func_info) {
                 throw std::runtime_error("Failed to get function info from resolved declaration");
             }
 
-            auto args = function->arg_begin();
+            auto args = current_function->arg_begin();
 
             // Create a basic block and set the insertion point
-            llvm::BasicBlock *entry = llvm::BasicBlock::Create(*context, "entry", function);
+            llvm::BasicBlock *entry = llvm::BasicBlock::Create(*context, "entry", current_function);
             builder->SetInsertPoint(entry);
 
             for (int i = 0; i < func_info->num_parameters; ++i) {
@@ -146,8 +147,9 @@ namespace {
         public:
             ResolvedStatementVisitor(llvm::LLVMContext *context,
                                      llvm::IRBuilder<> *builder,
+                                     llvm::Function *current_function,
                                      LLVMBackendAstVisitor *visitor)
-                : context(context), builder(builder), visitor(visitor) {}
+                : context(context), builder(builder), current_function(current_function), visitor(visitor) {}
 
             void operator()(const arena::sema::ResolvedIfStatement &resolved_stmt) {
                 visitor->visitExpression(resolved_stmt.condition);
@@ -157,16 +159,19 @@ namespace {
 
                 builder->CreateCondBr(visitor->read_current_value(), true_block, false_block);
 
+                current_function->insert(current_function->end(), true_block);
                 builder->SetInsertPoint(true_block);
                 visitor->visitStatement(resolved_stmt.then_branch);
                 builder->CreateBr(merge_block);
 
+                current_function->insert(current_function->end(), false_block);
                 builder->SetInsertPoint(false_block);
                 if (resolved_stmt.else_branch) {
                     visitor->visitStatement(resolved_stmt.else_branch);
                 }
                 builder->CreateBr(merge_block);
 
+                current_function->insert(current_function->end(), merge_block);
                 builder->SetInsertPoint(merge_block);
             }
 
@@ -214,11 +219,12 @@ namespace {
         private:
             llvm::LLVMContext *context;
             llvm::IRBuilder<> *builder;
+            llvm::Function *current_function;
             LLVMBackendAstVisitor *visitor;
         };
 
         void visitStatement(arena::sema::ResolvedStatement *node) {
-            std::visit(ResolvedStatementVisitor{context, builder, this}, node->info);
+            std::visit(ResolvedStatementVisitor{context, builder, current_function, this}, node->info);
         }
 
         void visit(const arena::ast::StringLiteral *node) override {
