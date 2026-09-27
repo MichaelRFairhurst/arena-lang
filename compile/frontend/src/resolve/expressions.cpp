@@ -177,6 +177,7 @@ namespace {
               variable_scope(variable_scope), lifetimes(lifetimes), resolved_decl(resolved_decl) {}
 
         void visit(const ast::FunctionDefinition *func_def) override {
+            auto scoped_stack_lifetime = lifetimes->push_stack(func_def->get_body());
             visit(static_cast<const ast::FunctionDeclaration *>(func_def));
         }
 
