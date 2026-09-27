@@ -45,6 +45,7 @@ namespace {
         const arena::sema::ResolvedExpression *current_expr = nullptr;
         const arena::sema::ResolvedDeclaration *current_decl;
         CurrentValue current_value;
+        bool has_exited = false;
         const arena::sema::FunctionTable *ftable;
         const arena::sema::TypeTable *ttable;
         std::unordered_map<arena::sema::VariableId, InMemoryValue> variable_map;
@@ -149,9 +150,14 @@ namespace {
                                      llvm::IRBuilder<> *builder,
                                      llvm::Function *current_function,
                                      LLVMBackendAstVisitor *visitor)
-                : context(context), builder(builder), current_function(current_function), visitor(visitor) {}
+                : context(context), builder(builder), current_function(current_function),
+                  visitor(visitor) {}
 
             void operator()(const arena::sema::ResolvedIfStatement &resolved_stmt) {
+                if (visitor->has_exited) {
+                    return;
+                }
+
                 visitor->visitExpression(resolved_stmt.condition);
                 auto true_block = llvm::BasicBlock::Create(*context, "true_block");
                 auto false_block = llvm::BasicBlock::Create(*context, "false_block");
@@ -162,20 +168,35 @@ namespace {
                 current_function->insert(current_function->end(), true_block);
                 builder->SetInsertPoint(true_block);
                 visitor->visitStatement(resolved_stmt.then_branch);
-                builder->CreateBr(merge_block);
+                bool then_exits = visitor->has_exited;
+                if (!then_exits) {
+                    builder->CreateBr(merge_block);
+                }
 
                 current_function->insert(current_function->end(), false_block);
                 builder->SetInsertPoint(false_block);
+                visitor->has_exited = false;
+                bool else_exits = false;
                 if (resolved_stmt.else_branch) {
                     visitor->visitStatement(resolved_stmt.else_branch);
+                    else_exits = visitor->has_exited;
                 }
-                builder->CreateBr(merge_block);
+                if (!else_exits) {
+                    builder->CreateBr(merge_block);
+                }
 
-                current_function->insert(current_function->end(), merge_block);
-                builder->SetInsertPoint(merge_block);
+                visitor->has_exited = then_exits && else_exits;
+                if (!visitor->has_exited) {
+                    current_function->insert(current_function->end(), merge_block);
+                    builder->SetInsertPoint(merge_block);
+                }
             }
 
             void operator()(const arena::sema::ResolvedLetStatement &resolved_stmt) {
+                if (visitor->has_exited) {
+                    return;
+                }
+
                 if (resolved_stmt.initializer == nullptr) {
                     throw std::runtime_error("Not yet implemented: let without initializer.");
                 }
@@ -198,21 +219,38 @@ namespace {
             }
 
             void operator()(const arena::sema::ResolvedReturnStatement &resolved_stmt) {
+                if (visitor->has_exited) {
+                    return;
+                }
+
                 visitor->visitExpression(resolved_stmt.expr);
                 builder->CreateRet(visitor->read_current_value());
+                visitor->has_exited = true;
             }
 
             void operator()(const arena::sema::ResolvedBlockStatement &resolved_stmt) {
                 for (size_t i = 0; i < resolved_stmt.num_statements; ++i) {
+                    if (visitor->has_exited) {
+                        return;
+                    }
+
                     visitor->visitStatement(&resolved_stmt.statements[i]);
                 }
             }
 
             void operator()(const arena::sema::ResolvedArenaStatement &resolved_stmt) {
+                if (visitor->has_exited) {
+                    return;
+                }
+
                 throw std::runtime_error("ResolvedArenaStatement not implemented");
             }
 
             void operator()(const arena::sema::ResolvedExprStatement &resolved_stmt) {
+                if (visitor->has_exited) {
+                    return;
+                }
+
                 visitor->visitExpression(resolved_stmt.expr);
             }
 
@@ -224,7 +262,8 @@ namespace {
         };
 
         void visitStatement(arena::sema::ResolvedStatement *node) {
-            std::visit(ResolvedStatementVisitor{context, builder, current_function, this}, node->info);
+            std::visit(ResolvedStatementVisitor{context, builder, current_function, this},
+                       node->info);
         }
 
         void visit(const arena::ast::StringLiteral *node) override {
@@ -251,8 +290,7 @@ namespace {
                     throw std::runtime_error("Expected integral type for integer literal");
                 }
 
-                auto apint =
-                    ::llvm::APInt(integral->size_bits, *int_value, integral->is_signed);
+                auto apint = ::llvm::APInt(integral->size_bits, *int_value, integral->is_signed);
                 set_current_reg(llvm::ConstantInt::get(*context, apint));
             } else if (auto string_value = std::get_if<std::string_view>(&value)) {
                 set_current_reg(builder->CreateGlobalStringPtr(*string_value));
