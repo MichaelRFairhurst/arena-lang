@@ -246,16 +246,14 @@ namespace {
                 }
 
                 auto apint =
-                    ::llvm::APInt(integral->size_bytes * 8, *int_value, integral->is_signed);
+                    ::llvm::APInt(integral->size_bits, *int_value, integral->is_signed);
                 set_current_reg(llvm::ConstantInt::get(*context, apint));
             } else if (auto string_value = std::get_if<std::string_view>(&value)) {
                 set_current_reg(builder->CreateGlobalStringPtr(*string_value));
             } else if (node->begin()->type == arena::ast::TokenType::TRUE) {
-                // TODO: use a size of 1 bit
-                set_current_reg(llvm::ConstantInt::get(*context, llvm::APInt(8, 1)));
+                set_current_reg(llvm::ConstantInt::get(*context, llvm::APInt(1, 1)));
             } else if (node->begin()->type == arena::ast::TokenType::FALSE) {
-                // TODO: use a size of 1 bit
-                set_current_reg(llvm::ConstantInt::get(*context, llvm::APInt(8, 0)));
+                set_current_reg(llvm::ConstantInt::get(*context, llvm::APInt(1, 0)));
             } else {
                 throw std::runtime_error("Expected integer or string literal");
             }

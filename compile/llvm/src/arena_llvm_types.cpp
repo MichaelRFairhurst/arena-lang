@@ -8,7 +8,7 @@ namespace {
         ::llvm::Type *operator()(const arena::sema::VoidType &) const { return builder->getVoidTy(); }
 
         ::llvm::Type *operator()(const arena::sema::IntegralType &i) const {
-            return builder->getIntNTy(i.size_bytes * 8);
+            return builder->getIntNTy(i.size_bits);
         }
 
         ::llvm::Type *operator()(const arena::sema::FloatingType &f) const {
