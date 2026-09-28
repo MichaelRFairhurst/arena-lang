@@ -1,0 +1,6 @@
+fun main(argc: int, argv: char**) -> long {
+    let l1: long = 10;
+    let l2: long = 20;
+
+    ret l1 + l2;
+}

@@ -1,0 +1,5 @@
+fun main(argc: int, argv: char**) -> short {
+    let s1: uint = 10;
+    let s2: uint = 20;
+    ret s1 + s2;
+}

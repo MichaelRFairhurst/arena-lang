@@ -1,0 +1,6 @@
+fun main(argc: int, argv: char**) -> ulong {
+    let l1: ulong = 10;
+    let l2: ulong = 20;
+
+    ret l1 + l2;
+}

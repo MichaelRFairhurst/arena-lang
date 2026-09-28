@@ -1,0 +1,5 @@
+fun main(argc: int, argv: char**) -> uint {
+    let i1: uint = 10;
+    let i2: uint = 20;
+    ret i1 + i2;
+}

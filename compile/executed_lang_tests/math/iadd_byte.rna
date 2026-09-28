@@ -1,0 +1,6 @@
+fun main(argc: int, argv: char**) -> byte {
+    let b1: byte = 10;
+    let b2: byte = 20;
+
+    ret b1 + b2;
+}
