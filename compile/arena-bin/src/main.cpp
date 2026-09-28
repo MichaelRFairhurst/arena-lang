@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 #include <boost/program_options.hpp>
+#include <sys/wait.h>
 
 #include "query/engine.hpp"
 #include "arena_backend.hpp"
@@ -237,9 +238,18 @@ namespace {
         std::system(
             ("cc " + backend_options.output_path.string() + " -o " + bin_path.string()).c_str());
 
-        std::cout << "done, now running.\n";
-        std::system(bin_path.string().c_str());
-        return 0;
+        std::cout << "done, now running.\n" << std::flush;
+        int status = std::system(bin_path.string().c_str());
+        if (status == -1) {
+            std::cerr << "Error: failed to execute the program.\n";
+            return 1;
+        }
+
+        if (WIFEXITED(status)) {
+            return WEXITSTATUS(status);
+        } else {
+            return 1;
+        }
     }
 
     void list_valid_subcommands() {
