@@ -105,7 +105,6 @@ namespace {
                 auto variable_id = func_info->parameters[i];
                 // TODO: get variable name
 
-
                 auto stack_var = InMemoryValue{};
                 stack_var.alignment = 1; // TODO: Determine proper alignment based on type
                 stack_var.alloca = builder->CreateAlloca(args->getType(), nullptr, args->getName());
@@ -118,6 +117,10 @@ namespace {
             }
 
             visitStatement(current_decl->resolved_stmt);
+
+            if (current_function->getReturnType()->isVoidTy() && !has_exited) {
+                builder->CreateRetVoid();
+            }
         }
 
         void visitExpression(const arena::sema::ResolvedExpression *node) {
@@ -223,8 +226,13 @@ namespace {
                     return;
                 }
 
-                visitor->visitExpression(resolved_stmt.expr);
-                builder->CreateRet(visitor->read_current_value());
+                if (resolved_stmt.expr == nullptr) {
+                    builder->CreateRetVoid();
+                } else {
+                    visitor->visitExpression(resolved_stmt.expr);
+                    builder->CreateRet(visitor->read_current_value());
+                }
+
                 visitor->has_exited = true;
             }
 
@@ -346,7 +354,12 @@ namespace {
                 throw std::runtime_error("Callee function not found in module");
             }
 
-            set_current_reg(builder->CreateCall(callee, args, "calltmp"));
+            if (func_type->getReturnType()->isVoidTy()) {
+                builder->CreateCall(callee, args);
+                set_current_reg(nullptr);
+            } else {
+                set_current_reg(builder->CreateCall(callee, args, "calltmp"));
+            }
         }
 
         void visit(const arena::ast::BinaryExpression *node) override {
