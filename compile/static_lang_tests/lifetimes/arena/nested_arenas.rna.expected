@@ -1,0 +1,21 @@
+
+Error[E-L_ESC_RNA]: Pointer value to a nested arena escapes its arena block
+at compile/static_lang_tests/lifetimes/arena/nested_arenas.rna:8:19:8:26
+  :         p_outer = p_inner; // E-L_ESC_RNA
+  :                   ^^^^^^^ Escape occurs here
+  :
+  : Conflicting lifetime requirements:
+  : 1. Lifetime '*arena<ctx>' may not outlive '*arena'
+  : 2. Lifetime '*arena<ctx>' must outlive '*arena'
+  .
+ ... caused by 1.
+  -> 'int*arena' assigned to pointer with lifetime '*arena<ctx>'
+  :
+ == note: pointee 'int' is lifetime-permissive, its lifetime may be shortened.
+  .
+ ... caused by 2.
+  -> '*arena<outer>' lifetime is greater than '*arena<inner>'
+  :
+ == note: '*arena<inner>' defined here
+  :     arena {
+  :     ^^^^^^^  --- nested_arenas.rna:4:5

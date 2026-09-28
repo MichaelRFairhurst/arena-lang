@@ -1,0 +1,12 @@
+
+Error[E-T_ASGN_NOREL]: Expected int but got Display*unsafe in variable 'd'
+at compile/static_lang_tests/typechecking/inference/deref_constrain.rna:6:13:6:30
+  :     let d = take_display(d.*);
+  :             ^^^^^^^^^^^^^^^^^ type mismatch
+  .
+ == note: expected type int based on return type
+  :     let d = take_display(d.*);
+  :             ^^^^^^^^^^^^^^^^^  --- deref_constrain.rna:6:13
+ == note: got conflicting type Display*unsafe for variable 'd'
+  :     let d = take_display(d.*);
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^  --- deref_constrain.rna:6:5
