@@ -61,6 +61,10 @@ namespace arena::parse {
             case '+':
                 return n_char_token(TokenType::PLUS, 1);
             case '-':
+                if (state.size() > 1 && std::isdigit(state[1])) {
+                    return lex_number();
+                }
+
                 return lex_match("->", TokenType::ARROW, [this]() {
                     return n_char_token(TokenType::MINUS, 1);
                 });
@@ -303,6 +307,12 @@ namespace arena::parse {
             __int128_t value = 0;
             int base = 10;
             int decimal = -1;
+            bool negative = false;
+            if (state[0] == '-') {
+                negative = true;
+                state = state.substr(1);
+            }
+
             auto it = state.begin();
 
             if (state.size() >= 2 && state[0] == '0') {
@@ -333,54 +343,29 @@ namespace arena::parse {
                     decimal *= base;
                 }
 
-                bool valid_digit = false;
-                switch (base) {
-                case 2: {
-                    if (*it != '0' && *it != '1') {
-                        break;
-                    }
-                    valid_digit = true;
-                    value = value * 2 + (*it - '0');
-                    break;
+                int next_digit_value = -1;
+                if (std::isdigit(*it)) {
+                    next_digit_value = *it - '0';
+                } else if (std::isalpha(*it)) {
+                    next_digit_value = std::tolower(*it) - 'a' + 10;
                 }
-                case 8: {
-                    if (*it < '0' || *it > '7') {
-                        break;
-                    }
-                    valid_digit = true;
-                    value = value * 8 + (*it - '0');
-                    break;
-                }
-                case 10: {
-                    if (!std::isdigit(*it)) {
-                        break;
-                    }
-                    valid_digit = true;
-                    value = value * 10 + (*it - '0');
+                
+                if (next_digit_value < 0 || next_digit_value >= base) {
                     break;
                 }
 
-                case 16: {
-                    if (!std::isxdigit(*it)) {
-                        break;
-                    }
-                    valid_digit = true;
-                    int digit = std::isdigit(*it) ? (*it - '0') : (std::tolower(*it) - 'a' + 10);
-                    value = value * 16 + digit;
-                    break;
+                if (value < std::numeric_limits<uint64_t>::max()) {
+                    value = value * base + next_digit_value;
                 }
-                default:
-                    throw std::runtime_error("Invalid base");
-                }
+            }
 
-                if (!valid_digit) {
-                    break;
-                }
+            if (negative) {
+                value = -value;
             }
 
             Token::Value literalValue;
             if (decimal == -1) {
-                literalValue = static_cast<int64_t>(value);
+                literalValue = value;
             } else {
                 literalValue = static_cast<double>(value) / decimal;
             }

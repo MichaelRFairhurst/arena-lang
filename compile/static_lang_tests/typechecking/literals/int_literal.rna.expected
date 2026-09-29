@@ -85,66 +85,311 @@ at compile/static_lang_tests/typechecking/literals/int_literal.rna:49:19:49:32
   :     let i3: int = 2'147'483'648; // E-T_LIT_OOR
   :                   ^^^^^^^^^^^^^ Literal out of range here
 int_literal.rna:49:5
-  :     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   :     let i3: int = 2'147'483'648; // E-T_LIT_OOR
-  :  ... (1 more lines) ...
-  :     // let i5: int = -2'147'483'649; // E-T_LIT_OOR
-  : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i3'
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i3'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i5'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:51:20:51:33
+  :     let i5: int = -2'147'483'649; // E-T_LIT_OOR
+  :                    ^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:51:5
+  :     let i5: int = -2'147'483'649; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i5'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as uint for variable 'u3'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:55:20:55:33
+  :     let u3: uint = 4'294'967'296; // E-T_LIT_OOR
+  :                    ^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:55:5
+  :     let u3: uint = 4'294'967'296; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'u3'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as uint for variable 'u4'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:56:21:56:22
+  :     let u4: uint = -1; // E-T_LIT_OOR
+  :                     ^ Literal out of range here
+int_literal.rna:56:5
+  :     let u4: uint = -1; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'u4'
 
 
 Error[E-T_LIT_OOR]: Literal value can not be represented as byte for variable 'b4'
-at compile/static_lang_tests/typechecking/literals/int_literal.rna:61:20:61:23
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:63:20:63:23
   :     let b4: byte = 256; // E-T_LIT_OOR
   :                    ^^^ Literal out of range here
-int_literal.rna:61:5
-  :     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int_literal.rna:63:5
   :     let b4: byte = 256; // E-T_LIT_OOR
-  :     // let b5: byte = -1; // E-T_LIT_OOR
-  : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'b4'
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'b4'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as byte for variable 'b5'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:64:21:64:22
+  :     let b5: byte = -1; // E-T_LIT_OOR
+  :                     ^ Literal out of range here
+int_literal.rna:64:5
+  :     let b5: byte = -1; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'b5'
 
 
 Error[E-T_LIT_OOR]: Literal value can not be represented as short for variable 's4'
-at compile/static_lang_tests/typechecking/literals/int_literal.rna:66:21:66:26
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:68:21:68:26
   :     let s4: short = 32768; // E-T_LIT_OOR
   :                     ^^^^^ Literal out of range here
-int_literal.rna:66:5
-  :     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int_literal.rna:68:5
   :     let s4: short = 32768; // E-T_LIT_OOR
-  :  ... (1 more lines) ...
-  :     // let s5: short = -32769; // E-T_LIT_OOR
-  : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 's4'
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 's4'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as short for variable 's5'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:70:22:70:27
+  :     let s5: short = -32769; // E-T_LIT_OOR
+  :                      ^^^^^ Literal out of range here
+int_literal.rna:70:5
+  :     let s5: short = -32769; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 's5'
 
 
 Error[E-T_LIT_OOR]: Literal value can not be represented as ushort for variable 'us4'
-at compile/static_lang_tests/typechecking/literals/int_literal.rna:72:23:72:28
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:74:23:74:28
   :     let us4: ushort = 65536; // E-T_LIT_OOR
   :                       ^^^^^ Literal out of range here
-int_literal.rna:72:5
-  :     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int_literal.rna:74:5
   :     let us4: ushort = 65536; // E-T_LIT_OOR
-  :     // let us5: ushort = -1; // E-T_LIT_OOR
-  : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'us4'
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'us4'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as ushort for variable 'us5'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:75:24:75:25
+  :     let us5: ushort = -1; // E-T_LIT_OOR
+  :                        ^ Literal out of range here
+int_literal.rna:75:5
+  :     let us5: ushort = -1; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'us5'
 
 
 Error[E-T_LIT_OOR]: Literal value can not be represented as long for variable 'l4'
-at compile/static_lang_tests/typechecking/literals/int_literal.rna:77:20:77:45
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:79:20:79:45
   :     let l4: long = 9'223'372'036'854'775'808; // E-T_LIT_OOR
   :                    ^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
-int_literal.rna:77:5
-  :     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int_literal.rna:79:5
   :     let l4: long = 9'223'372'036'854'775'808; // E-T_LIT_OOR
-  :  ... (1 more lines) ...
-  :     // let l6: long = -9'223'372'036'854'775'809; // E-T_LIT_OOR
-  : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'l4'
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'l4'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as long for variable 'l6'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:81:21:81:46
+  :     let l6: long = -9'223'372'036'854'775'809; // E-T_LIT_OOR
+  :                     ^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:81:5
+  :     let l6: long = -9'223'372'036'854'775'809; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'l6'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as ulong for variable 'ul4'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:85:22:85:48
+  :     let ul4: ulong = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                      ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:85:5
+  :     let ul4: ulong = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'ul4'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as ulong for variable 'ul5'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:86:23:86:24
+  :     let ul5: ulong = -1; // E-T_LIT_OOR
+  :                       ^ Literal out of range here
+int_literal.rna:86:5
+  :     let ul5: ulong = -1; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'ul5'
 
 
 Error[E-T_LIT_OOR]: Literal value can not be represented as ssize for variable 'z4'
-at compile/static_lang_tests/typechecking/literals/int_literal.rna:88:21:88:46
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:90:21:90:46
   :     let z4: ssize = 9'223'372'036'854'775'808; // E-T_LIT_OOR
   :                     ^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
-int_literal.rna:88:5
-  :     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int_literal.rna:90:5
   :     let z4: ssize = 9'223'372'036'854'775'808; // E-T_LIT_OOR
-  :  ... (1 more lines) ...
-  :     // let z6: ssize = -9'223'372'036'854'775'809; // E-T_LIT_OOR
-  : ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'z4'
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'z4'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as ssize for variable 'z6'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:92:22:92:47
+  :     let z6: ssize = -9'223'372'036'854'775'809; // E-T_LIT_OOR
+  :                      ^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:92:5
+  :     let z6: ssize = -9'223'372'036'854'775'809; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'z6'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as usize for variable 'uz4'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:96:22:96:48
+  :     let uz4: usize = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                      ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:96:5
+  :     let uz4: usize = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'uz4'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as usize for variable 'uz5'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:97:23:97:24
+  :     let uz5: usize = -1; // E-T_LIT_OOR
+  :                       ^ Literal out of range here
+int_literal.rna:97:5
+  :     let uz5: usize = -1; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'uz5'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as byte for variable 'b'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:101:19:101:45
+  :     let b: byte = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                   ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:101:5
+  :     let b: byte = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'b'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as short for variable 's'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:102:20:102:46
+  :     let s: short = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                    ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:102:5
+  :     let s: short = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 's'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as ushort for variable 'us'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:103:22:103:48
+  :     let us: ushort = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                      ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:103:5
+  :     let us: ushort = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'us'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:104:18:104:44
+  :     let i: int = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:104:5
+  :     let i: int = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as uint for variable 'us'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:105:20:105:46
+  :     let us: uint = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                    ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:105:5
+  :     let us: uint = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'us'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as long for variable 'l'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:106:19:106:45
+  :     let l: long = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                   ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:106:5
+  :     let l: long = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'l'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as ulong for variable 'ul'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:107:21:107:47
+  :     let ul: ulong = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :                     ^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:107:5
+  :     let ul: ulong = 18'446'744'073'709'551'616; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'ul'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_2to127m1'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:114:27:114:66
+  :     let i_2to127m1: int = 170141183460469231731687303715884105727; // E-T_LIT_OOR
+  :                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:114:5
+  :     let i_2to127m1: int = 170141183460469231731687303715884105727; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_2to127m1'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_2to127'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:115:25:115:64
+  :     let i_2to127: int = 170141183460469231731687303715884105728; // E-T_LIT_OOR
+  :                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:115:5
+  :     let i_2to127: int = 170141183460469231731687303715884105728; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_2to127'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_2to127p1'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:116:27:116:66
+  :     let i_2to127p1: int = 170141183460469231731687303715884105729; // E-T_LIT_OOR
+  :                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:116:5
+  :     let i_2to127p1: int = 170141183460469231731687303715884105729; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_2to127p1'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_n2to127'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:117:27:117:66
+  :     let i_n2to127: int = -170141183460469231731687303715884105728; // E-T_LIT_OOR
+  :                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:117:5
+  :     let i_n2to127: int = -170141183460469231731687303715884105728; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_n2to127'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_n2to127p1'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:118:29:118:68
+  :     let i_n2to127p1: int = -170141183460469231731687303715884105729; // E-T_LIT_OOR
+  :                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:118:5
+  :     let i_n2to127p1: int = -170141183460469231731687303715884105729; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_n2to127p1'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_2to128m1'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:120:27:120:66
+  :     let i_2to128m1: int = 340282366920938463463374607431768211455; // E-T_LIT_OOR
+  :                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:120:5
+  :     let i_2to128m1: int = 340282366920938463463374607431768211455; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_2to128m1'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_2to128'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:121:25:121:64
+  :     let i_2to128: int = 340282366920938463463374607431768211456; // E-T_LIT_OOR
+  :                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:121:5
+  :     let i_2to128: int = 340282366920938463463374607431768211456; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_2to128'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_2to128p1'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:122:27:122:66
+  :     let i_2to128p1: int = 340282366920938463463374607431768211457; // E-T_LIT_OOR
+  :                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:122:5
+  :     let i_2to128p1: int = 340282366920938463463374607431768211457; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_2to128p1'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_n2to128'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:123:27:123:66
+  :     let i_n2to128: int = -340282366920938463463374607431768211456; // E-T_LIT_OOR
+  :                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:123:5
+  :     let i_n2to128: int = -340282366920938463463374607431768211456; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_n2to128'
+
+
+Error[E-T_LIT_OOR]: Literal value can not be represented as int for variable 'i_n2to128p1'
+at compile/static_lang_tests/typechecking/literals/int_literal.rna:124:29:124:68
+  :     let i_n2to128p1: int = -340282366920938463463374607431768211457; // E-T_LIT_OOR
+  :                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Literal out of range here
+int_literal.rna:124:5
+  :     let i_n2to128p1: int = -340282366920938463463374607431768211457; // E-T_LIT_OOR
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by variable 'i_n2to128p1'

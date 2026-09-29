@@ -284,7 +284,7 @@ namespace {
 
         void visit(const arena::ast::Literal *node) override {
             auto value = node->begin()->literalValue;
-            if (auto int_value = std::get_if<int64_t>(&value)) {
+            if (auto int_value = std::get_if<__int128_t>(&value)) {
                 auto type_info = current_expr->type;
                 if (!type_info.has_value()) {
                     throw std::runtime_error("Expected type information for integer literal");
@@ -297,6 +297,10 @@ namespace {
                 if (!integral) {
                     throw std::runtime_error("Expected integral type for integer literal");
                 }
+
+                uint64_t value64 = integral->is_signed
+                                       ? static_cast<uint64_t>(static_cast<int64_t>(*int_value))
+                                       : static_cast<uint64_t>(*int_value);
 
                 auto apint = ::llvm::APInt(integral->size_bits, *int_value, integral->is_signed);
                 set_current_reg(llvm::ConstantInt::get(*context, apint));

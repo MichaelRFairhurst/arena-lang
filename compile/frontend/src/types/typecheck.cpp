@@ -87,7 +87,7 @@ namespace {
             auto token = step.ast->get_literal()->begin();
             if (token->type == ast::TokenType::TRUE || token->type == ast::TokenType::FALSE) {
                 return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
-            } else if (std::holds_alternative<int64_t>(token->literalValue)) {
+            } else if (auto value = std::get_if<__int128_t>(&token->literalValue)) {
                 auto int_type = ops.get_types().get_type_id(NamedTypeSymbol{"int"});
                 inference_ctx->constrain_integral_literal(int_type, step.ast);
                 auto result_id = set_type_info(step.type_out(), ResolvedRValue{});
@@ -97,11 +97,9 @@ namespace {
                         std::get_if<IntegralType>(&actual_type.get_program_type())) {
 
                     auto name = std::string{actual_type.get_name()};
-                    auto value = std::get<int64_t>(token->literalValue);
                     if (integral_type->literal_kind == IntegralLiteralKind::Int &&
-                        value > integral_type->max_value()) {
-                        // TODO: Handle negative values for signed types, and literals that can't be
-                        // represented in 64 bits.
+                        (*value > integral_type->max_value() ||
+                         *value < integral_type->min_value())) {
                         ops.get_errors().E_T_LIT_OOR(step.ast,
                                                      name,
                                                      inference_ctx->get_why_constraint());
@@ -188,7 +186,8 @@ namespace {
         TypeId operator()(ExprTransformStep<ast::CallExpression> step) {
             auto callee = step.original->children[0];
             if (std::holds_alternative<UnresolvedExprInfo>(callee.info)) {
-                // The callee has already be reported as unresolved, so we just return an error type.
+                // The callee has already be reported as unresolved, so we just return an error
+                // type.
                 return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
             }
 

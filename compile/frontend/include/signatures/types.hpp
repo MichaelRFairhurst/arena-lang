@@ -32,17 +32,17 @@ namespace arena::sema {
         std::string_view name;
         IntegralLiteralKind literal_kind;
 
-        uint64_t max_value() const {
+        __int128_t max_value() const {
             // Be careful to avoid UB by shifting a 64-bit value by 64 or more bits
             auto max64 = std::numeric_limits<uint64_t>::max();
             auto shift_amount = (64 - size_bits) + (is_signed ? 1 : 0);
-            return max64 >> shift_amount;
+            return static_cast<__int128_t>(max64 >> shift_amount);
         }
 
-        uint64_t min_value_abs() const {
+        __int128_t min_value() const {
             // This will not ever shift by more than 63 bits.
             if (is_signed) {
-                return 1ULL << (size_bits - 1);
+                return -static_cast<__int128_t>(1ULL << (size_bits - 1));
             } else {
                 return 0;
             }

@@ -32,8 +32,8 @@ namespace {
             auto value = size_literal->begin()->literalValue;
 
             size_t size = 0;
-            if (std::holds_alternative<int64_t>(value)) {
-                size = std::get<int64_t>(value);
+            if (std::holds_alternative<__int128_t>(value)) {
+                size = std::get<__int128_t>(value);
             }
             result = registry->get_interned(ArrayTypeSymbol{element_id, size});
         }

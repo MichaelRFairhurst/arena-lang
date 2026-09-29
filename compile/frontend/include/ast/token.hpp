@@ -56,7 +56,7 @@ namespace arena::ast {
     };
 
     struct Token {
-        using Value = std::variant<std::monostate, int64_t, double, std::string_view>;
+        using Value = std::variant<std::monostate, __int128_t, double, std::string_view>;
         TokenType type = TokenType::UNINITIALIZED_TOKEN;
         std::string_view text;
         Token *next = nullptr;
