@@ -33,16 +33,17 @@ namespace {
                               llvm::IRBuilder<> &builder,
                               const arena::sema::ResolvedDeclaration *current_decl,
                               const arena::sema::FunctionTable *ftable,
-                              const arena::sema::TypeTable *ttable)
+                              const arena::sema::TypeTable *ttable,
+                              const arena::sema::VariableRegistry *variables)
             : context(&context), module(&module), builder(&builder), current_decl(current_decl),
-              ftable(ftable), ttable(ttable) {}
+              ftable(ftable), ttable(ttable), variables(variables) {}
 
     private:
         struct InMemoryValue {
             llvm::Value *alloca = nullptr;
             size_t alignment = 0;
             ::llvm::Type *type = nullptr;
-            const char *name;
+            std::string_view name;
         };
 
         struct CurrentValue {
@@ -60,6 +61,7 @@ namespace {
         bool has_exited = false;
         const arena::sema::FunctionTable *ftable;
         const arena::sema::TypeTable *ttable;
+        const arena::sema::VariableRegistry *variables;
         std::unordered_map<arena::sema::VariableId, InMemoryValue> variable_map;
 
         llvm::Type *getLLVMType(const arena::sema::TypeId type_id) {
@@ -115,13 +117,14 @@ namespace {
 
             for (int i = 0; i < func_info->num_parameters; ++i) {
                 auto variable_id = func_info->parameters[i];
-                // TODO: get variable name
+                auto param_var = variables->resolve_variable(variable_id);
+                args->setName(param_var->name);
 
                 auto stack_var = InMemoryValue{};
                 stack_var.alignment = 1; // TODO: Determine proper alignment based on type
-                stack_var.alloca = builder->CreateAlloca(args->getType(), nullptr, args->getName());
+                stack_var.alloca = builder->CreateAlloca(args->getType(), nullptr, param_var->name);
                 stack_var.type = args->getType();
-                stack_var.name = "arg"; // TODO: get variable name
+                stack_var.name = param_var->name;
                 variable_map[variable_id] = stack_var;
 
                 builder->CreateStore(&*args, stack_var.alloca);
@@ -212,20 +215,21 @@ namespace {
                     return;
                 }
 
-                if (resolved_stmt.initializer == nullptr) {
-                    throw std::runtime_error("Not yet implemented: let without initializer.");
+                auto variable_id = resolved_stmt.variable_id;
+                auto variable = visitor->variables->resolve_variable(variable_id);
+                // TODO: get the type from the variable declaration instead of the initializer
+                if (!variable->has_type()) {
+                    throw std::runtime_error("Variable does not have a type");
                 }
 
-                auto variable_id = resolved_stmt.variable_id;
-                // TODO: get the type from the variable declaration instead of the initializer
-                auto type = visitor->getLLVMType(resolved_stmt.initializer->type->type_id);
+                auto type = visitor->getLLVMType(variable->get_type_id().value());
 
                 auto stack_var = InMemoryValue{};
                 // TODO: get the variable name
-                stack_var.alloca = builder->CreateAlloca(type, nullptr, "alloca_tmp");
+                stack_var.alloca = builder->CreateAlloca(type, nullptr, variable->name);
                 stack_var.alignment = 1; // TODO: Determine proper alignment based on type
                 stack_var.type = type;
-                stack_var.name = {"alloca_tmp"};
+                stack_var.name = variable->name;
                 visitor->variable_map[variable_id] = stack_var;
 
                 visitor->visitExpression(resolved_stmt.initializer);
@@ -689,8 +693,9 @@ void arena::backend::emit_impl(const std::vector<arena::backend::ResolvedCompila
     for (const auto &unit : resolved) {
         auto ftable = unit.ftable;
         auto ttable = unit.ttable;
+        auto vars = unit.resolved->get_resolved_variables();
         for (const auto decl : unit.resolved->get_resolved_decls()) {
-            LLVMBackendAstVisitor visitor(context, module, builder, decl, ftable, ttable);
+            LLVMBackendAstVisitor visitor(context, module, builder, decl, ftable, ttable, vars);
             // TODO: don't require visiting the original AST node directly
             decl->original->accept(&visitor);
         }
