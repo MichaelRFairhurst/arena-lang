@@ -547,6 +547,31 @@ namespace {
                 throw std::runtime_error("Unsupported dot operator");
             }
         }
+
+        void visit(const arena::ast::UnaryPrefixExpression *ast) override {
+            if (ast->get_operator() == arena::ast::TokenType::MINUS) {
+                visitExpression(&current_expr->children[0]);
+                auto type_info = current_expr->type;
+                if (!type_info.has_value()) {
+                    throw std::runtime_error("Unary prefix expression has no type information");
+                }
+
+                auto type = ttable->get_type(type_info->type_id, &this->current_decl->lifetimes);
+
+                if (std::holds_alternative<arena::sema::IntegralType>(type.get_program_type())) {
+                    auto val = read_current_value();
+                    auto zero = builder->getIntN(val->getType()->getIntegerBitWidth(), 0);
+                    set_current_reg(builder->CreateSub(zero, val));
+                } else if (std::holds_alternative<arena::sema::FloatingType>(
+                               type.get_program_type())) {
+                    set_current_reg(builder->CreateFNeg(read_current_value()));
+                } else {
+                    throw std::runtime_error("Unsupported type for unary prefix minus");
+                }
+            } else {
+                throw std::runtime_error("Unsupported unary prefix operator");
+            }
+        }
     };
 
     void output_ir_to_file(::llvm::Module &module, const std::string &output_path) {

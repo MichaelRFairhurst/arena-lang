@@ -31,6 +31,7 @@ namespace arena::sema {
         size_t size_bits;
         std::string_view name;
         IntegralLiteralKind literal_kind;
+        std::optional<std::string_view> signed_version;
 
         __int128_t max_value() const {
             // Be careful to avoid UB by shifting a 64-bit value by 64 or more bits
@@ -46,6 +47,14 @@ namespace arena::sema {
             } else {
                 return 0;
             }
+        }
+
+        std::optional<NamedTypeSymbol> signed_type() const {
+            if (signed_version.has_value()) {
+                return NamedTypeSymbol{*signed_version};
+            }
+
+            return std::nullopt;
         }
     };
 

@@ -1,0 +1,18 @@
+fun main(argc: int, argv: char**) -> int {
+    let x: int = 10;
+    let d: double = 15.0;
+
+    if (d == -15.0) {
+        ret 1;
+    }
+
+    if (-d == 15.0) {
+        ret 2;
+    }
+
+    if (-d == -15.0) {
+        ret -x;
+    }
+    
+    ret 0;
+}

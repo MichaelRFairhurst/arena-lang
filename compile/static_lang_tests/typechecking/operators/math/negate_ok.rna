@@ -1,0 +1,23 @@
+fun test() {
+    let s: short = 0;
+    let us: ushort = 0;
+    let i: int = 0;
+    let ui: uint = 0;
+    let l: long = 0;
+    let ul: long = 0;
+    let uz: usize = 0;
+    let sz: ssize = 0;
+    let f: float32;
+    let d: double64;
+
+    let s2: short = -s;
+    let s3: short = -us;
+    let i2: int = -i;
+    let i3: int = -ui;
+    let l2: long = -l;
+    let l3: long = -ul;
+    let sz2: ssize = -uz;
+    let sz3: ssize = -sz;
+    let f_2: float32 = -f;
+    let d_2: double64 = -d;
+}

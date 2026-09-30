@@ -323,20 +323,56 @@ namespace {
         }
 
         TypeId operator()(ExprTransformStep<ast::UnaryPrefixExpression> step) {
-            if (step.ast->get_operator() != ast::TokenType::NOT) {
+            if (step.ast->get_operator() == ast::TokenType::NOT) {
+                auto bool_id = ops.get_types().get_type_id(NamedTypeSymbol{"bool"});
+                auto operand_inference_ctx = make_child_context(step, 0);
+                operand_inference_ctx.constrain_context_type( // force line break
+                    bool_id,
+                    error::LocatedText(step.ast, "operand of '!'"));
+                inference_ctx->constrain_context_type( // force line break
+                    bool_id,
+                    error::LocatedText(step.ast, "result of '!'"));
+                resolve_child(step, 0, &operand_inference_ctx);
+                return set_type_info(step.type_out(), ResolvedRValue{});
+            } else if (step.ast->get_operator() == ast::TokenType::MINUS) {
+                auto operand_inference_ctx = make_child_context(step, 0);
+                auto operand_type_id = resolve_child(step, 0, &operand_inference_ctx);
+
+                auto operand_type = ops.get_type(operand_type_id);
+                if (auto integral_type =
+                        std::get_if<IntegralType>(&operand_type.get_program_type())) {
+                    auto negated_symbol = integral_type->signed_type();
+                    if (integral_type->literal_kind != IntegralLiteralKind::Int ||
+                        !negated_symbol.has_value()) {
+                        ops.get_errors().E_T_CANT_INTNEG( // force line break
+                            step.ast,
+                            error::LocatedText{step.original->children[0].original,
+                                               integral_type->name});
+                        return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+                    }
+
+                    auto negated_type_id = ops.get_types().get_type_id(*negated_symbol);
+                    inference_ctx->constrain_context_type( // force line break
+                        negated_type_id,
+                        error::LocatedText(step.ast, "result of unary minus"));
+                } else if (auto float_type =
+                               std::get_if<FloatingType>(&operand_type.get_program_type())) {
+                    inference_ctx->constrain_context_type( // force line break
+                        operand_type_id,
+                        error::LocatedText(step.ast, "result of unary minus"));
+                } else {
+                    ops.get_errors().E_T_CANT_INTNEG( // force line break
+                        step.ast,
+                        error::LocatedText{step.original->children[0].original,
+                                           ops.get_type_name(operand_type_id)});
+                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+                }
+
+                return set_type_info(step.type_out(), ResolvedRValue{});
+            } else {
                 throw std::runtime_error("Unexpected unary prefix operator: " +
                                          std::string(step.ast->get_operator_token()->text));
             }
-
-            auto bool_id = ops.get_types().get_type_id(NamedTypeSymbol{"bool"});
-            auto operand_inference_ctx = make_child_context(step, 0);
-            operand_inference_ctx.constrain_context_type(bool_id,
-                                                         error::LocatedText(step.ast,
-                                                                            "operand of '!'"));
-            inference_ctx->constrain_context_type(bool_id,
-                                                  error::LocatedText(step.ast, "result of '!'"));
-            resolve_child(step, 0, &operand_inference_ctx);
-            return set_type_info(step.type_out(), ResolvedRValue{});
         }
 
         LifetimeId current_arena_lifetime;

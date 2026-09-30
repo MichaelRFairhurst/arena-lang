@@ -1,0 +1,85 @@
+struct MyStruct {}
+
+fun test() {
+    let s: short = 0;
+    let us: ushort = 0;
+    let i: int = 0;
+    let ui: uint = 0;
+    let l: long = 0;
+    let ul: long = 0;
+    let uz: usize = 0;
+    let sz: ssize = 0;
+
+    let s2: ushort = -s; // E-T_ASGN_NOREL
+    let s3: ushort = -us; // E-T_ASGN_NOREL
+    let i2: uint = -i; // E-T_ASGN_NOREL
+    let i3: uint = -ui; // E-T_ASGN_NOREL
+    let l2: ulong = -l; // E-T_ASGN_NOREL
+    let l3: ulong = -ul; // E-T_ASGN_NOREL
+    let uz2: usize = -uz; // E-T_ASGN_NOREL
+    let uz2: usize = -sz; // E-T_ASGN_NOREL
+
+    // Long and size are not interchangeable
+    let sz2: ssize = -l; // E-T_ASGN_NOREL
+    let sz3: ssize = -ul; // E-T_ASGN_NOREL
+    let l4: long = -uz; // E-T_ASGN_NOREL
+    let l5: long = sz; // E-T_ASGN_NOREL
+
+    let b: byte = 0;
+    -b; // E-T_CANT_INTNEG
+
+    let str: MyStruct;
+    -str; // E-T_CANT_INTNEG
+
+    let b: bool = true;
+    -b; // E-T_CANT_INTNEG
+
+    let p: int*;
+    -p; // E-T_CANT_INTNEG
+
+    let arr: int[3];
+    -arr; // E-T_CANT_INTNEG
+
+    let f: float32;
+    let d: double64;
+    
+    f = -s; // E-T_ASGN_NOREL
+    f = -us; // E-T_ASGN_NOREL
+    f = -i; // E-T_ASGN_NOREL
+    f = -ui; // E-T_ASGN_NOREL
+    f = -l; // E-T_ASGN_NOREL
+    f = -ul; // E-T_ASGN_NOREL
+    f = -sz; // E-T_ASGN_NOREL
+    f = -uz; // E-T_ASGN_NOREL
+    f = -d; // E-T_ASGN_NOREL
+
+    d = -s; // E-T_ASGN_NOREL
+    d = -us; // E-T_ASGN_NOREL
+    d = -i; // E-T_ASGN_NOREL
+    d = -ui; // E-T_ASGN_NOREL
+    d = -l; // E-T_ASGN_NOREL
+    d = -ul; // E-T_ASGN_NOREL
+    d = -sz; // E-T_ASGN_NOREL
+    d = -uz; // E-T_ASGN_NOREL
+    d = -f; // E-T_ASGN_NOREL
+
+    s = -f; // E-T_ASGN_NOREL
+    s = -d; // E-T_ASGN_NOREL
+    us = -f; // E-T_ASGN_NOREL
+    us = -d; // E-T_ASGN_NOREL
+
+    i = -f; // E-T_ASGN_NOREL
+    i = -d; // E-T_ASGN_NOREL
+    ui = -f; // E-T_ASGN_NOREL
+    ui = -d; // E-T_ASGN_NOREL
+
+    l = -f; // E-T_ASGN_NOREL
+    l = -d; // E-T_ASGN_NOREL
+    ul = -f; // E-T_ASGN_NOREL
+    ul = -d; // E-T_ASGN_NOREL
+
+    sz = -f; // E-T_ASGN_NOREL
+    sz = -d; // E-T_ASGN_NOREL
+    uz = -f; // E-T_ASGN_NOREL
+    uz = -d; // E-T_ASGN_NOREL
+}

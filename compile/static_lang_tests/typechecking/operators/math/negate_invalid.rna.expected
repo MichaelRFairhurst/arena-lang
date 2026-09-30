@@ -1,0 +1,642 @@
+
+Error[E-T_ASGN_NOREL]: Expected ushort but got short in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:13:22:13:24
+  :     let s2: ushort = -s; // E-T_ASGN_NOREL
+  :                      ^^ type mismatch
+  .
+ == note: expected type ushort based on variable 's2'
+  :     let s2: ushort = -s; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:13:5
+ == note: got conflicting type short for result of unary minus
+  :     let s2: ushort = -s; // E-T_ASGN_NOREL
+  :                      ^^  --- negate_invalid.rna:13:22
+
+
+Error[E-T_ASGN_NOREL]: Expected ushort but got short in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:14:22:14:25
+  :     let s3: ushort = -us; // E-T_ASGN_NOREL
+  :                      ^^^ type mismatch
+  .
+ == note: expected type ushort based on variable 's3'
+  :     let s3: ushort = -us; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:14:5
+ == note: got conflicting type short for result of unary minus
+  :     let s3: ushort = -us; // E-T_ASGN_NOREL
+  :                      ^^^  --- negate_invalid.rna:14:22
+
+
+Error[E-T_ASGN_NOREL]: Expected uint but got int in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:15:20:15:22
+  :     let i2: uint = -i; // E-T_ASGN_NOREL
+  :                    ^^ type mismatch
+  .
+ == note: expected type uint based on variable 'i2'
+  :     let i2: uint = -i; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:15:5
+ == note: got conflicting type int for result of unary minus
+  :     let i2: uint = -i; // E-T_ASGN_NOREL
+  :                    ^^  --- negate_invalid.rna:15:20
+
+
+Error[E-T_ASGN_NOREL]: Expected uint but got int in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:16:20:16:23
+  :     let i3: uint = -ui; // E-T_ASGN_NOREL
+  :                    ^^^ type mismatch
+  .
+ == note: expected type uint based on variable 'i3'
+  :     let i3: uint = -ui; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:16:5
+ == note: got conflicting type int for result of unary minus
+  :     let i3: uint = -ui; // E-T_ASGN_NOREL
+  :                    ^^^  --- negate_invalid.rna:16:20
+
+
+Error[E-T_ASGN_NOREL]: Expected ulong but got long in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:17:21:17:23
+  :     let l2: ulong = -l; // E-T_ASGN_NOREL
+  :                     ^^ type mismatch
+  .
+ == note: expected type ulong based on variable 'l2'
+  :     let l2: ulong = -l; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:17:5
+ == note: got conflicting type long for result of unary minus
+  :     let l2: ulong = -l; // E-T_ASGN_NOREL
+  :                     ^^  --- negate_invalid.rna:17:21
+
+
+Error[E-T_ASGN_NOREL]: Expected ulong but got long in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:18:21:18:24
+  :     let l3: ulong = -ul; // E-T_ASGN_NOREL
+  :                     ^^^ type mismatch
+  .
+ == note: expected type ulong based on variable 'l3'
+  :     let l3: ulong = -ul; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:18:5
+ == note: got conflicting type long for result of unary minus
+  :     let l3: ulong = -ul; // E-T_ASGN_NOREL
+  :                     ^^^  --- negate_invalid.rna:18:21
+
+
+Error[E-T_ASGN_NOREL]: Expected usize but got ssize in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:19:22:19:25
+  :     let uz2: usize = -uz; // E-T_ASGN_NOREL
+  :                      ^^^ type mismatch
+  .
+ == note: expected type usize based on variable 'uz2'
+  :     let uz2: usize = -uz; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:19:5
+ == note: got conflicting type ssize for result of unary minus
+  :     let uz2: usize = -uz; // E-T_ASGN_NOREL
+  :                      ^^^  --- negate_invalid.rna:19:22
+
+
+Error[E-T_ASGN_NOREL]: Expected usize but got ssize in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:20:22:20:25
+  :     let uz2: usize = -sz; // E-T_ASGN_NOREL
+  :                      ^^^ type mismatch
+  .
+ == note: expected type usize based on variable 'uz2'
+  :     let uz2: usize = -sz; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:20:5
+ == note: got conflicting type ssize for result of unary minus
+  :     let uz2: usize = -sz; // E-T_ASGN_NOREL
+  :                      ^^^  --- negate_invalid.rna:20:22
+
+
+Error[E-T_ASGN_NOREL]: Expected ssize but got long in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:23:22:23:24
+  :     let sz2: ssize = -l; // E-T_ASGN_NOREL
+  :                      ^^ type mismatch
+  .
+ == note: expected type ssize based on variable 'sz2'
+  :     let sz2: ssize = -l; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:23:5
+ == note: got conflicting type long for result of unary minus
+  :     let sz2: ssize = -l; // E-T_ASGN_NOREL
+  :                      ^^  --- negate_invalid.rna:23:22
+
+
+Error[E-T_ASGN_NOREL]: Expected ssize but got long in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:24:22:24:25
+  :     let sz3: ssize = -ul; // E-T_ASGN_NOREL
+  :                      ^^^ type mismatch
+  .
+ == note: expected type ssize based on variable 'sz3'
+  :     let sz3: ssize = -ul; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:24:5
+ == note: got conflicting type long for result of unary minus
+  :     let sz3: ssize = -ul; // E-T_ASGN_NOREL
+  :                      ^^^  --- negate_invalid.rna:24:22
+
+
+Error[E-T_ASGN_NOREL]: Expected long but got ssize in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:25:20:25:23
+  :     let l4: long = -uz; // E-T_ASGN_NOREL
+  :                    ^^^ type mismatch
+  .
+ == note: expected type long based on variable 'l4'
+  :     let l4: long = -uz; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:25:5
+ == note: got conflicting type ssize for result of unary minus
+  :     let l4: long = -uz; // E-T_ASGN_NOREL
+  :                    ^^^  --- negate_invalid.rna:25:20
+
+
+Error[E-T_ASGN_NOREL]: Expected long but got ssize in variable 'sz'
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:26:20:26:22
+  :     let l5: long = sz; // E-T_ASGN_NOREL
+  :                    ^^ type mismatch
+  .
+ == note: expected type long based on variable 'l5'
+  :     let l5: long = sz; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:26:5
+ == note: got conflicting type ssize for variable 'sz'
+  :     let sz: ssize = 0;
+  :     ^^^^^^^^^^^^^^^^^^  --- negate_invalid.rna:11:5
+
+
+Error[E-T_CANT_INTNEG]: byte
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:29:5:29:7
+  :     -b; // E-T_CANT_INTNEG
+  :     ^^ Cannot apply unary minus to type 
+negate_invalid.rna:29:6
+  :     -b; // E-T_CANT_INTNEG
+  :      ^ expression has type byte
+
+
+Error[E-T_CANT_INTNEG]: MyStruct
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:32:5:32:9
+  :     -str; // E-T_CANT_INTNEG
+  :     ^^^^ Cannot apply unary minus to type 
+negate_invalid.rna:32:6
+  :     -str; // E-T_CANT_INTNEG
+  :      ^^^ expression has type MyStruct
+
+
+Error[E-T_CANT_INTNEG]: bool
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:35:5:35:7
+  :     -b; // E-T_CANT_INTNEG
+  :     ^^ Cannot apply unary minus to type 
+negate_invalid.rna:35:6
+  :     -b; // E-T_CANT_INTNEG
+  :      ^ expression has type bool
+
+
+Error[E-T_CANT_INTNEG]: int*<free>
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:38:5:38:7
+  :     -p; // E-T_CANT_INTNEG
+  :     ^^ Cannot apply unary minus to type 
+negate_invalid.rna:38:6
+  :     -p; // E-T_CANT_INTNEG
+  :      ^ expression has type int*<free>
+
+
+Error[E-T_CANT_INTNEG]: int[3]
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:41:5:41:9
+  :     -arr; // E-T_CANT_INTNEG
+  :     ^^^^ Cannot apply unary minus to type 
+negate_invalid.rna:41:6
+  :     -arr; // E-T_CANT_INTNEG
+  :      ^^^ expression has type int[3]
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got short in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:46:9:46:11
+  :     f = -s; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -s; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:46:5
+ == note: got conflicting type short for result of unary minus
+  :     f = -s; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:46:9
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got short in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:47:9:47:12
+  :     f = -us; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -us; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:47:5
+ == note: got conflicting type short for result of unary minus
+  :     f = -us; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:47:9
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got int in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:48:9:48:11
+  :     f = -i; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -i; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:48:5
+ == note: got conflicting type int for result of unary minus
+  :     f = -i; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:48:9
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got int in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:49:9:49:12
+  :     f = -ui; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -ui; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:49:5
+ == note: got conflicting type int for result of unary minus
+  :     f = -ui; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:49:9
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got long in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:50:9:50:11
+  :     f = -l; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -l; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:50:5
+ == note: got conflicting type long for result of unary minus
+  :     f = -l; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:50:9
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got long in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:51:9:51:12
+  :     f = -ul; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -ul; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:51:5
+ == note: got conflicting type long for result of unary minus
+  :     f = -ul; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:51:9
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got ssize in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:52:9:52:12
+  :     f = -sz; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -sz; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:52:5
+ == note: got conflicting type ssize for result of unary minus
+  :     f = -sz; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:52:9
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got ssize in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:53:9:53:12
+  :     f = -uz; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -uz; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:53:5
+ == note: got conflicting type ssize for result of unary minus
+  :     f = -uz; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:53:9
+
+
+Error[E-T_ASGN_NOREL]: Expected float32 but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:54:9:54:11
+  :     f = -d; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type float32 based on lvalue in assignment here
+  :     f = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:54:5
+ == note: got conflicting type double64 for result of unary minus
+  :     f = -d; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:54:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got short in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:56:9:56:11
+  :     d = -s; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -s; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:56:5
+ == note: got conflicting type short for result of unary minus
+  :     d = -s; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:56:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got short in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:57:9:57:12
+  :     d = -us; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -us; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:57:5
+ == note: got conflicting type short for result of unary minus
+  :     d = -us; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:57:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got int in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:58:9:58:11
+  :     d = -i; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -i; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:58:5
+ == note: got conflicting type int for result of unary minus
+  :     d = -i; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:58:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got int in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:59:9:59:12
+  :     d = -ui; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -ui; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:59:5
+ == note: got conflicting type int for result of unary minus
+  :     d = -ui; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:59:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got long in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:60:9:60:11
+  :     d = -l; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -l; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:60:5
+ == note: got conflicting type long for result of unary minus
+  :     d = -l; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:60:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got long in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:61:9:61:12
+  :     d = -ul; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -ul; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:61:5
+ == note: got conflicting type long for result of unary minus
+  :     d = -ul; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:61:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got ssize in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:62:9:62:12
+  :     d = -sz; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -sz; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:62:5
+ == note: got conflicting type ssize for result of unary minus
+  :     d = -sz; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:62:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got ssize in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:63:9:63:12
+  :     d = -uz; // E-T_ASGN_NOREL
+  :         ^^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -uz; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:63:5
+ == note: got conflicting type ssize for result of unary minus
+  :     d = -uz; // E-T_ASGN_NOREL
+  :         ^^^  --- negate_invalid.rna:63:9
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:64:9:64:11
+  :     d = -f; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type double64 based on lvalue in assignment here
+  :     d = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:64:5
+ == note: got conflicting type float32 for result of unary minus
+  :     d = -f; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:64:9
+
+
+Error[E-T_ASGN_NOREL]: Expected short but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:66:9:66:11
+  :     s = -f; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type short based on lvalue in assignment here
+  :     s = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:66:5
+ == note: got conflicting type float32 for result of unary minus
+  :     s = -f; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:66:9
+
+
+Error[E-T_ASGN_NOREL]: Expected short but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:67:9:67:11
+  :     s = -d; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type short based on lvalue in assignment here
+  :     s = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:67:5
+ == note: got conflicting type double64 for result of unary minus
+  :     s = -d; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:67:9
+
+
+Error[E-T_ASGN_NOREL]: Expected ushort but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:68:10:68:12
+  :     us = -f; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type ushort based on lvalue in assignment here
+  :     us = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:68:5
+ == note: got conflicting type float32 for result of unary minus
+  :     us = -f; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:68:10
+
+
+Error[E-T_ASGN_NOREL]: Expected ushort but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:69:10:69:12
+  :     us = -d; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type ushort based on lvalue in assignment here
+  :     us = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:69:5
+ == note: got conflicting type double64 for result of unary minus
+  :     us = -d; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:69:10
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:71:9:71:11
+  :     i = -f; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type int based on lvalue in assignment here
+  :     i = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:71:5
+ == note: got conflicting type float32 for result of unary minus
+  :     i = -f; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:71:9
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:72:9:72:11
+  :     i = -d; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type int based on lvalue in assignment here
+  :     i = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:72:5
+ == note: got conflicting type double64 for result of unary minus
+  :     i = -d; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:72:9
+
+
+Error[E-T_ASGN_NOREL]: Expected uint but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:73:10:73:12
+  :     ui = -f; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type uint based on lvalue in assignment here
+  :     ui = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:73:5
+ == note: got conflicting type float32 for result of unary minus
+  :     ui = -f; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:73:10
+
+
+Error[E-T_ASGN_NOREL]: Expected uint but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:74:10:74:12
+  :     ui = -d; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type uint based on lvalue in assignment here
+  :     ui = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:74:5
+ == note: got conflicting type double64 for result of unary minus
+  :     ui = -d; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:74:10
+
+
+Error[E-T_ASGN_NOREL]: Expected long but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:76:9:76:11
+  :     l = -f; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type long based on lvalue in assignment here
+  :     l = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:76:5
+ == note: got conflicting type float32 for result of unary minus
+  :     l = -f; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:76:9
+
+
+Error[E-T_ASGN_NOREL]: Expected long but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:77:9:77:11
+  :     l = -d; // E-T_ASGN_NOREL
+  :         ^^ type mismatch
+  .
+ == note: expected type long based on lvalue in assignment here
+  :     l = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^  --- negate_invalid.rna:77:5
+ == note: got conflicting type double64 for result of unary minus
+  :     l = -d; // E-T_ASGN_NOREL
+  :         ^^  --- negate_invalid.rna:77:9
+
+
+Error[E-T_ASGN_NOREL]: Expected long but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:78:10:78:12
+  :     ul = -f; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type long based on lvalue in assignment here
+  :     ul = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:78:5
+ == note: got conflicting type float32 for result of unary minus
+  :     ul = -f; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:78:10
+
+
+Error[E-T_ASGN_NOREL]: Expected long but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:79:10:79:12
+  :     ul = -d; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type long based on lvalue in assignment here
+  :     ul = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:79:5
+ == note: got conflicting type double64 for result of unary minus
+  :     ul = -d; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:79:10
+
+
+Error[E-T_ASGN_NOREL]: Expected ssize but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:81:10:81:12
+  :     sz = -f; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type ssize based on lvalue in assignment here
+  :     sz = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:81:5
+ == note: got conflicting type float32 for result of unary minus
+  :     sz = -f; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:81:10
+
+
+Error[E-T_ASGN_NOREL]: Expected ssize but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:82:10:82:12
+  :     sz = -d; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type ssize based on lvalue in assignment here
+  :     sz = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:82:5
+ == note: got conflicting type double64 for result of unary minus
+  :     sz = -d; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:82:10
+
+
+Error[E-T_ASGN_NOREL]: Expected usize but got float32 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:83:10:83:12
+  :     uz = -f; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type usize based on lvalue in assignment here
+  :     uz = -f; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:83:5
+ == note: got conflicting type float32 for result of unary minus
+  :     uz = -f; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:83:10
+
+
+Error[E-T_ASGN_NOREL]: Expected usize but got double64 in result of unary minus
+at compile/static_lang_tests/typechecking/operators/math/negate_invalid.rna:84:10:84:12
+  :     uz = -d; // E-T_ASGN_NOREL
+  :          ^^ type mismatch
+  .
+ == note: expected type usize based on lvalue in assignment here
+  :     uz = -d; // E-T_ASGN_NOREL
+  :     ^^^^^^^  --- negate_invalid.rna:84:5
+ == note: got conflicting type double64 for result of unary minus
+  :     uz = -d; // E-T_ASGN_NOREL
+  :          ^^  --- negate_invalid.rna:84:10

@@ -384,6 +384,19 @@ namespace arena::error {
             });
         }
 
+        Error &E_T_CANT_INTNEG(Location l, LocatedText context) {
+            return report({
+                "E-T_CANT_INTNEG",
+                l,
+                "Cannot apply unary minus to type ",
+                std::vector<Chunk>{
+                    Link{.link_text = context.second,
+                         .label_text = "expression has type " + context.second,
+                         .location = context.first},
+                },
+            });
+        }
+
         Error &E_R_UNKN_FUNC(Location l, Location target) {
             return report({
                 "E-R_UNKN_FUNC",
