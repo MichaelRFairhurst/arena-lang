@@ -376,15 +376,17 @@ namespace {
         }
 
         void visit(const arena::ast::BinaryExpression *node) override {
-            auto &info = current_expr->type;
-            if (!info.has_value()) {
+            auto &lhs_info = current_expr->children[0].type;
+            if (!lhs_info.has_value()) {
                 throw std::runtime_error("Binary expression has no type information");
             }
 
-            auto type = ttable->get_type(info->type_id, &this->current_decl->lifetimes);
+            auto lhs_type = ttable->get_type(lhs_info->type_id, &this->current_decl->lifetimes);
 
-            auto integral_type = std::get_if<arena::sema::IntegralType>(&type.get_program_type());
-            auto floating_type = std::get_if<arena::sema::FloatingType>(&type.get_program_type());
+            auto integral_type =
+                std::get_if<arena::sema::IntegralType>(&lhs_type.get_program_type());
+            auto floating_type =
+                std::get_if<arena::sema::FloatingType>(&lhs_type.get_program_type());
 
             if (node->get_operator() == arena::ast::TokenType::EQUAL) {
                 visitExpression(&current_expr->children[0]);
