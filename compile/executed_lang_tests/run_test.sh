@@ -2,9 +2,10 @@
 TEST_FILE=$1
 EXPECTED_FILE=$1.expected
 COMPILER=$2
+OPT_LEVEL=$3
 
 EXPECTED=$(cat "$EXPECTED_FILE")
-ACTUAL=$($COMPILER run "$TEST_FILE" 2>&1 ; echo -e "Program exited with code $?")
+ACTUAL=$($COMPILER run "$TEST_FILE" $OPT_LEVEL 2>&1 ; echo -e "Program exited with code $?")
 DIFF=$(echo "$ACTUAL" | diff -u "$EXPECTED_FILE" -)
 EXIT_CODE=$?
 
