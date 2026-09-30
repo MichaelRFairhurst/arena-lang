@@ -28,5 +28,5 @@ target_compile_definitions(arena-backend-llvm PRIVATE ${LLVM_DEFINITIONS})
 target_compile_features(arena-backend-llvm PUBLIC cxx_std_17)
 
 # Map LLVM components to libraries
-llvm_map_components_to_libnames(llvm_libs support core irreader nativecodegen)
+llvm_map_components_to_libnames(llvm_libs support core irreader nativecodegen passes)
 target_link_libraries(arena-backend-llvm PRIVATE ${llvm_libs})

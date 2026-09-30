@@ -6,12 +6,12 @@
 #include "resolve/expressions.hpp"
 
 namespace arena::backend {
-    enum class OptimizationLevel { None, Debug, Performance, Aggressive };
+    enum class OptimizationLevel { None, Debug, Performance, Aggressive, Size, Minify };
 
     struct BackendOptions {
         bool validate_ir = false;
         bool print_ir = false;
-        OptimizationLevel optimization_level_enum = OptimizationLevel::None;
+        OptimizationLevel optimization_level = OptimizationLevel::None;
         std::filesystem::path output_path;
     };
 

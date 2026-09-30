@@ -11,8 +11,33 @@
 
 namespace po = boost::program_options;
 
+namespace arena::backend {
+    std::istream &operator>>(std::istream &in, arena::backend::OptimizationLevel &level) {
+        std::string token;
+        in >> token;
+        if (token == "none") {
+            level = arena::backend::OptimizationLevel::None;
+        } else if (token == "d" || token == "debug") {
+            level = arena::backend::OptimizationLevel::Debug;
+        } else if (token == "performance") {
+            level = arena::backend::OptimizationLevel::Performance;
+        } else if (token == "aggressive") {
+            level = arena::backend::OptimizationLevel::Aggressive;
+        } else if (token == "size") {
+            level = arena::backend::OptimizationLevel::Size;
+        } else if (token == "minify") {
+            level = arena::backend::OptimizationLevel::Minify;
+        } else {
+            in.setstate(std::ios::failbit);
+        }
+        return in;
+    }
+}
+
+
 namespace {
     int command_check(int argc, char **argv) {
+
         std::vector<std::filesystem::path> source_files;
         bool keep_alive = false;
         bool verbose = false;
@@ -79,6 +104,31 @@ namespace {
         return has_errors ? 1 : 0;
     }
 
+    std::pair<std::string, std::string> optimization_level_parser(const std::string &opt) {
+        if (opt.find("-O") == 0) {
+            return {"optimization-level", opt.substr(2)};
+        }
+        return {"", ""};
+    }
+
+    po::options_description compile_options(arena::backend::BackendOptions &backend_options) {
+        po::options_description options;
+        // clang-format off
+        options.add_options()
+            ("help,h", "Show this help message")
+            ("validate-ir",
+             po::bool_switch(&backend_options.validate_ir),
+             "Validate the generated IR before assembling")
+            ("print-ir",
+             po::bool_switch(&backend_options.print_ir),
+             "Print the generated IR before assembling")
+            ("optimization-level",
+             po::value<arena::backend::OptimizationLevel>(&backend_options.optimization_level),
+             "Set the optimization level for the backend");
+        // clang-format on
+        return options;
+    }
+
     int command_compile(int argc, char **argv) {
         std::vector<std::filesystem::path> source_files;
         arena::backend::BackendOptions backend_options;
@@ -89,23 +139,24 @@ namespace {
             ("sources",
              po::value<std::vector<std::filesystem::path>>(&source_files),
              "Source files to load")
-            ("validate-ir",
-             po::bool_switch(&backend_options.validate_ir),
-             "Validate the generated IR before assembling")
-            ("print-ir",
-             po::bool_switch(&backend_options.print_ir),
-             "Print the generated IR before assembling")
             ("output-path,o",
              po::value<std::filesystem::path>(&backend_options.output_path)->default_value("a.out"),
              "Output path for the generated backend output");
         // clang-format on
+
+        desc.add(compile_options(backend_options));
 
         // Define positional arguments (source files)
         po::positional_options_description pos_desc;
         pos_desc.add("sources", -1);
 
         po::variables_map vm;
-        po::store(po::command_line_parser(argc, argv).options(desc).positional(pos_desc).run(), vm);
+        po::store(po::command_line_parser(argc, argv)
+                      .options(desc)
+                      .positional(pos_desc)
+                      .extra_parser(optimization_level_parser)
+                      .run(),
+                  vm);
         po::notify(vm);
         if (vm.count("help")) {
             std::cout << desc << "\n";
@@ -158,12 +209,6 @@ namespace {
             ("sources",
              po::value<std::vector<std::filesystem::path>>(&source_files),
              "Source files of the arena program")
-            ("validate-ir",
-             po::bool_switch(&backend_options.validate_ir),
-             "Validate the generated IR before assembling")
-            ("print-ir",
-             po::bool_switch(&backend_options.print_ir),
-             "Print the generated IR before assembling")
             ("cache-dir",
              po::value<std::filesystem::path>(&cache_dir),
              "Directory to use for caching build objects. Defaults to `.arena/` in the current directory.")
@@ -172,12 +217,19 @@ namespace {
              "Use the OS cache for build objects");
         // clang-format on
 
+        desc.add(compile_options(backend_options));
+
         // Define positional arguments (source files)
         po::positional_options_description pos_desc;
         pos_desc.add("sources", -1);
 
         po::variables_map vm;
-        po::store(po::command_line_parser(argc, argv).options(desc).positional(pos_desc).run(), vm);
+        po::store(po::command_line_parser(argc, argv)
+                      .options(desc)
+                      .positional(pos_desc)
+                      .extra_parser(optimization_level_parser)
+                      .run(),
+                  vm);
         po::notify(vm);
         if (vm.count("help")) {
             std::cout << desc << "\n";

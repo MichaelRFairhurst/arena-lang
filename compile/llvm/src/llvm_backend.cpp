@@ -1,6 +1,7 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/PassManager.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Verifier.h"
 #include "llvm/ADT/APFloat.h"
@@ -10,6 +11,16 @@
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/MC/TargetRegistry.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/StandardInstrumentations.h"
+#include "llvm/Transforms/IPO/InferFunctionAttrs.h"
+#include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Utils/LowerMemIntrinsics.h"
+#include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Scalar/Reassociate.h"
+#include "llvm/Transforms/Scalar/SimplifyCFG.h"
+#include "llvm/Transforms/Scalar/GVN.h"
+#include "llvm/Transforms/Utils/Mem2Reg.h"
 #include "arena_backend.hpp"
 #include "ast/visitor.hpp"
 #include "arena_llvm_types.hpp"
@@ -574,7 +585,52 @@ namespace {
         }
     };
 
-    void output_ir_to_file(::llvm::Module &module, const std::string &output_path) {
+    void optimize(::llvm::Module &module, arena::backend::OptimizationLevel level) {
+        ::llvm::LoopAnalysisManager loop_analysis_manager;
+        ::llvm::FunctionAnalysisManager func_analysis_manager;
+        ::llvm::CGSCCAnalysisManager cg_analysis_manager;
+        ::llvm::ModuleAnalysisManager mod_analysis_manager;
+
+        ::llvm::PassBuilder pass_builder;
+        pass_builder.registerModuleAnalyses(mod_analysis_manager);
+        pass_builder.registerCGSCCAnalyses(cg_analysis_manager);
+        pass_builder.registerLoopAnalyses(loop_analysis_manager);
+        pass_builder.registerFunctionAnalyses(func_analysis_manager);
+        pass_builder.crossRegisterProxies(loop_analysis_manager,
+                                          func_analysis_manager,
+                                          cg_analysis_manager,
+                                          mod_analysis_manager);
+
+        // TODO: Consider writing our own optimization pipeline tailored to Arena's needs.
+        ::llvm::OptimizationLevel opt_llvm;
+        switch (level) {
+        case arena::backend::OptimizationLevel::None:
+            // Note that LLVM does define an optimization pass for O0. For example, __always_inline
+            // functions will still be inlined.
+            opt_llvm = ::llvm::OptimizationLevel::O0;
+            break;
+        case arena::backend::OptimizationLevel::Debug:
+            opt_llvm = ::llvm::OptimizationLevel::O1;
+            break;
+        case arena::backend::OptimizationLevel::Performance:
+            opt_llvm = ::llvm::OptimizationLevel::O2;
+            break;
+        case arena::backend::OptimizationLevel::Aggressive:
+            opt_llvm = ::llvm::OptimizationLevel::O3;
+            break;
+        case arena::backend::OptimizationLevel::Size:
+            opt_llvm = ::llvm::OptimizationLevel::Os;
+            break;
+        case arena::backend::OptimizationLevel::Minify:
+            opt_llvm = ::llvm::OptimizationLevel::Oz;
+            break;
+        }
+
+        auto mod_pass_manager = pass_builder.buildPerModuleDefaultPipeline(opt_llvm);
+        mod_pass_manager.run(module, mod_analysis_manager);
+    }
+
+    ::llvm::TargetMachine *set_target(::llvm::Module &module) {
         auto targetTriple = ::llvm::sys::getDefaultTargetTriple();
         ::llvm::InitializeNativeTarget();
         ::llvm::InitializeNativeTargetAsmPrinter();
@@ -595,7 +651,12 @@ namespace {
                                                           ::llvm::Reloc::Model::PIC_);
         module.setDataLayout(target_machine->createDataLayout());
         module.setTargetTriple(targetTriple);
+        return target_machine;
+    }
 
+    void output_ir_to_file(::llvm::Module &module,
+                           ::llvm::TargetMachine *target_machine,
+                           const std::string &output_path) {
         std::error_code ec;
         ::llvm::raw_fd_ostream fd_os(output_path, ec);
 
@@ -635,19 +696,25 @@ void arena::backend::emit_impl(const std::vector<arena::backend::ResolvedCompila
         }
     }
 
-    if (options.print_ir) {
-        ::llvm::outs() << "LLVM IR:\n";
-        module.print(::llvm::outs(), nullptr);
-    }
-
     if (options.validate_ir) {
         if (::llvm::verifyModule(module, &::llvm::errs())) {
             ::llvm::outs() << "IR validation failed.\n";
+            ::llvm::outs() << "LLVM IR:\n";
+            module.print(::llvm::outs(), nullptr);
+
             return;
         }
 
         ::llvm::outs() << "IR validation successful.\n";
     }
 
-    output_ir_to_file(module, options.output_path.string());
+    auto target_machine = set_target(module);
+    optimize(module, options.optimization_level);
+
+    if (options.print_ir) {
+        ::llvm::outs() << "LLVM IR:\n";
+        module.print(::llvm::outs(), nullptr);
+    }
+
+    output_ir_to_file(module, target_machine, options.output_path.string());
 }
