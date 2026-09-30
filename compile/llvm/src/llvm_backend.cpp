@@ -3,6 +3,7 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/ADT/APFloat.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Target/TargetOptions.h"
@@ -304,6 +305,14 @@ namespace {
 
                 auto apint = ::llvm::APInt(integral->size_bits, *int_value, integral->is_signed);
                 set_current_reg(llvm::ConstantInt::get(*context, apint));
+            } else if (auto float_value = std::get_if<double>(&value)) {
+                auto type_info = current_expr->type;
+                if (!type_info.has_value()) {
+                    throw std::runtime_error("Expected type information for float literal");
+                }
+
+                auto llvm_type = getLLVMType(type_info->type_id);
+                set_current_reg(::llvm::ConstantFP::get(llvm_type, *float_value));
             } else if (auto string_value = std::get_if<std::string_view>(&value)) {
                 set_current_reg(builder->CreateGlobalStringPtr(*string_value));
             } else if (node->begin()->type == arena::ast::TokenType::TRUE) {

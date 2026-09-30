@@ -634,6 +634,11 @@ namespace arena::parse {
                 Token *op = tokens.take();
                 Expression *operand = parse_unary_expression();
                 return arena->alloc<UnaryPrefixExpression>(op, operand);
+            } else if (tokens.peek()->type == TokenType::MINUS) {
+                Token *op = tokens.take();
+                if (tokens.peek()->type == TokenType::INTEGER) {}
+                Expression *operand = parse_unary_expression();
+                return arena->alloc<UnaryPrefixExpression>(op, operand);
             } else {
                 return parse_postfix_expression();
             }
