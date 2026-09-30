@@ -32,7 +32,7 @@ namespace arena::backend {
         }
         return in;
     }
-}
+} // namespace arena::backend
 
 
 namespace {
@@ -129,6 +129,39 @@ namespace {
         return options;
     }
 
+    std::vector<arena::backend::ResolvedCompilationUnit> get_compilation_units(
+        arena::sema::QueryEngine &engine, const std::vector<std::filesystem::path> &source_files) {
+        std::vector<arena::backend::ResolvedCompilationUnit> compilation_units;
+        bool has_errors = false;
+
+        for (const auto &file : source_files) {
+            const auto errors = engine.execute(arena::sema::RenderedErrorsQuery{file});
+
+            if (!errors.empty()) {
+                std::cout << errors << "\n";
+                has_errors = true;
+            } else {
+                const auto &typechecked = engine.execute(arena::sema::TypecheckedFileQuery{file});
+                const auto &ftable =
+                    engine.execute(arena::sema::AvailableFunctionsTableQuery{file});
+                const auto &ttable = engine.execute(arena::sema::AvailableTypesTableQuery{file});
+
+                compilation_units.push_back(arena::backend::ResolvedCompilationUnit{
+                    .source_path = file,
+                    .resolved = &typechecked,
+                    .ftable = &ftable,
+                    .ttable = &ttable,
+                });
+            }
+        }
+
+        if (has_errors) {
+            return {};
+        }
+
+        return compilation_units;
+    }
+
     int command_compile(int argc, char **argv) {
         std::vector<std::filesystem::path> source_files;
         arena::backend::BackendOptions backend_options;
@@ -163,36 +196,22 @@ namespace {
             return 0;
         }
 
-        bool has_errors = false;
+        if (source_files.empty()) {
+            std::cerr << "No source files provided.\n";
+            return 1;
+        }
+
         arena::sema::QueryEngine engine;
-        std::vector<arena::backend::ResolvedCompilationUnit> compilation_units;
+        auto compilation_units = get_compilation_units(engine, source_files);
 
-        for (const auto &file : source_files) {
-            const auto errors = engine.execute(arena::sema::RenderedErrorsQuery{file});
-
-            if (!errors.empty()) {
-                std::cout << errors << "\n";
-                has_errors = true;
-            } else {
-                const auto &typechecked = engine.execute(arena::sema::TypecheckedFileQuery{file});
-                const auto &ftable =
-                    engine.execute(arena::sema::AvailableFunctionsTableQuery{file});
-                const auto &ttable = engine.execute(arena::sema::AvailableTypesTableQuery{file});
-
-                compilation_units.push_back(arena::backend::ResolvedCompilationUnit{
-                    .source_path = file,
-                    .resolved = &typechecked,
-                    .ftable = &ftable,
-                    .ttable = &ttable,
-                });
-            }
+        if (compilation_units.empty()) {
+            std::cerr << "Compilation failed due to static errors.\n";
+            return 2;
         }
 
-        if (!has_errors) {
-            arena::backend::emit_impl(compilation_units, backend_options);
-        }
+        arena::backend::emit_impl(compilation_units, backend_options);
 
-        return has_errors ? 1 : 0;
+        return 0;
     }
 
     int command_run(int argc, char **argv) {
@@ -242,33 +261,17 @@ namespace {
             return 1;
         }
 
-        std::cout << "Compiling..." << std::flush;
-        bool has_errors = false;
-        arena::sema::QueryEngine engine;
-        std::vector<arena::backend::ResolvedCompilationUnit> compilation_units;
-
-        for (const auto &file : source_files) {
-            const auto errors = engine.execute(arena::sema::RenderedErrorsQuery{file});
-
-            if (!errors.empty()) {
-                std::cout << errors << "\n";
-                has_errors = true;
-            } else {
-                const auto &typechecked = engine.execute(arena::sema::TypecheckedFileQuery{file});
-                const auto &ftable =
-                    engine.execute(arena::sema::AvailableFunctionsTableQuery{file});
-                const auto &ttable = engine.execute(arena::sema::AvailableTypesTableQuery{file});
-
-                compilation_units.push_back(arena::backend::ResolvedCompilationUnit{
-                    .source_path = file,
-                    .resolved = &typechecked,
-                    .ftable = &ftable,
-                    .ttable = &ttable,
-                });
-            }
+        if (source_files.empty()) {
+            std::cerr << "Error: no source files provided.\n";
+            return 2;
         }
 
-        if (has_errors) {
+        std::cout << "Compiling..." << std::flush;
+        arena::sema::QueryEngine engine;
+        auto compilation_units = get_compilation_units(engine, source_files);
+
+        if (compilation_units.empty()) {
+            std::cerr << "Error: compilation failed due to static errors.\n";
             return 1;
         }
 
