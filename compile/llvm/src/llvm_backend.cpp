@@ -81,44 +81,63 @@ namespace {
             return llvm::FunctionType::get(return_type, param_types, false);
         }
 
-        llvm::Function *declare_function(const arena::ast::FunctionDeclaration *node) {
-            // TODO: Don't require looking up the function via the function table; we should have
-            // this information available directly from the resolved declaration.
-            auto func = ftable->resolve(node->get_name());
-            if (!func) {
-                throw std::runtime_error("Function not found in function table: " +
-                                         std::string(node->get_name()));
-            }
-
-            auto func_type = getLLVMFunctionType(*func);
-
-            llvm::Function *function = llvm::Function::Create(func_type,
-                                                              llvm::Function::ExternalLinkage,
-                                                              node->get_name(),
-                                                              *module);
-            return function;
-        }
-
-        void visit(const arena::ast::FunctionDeclaration *node) override { declare_function(node); }
-
-        void visit(const arena::ast::FunctionDefinition *node) override {
-            current_function = declare_function(node);
+        std::pair<llvm::Function *, const arena::sema::ResolvedFunctionDeclaration *>
+        declare_function(const arena::ast::FunctionDeclaration *node) {
             auto func_info =
                 std::get_if<arena::sema::ResolvedFunctionDeclaration>(&current_decl->info);
             if (!func_info) {
                 throw std::runtime_error("Failed to get function info from resolved declaration");
             }
 
-            auto args = current_function->arg_begin();
+            if (!func_info->return_type.has_value()) {
+                throw std::runtime_error(
+                    "Function must have a return type (explicit void required if none)");
+            }
+
+            llvm::Type *return_type = getLLVMType(func_info->return_type.value());
+            std::vector<llvm::Type *> param_types;
+            std::vector<std::string_view> param_names;
+            for (int i = 0; i < func_info->num_parameters; ++i) {
+                auto variable_id = func_info->parameters[i];
+                auto param_var = variables->resolve_variable(variable_id);
+                if (!param_var->has_type()) {
+                    throw std::runtime_error("Cannot emit llvm for parameter without a type");
+                }
+
+                param_types.push_back(getLLVMType(*param_var->get_type_id()));
+                param_names.push_back(param_var->name);
+            }
+
+            auto func_type = llvm::FunctionType::get(return_type, param_types, false);
+
+            llvm::Function *function = llvm::Function::Create(func_type,
+                                                              llvm::Function::ExternalLinkage,
+                                                              node->get_name(),
+                                                              *module);
+
+            auto args = function->arg_begin();
+            for (auto name : param_names) {
+                args->setName(name);
+                ++args;
+            }
+
+            return {function, func_info};
+        }
+
+        void visit(const arena::ast::FunctionDeclaration *node) override { declare_function(node); }
+
+        void visit(const arena::ast::FunctionDefinition *node) override {
+            auto [llvm_function, func_info] = declare_function(node);
+            current_function = llvm_function;
 
             // Create a basic block and set the insertion point
             llvm::BasicBlock *entry = llvm::BasicBlock::Create(*context, "entry", current_function);
             builder->SetInsertPoint(entry);
 
+            auto args = current_function->arg_begin();
             for (int i = 0; i < func_info->num_parameters; ++i) {
                 auto variable_id = func_info->parameters[i];
                 auto param_var = variables->resolve_variable(variable_id);
-                args->setName(param_var->name);
 
                 auto stack_var = InMemoryValue{};
                 stack_var.alignment = 1; // TODO: Determine proper alignment based on type

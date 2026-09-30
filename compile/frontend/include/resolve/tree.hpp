@@ -91,6 +91,7 @@ namespace arena::sema {
     struct ResolvedFunctionDeclaration {
         size_t num_parameters = 0;
         VariableId *parameters = nullptr;
+        std::optional<TypeId> return_type;
     };
 
     using ResolvedDeclarationInfo = std::variant<ResolvedFunctionDeclaration>;

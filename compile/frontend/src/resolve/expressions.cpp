@@ -185,9 +185,18 @@ namespace {
             auto param_list = func_decl->get_params()->get_params();
             auto num_params = param_list.size();
 
+            std::optional<TypeId> return_type_id;
+            if (func_decl->get_return_type() != nullptr) {
+                return_type_id =
+                    type_symbols->get_id(symbolizer.resolve(func_decl->get_return_type()));
+            } else {
+                return_type_id = type_symbols->get_id(VoidTypeSymbol{});
+            }
+
             resolved_decl->info = ResolvedFunctionDeclaration{
                 .num_parameters = num_params,
                 .parameters = arena->alloc_array<VariableId>(num_params),
+                .return_type = return_type_id,
             };
 
             auto p_resolved_param =
