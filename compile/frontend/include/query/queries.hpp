@@ -55,9 +55,9 @@ namespace arena::sema {
                                           QueryRefreshType::AlwaysRefresh>;
 
     using LineEndingsQuery = QueryBase<struct LineEndingsQueryTag,
-                                 std::filesystem::path,
-                                 error::LineEndings,
-                                 QueryRefreshType::RefreshOnDependentChange>;
+                                       std::filesystem::path,
+                                       error::LineEndings,
+                                       QueryRefreshType::RefreshOnDependentChange>;
 
     using ParseQuery = QueryBase<struct ParseQueryTag,
                                  std::filesystem::path,
@@ -80,9 +80,9 @@ namespace arena::sema {
                                      QueryRefreshType::RefreshOnDependentChange>;
 
     using StructTableQuery = QueryBase<struct StructTableQueryTag,
-                                     std::filesystem::path,
-                                     StructTable,
-                                     QueryRefreshType::RefreshOnDependentChange>;
+                                       std::filesystem::path,
+                                       StructTable,
+                                       QueryRefreshType::RefreshOnDependentChange>;
 
     using FunctionIdsQuery = QueryBase<struct FunctionIdsQueryTag,
                                        std::filesystem::path,
@@ -95,14 +95,14 @@ namespace arena::sema {
                                                 QueryRefreshType::RefreshOnDependentChange>;
 
     using TypeIdsQuery = QueryBase<struct TypeIdsQueryTag,
-                                       std::filesystem::path,
-                                       TypeSymbolSet,
-                                       QueryRefreshType::RefreshOnDependentChange>;
+                                   std::filesystem::path,
+                                   TypeSymbolSet,
+                                   QueryRefreshType::RefreshOnDependentChange>;
 
     using AvailableTypeIdsQuery = QueryBase<struct AvailableTypeIdsQueryTag,
-                                       std::filesystem::path,
-                                       TypeSymbolSet,
-                                       QueryRefreshType::RefreshOnDependentChange>;
+                                            std::filesystem::path,
+                                            TypeSymbolSet,
+                                            QueryRefreshType::RefreshOnDependentChange>;
 
     using AvailableFunctionsTableQuery = QueryBase<struct AvailableFunctionsTableQueryTag,
                                                    std::filesystem::path,
@@ -110,14 +110,14 @@ namespace arena::sema {
                                                    QueryRefreshType::RefreshOnDependentChange>;
 
     using AvailableTypesTableQuery = QueryBase<struct AvailableTypesTableQueryTag,
-                                                   std::filesystem::path,
-                                                   TypeTable,
-                                                   QueryRefreshType::RefreshOnDependentChange>;
+                                               std::filesystem::path,
+                                               TypeTable,
+                                               QueryRefreshType::RefreshOnDependentChange>;
 
     using AvailableStructsTableQuery = QueryBase<struct AvailableStructsTableQueryTag,
-                                                    std::filesystem::path,
-                                                    StructTable,
-                                                    QueryRefreshType::RefreshOnDependentChange>;
+                                                 std::filesystem::path,
+                                                 StructTable,
+                                                 QueryRefreshType::RefreshOnDependentChange>;
 
     using ResolvedCallsQuery = QueryBase<struct ResolvedCallsQueryTag,
                                          std::filesystem::path,
@@ -130,14 +130,14 @@ namespace arena::sema {
                                            QueryRefreshType::RefreshOnDependentChange>;
 
     using ErrorsQuery = QueryBase<struct ErrorsQueryTag,
-                                std::filesystem::path,
-                                std::vector<error::Error>,
-                                QueryRefreshType::RefreshOnDependentChange>;
+                                  std::filesystem::path,
+                                  std::vector<error::Error>,
+                                  QueryRefreshType::RefreshOnDependentChange>;
 
     using RenderedErrorsQuery = QueryBase<struct RenderedErrorsQueryTag,
-                                std::filesystem::path,
-                                std::string,
-                                QueryRefreshType::RefreshOnDependentChange>;
+                                          std::filesystem::path,
+                                          std::string,
+                                          QueryRefreshType::RefreshOnDependentChange>;
 
     std::string compute_query_result(const QueryEngineContext &ctx, SourceContentsQuery query);
     error::LineEndings compute_query_result(const QueryEngineContext &ctx, LineEndingsQuery query);
@@ -154,15 +154,15 @@ namespace arena::sema {
     TypeSymbolSet compute_query_result(const QueryEngineContext &ctx, AvailableTypeIdsQuery query);
     FunctionTable compute_query_result(const QueryEngineContext &ctx,
                                        AvailableFunctionsTableQuery query);
-    TypeTable compute_query_result(const QueryEngineContext &ctx,
-                                       AvailableTypesTableQuery query);
+    TypeTable compute_query_result(const QueryEngineContext &ctx, AvailableTypesTableQuery query);
     StructTable compute_query_result(const QueryEngineContext &ctx,
-                                       AvailableStructsTableQuery query);
+                                     AvailableStructsTableQuery query);
     arena::sema::ResolvedExpressionsResult compute_query_result(const QueryEngineContext &ctx,
                                                                 ResolvedCallsQuery query);
     arena::sema::ResolvedExpressionsResult compute_query_result(const QueryEngineContext &ctx,
                                                                 TypecheckedFileQuery query);
-    std::vector<error::Error> compute_query_result(const QueryEngineContext &ctx, ErrorsQuery query);
+    std::vector<error::Error> compute_query_result(const QueryEngineContext &ctx,
+                                                   ErrorsQuery query);
     std::string compute_query_result(const QueryEngineContext &ctx, RenderedErrorsQuery query);
 
     struct QueryCache {
@@ -336,8 +336,8 @@ struct std::hash<arena::sema::TypecheckedFileQuery>
     : arena::sema::QueryHashBase<arena::sema::TypecheckedFileQuery> {};
 
 template <>
-struct std::hash<arena::sema::ErrorsQuery>
-    : arena::sema::QueryHashBase<arena::sema::ErrorsQuery> {};
+struct std::hash<arena::sema::ErrorsQuery> : arena::sema::QueryHashBase<arena::sema::ErrorsQuery> {
+};
 
 template <>
 struct std::hash<arena::sema::RenderedErrorsQuery>
