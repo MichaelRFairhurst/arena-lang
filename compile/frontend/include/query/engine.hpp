@@ -26,9 +26,12 @@ namespace arena::sema {
 
         const TypeSymbolRegistry &get_type_registry() const { return type_registry; }
 
+        const StructSymbolRegistry &get_struct_registry() const { return struct_registry; }
+
     private:
         FunctionSymbolRegistry function_registry;
         TypeSymbolRegistry type_registry;
+        StructSymbolRegistry struct_registry;
     };
 
     class QueryEngine;
@@ -40,8 +43,15 @@ namespace arena::sema {
         template <typename T>
         const typename T::ResultType &run_query(const T &child_query) const;
 
-        const FunctionSymbolRegistry &get_function_registry() const { return global_context->get_function_registry(); }
-        const TypeSymbolRegistry &get_type_registry() const { return global_context->get_type_registry(); }
+        const FunctionSymbolRegistry &get_function_registry() const {
+            return global_context->get_function_registry();
+        }
+        const TypeSymbolRegistry &get_type_registry() const {
+            return global_context->get_type_registry();
+        }
+        const StructSymbolRegistry &get_struct_registry() const {
+            return global_context->get_struct_registry();
+        }
 
     private:
         GlobalContext *global_context;

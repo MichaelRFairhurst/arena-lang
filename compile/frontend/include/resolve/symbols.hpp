@@ -152,6 +152,20 @@ namespace arena::sema {
                                     VoidTypeSymbol,
                                     ErrorTypeSymbol>;
 
+    struct StructId {
+        size_t s_id;
+
+        bool operator==(const StructId &other) const { return s_id == other.s_id; }
+        bool operator!=(const StructId &other) const { return !(*this == other); }
+    };
+
+    struct StructSymbol {
+        std::string_view name;
+
+        bool operator==(const StructSymbol &other) const { return name == other.name; }
+        bool operator!=(const StructSymbol &other) const { return !(*this == other); }
+    };
+
     /**
      * A class to turn function names into unique IDs, and to intern their names for later use via
      * `string_view`s.
@@ -269,6 +283,20 @@ struct std::hash<arena::sema::TypeSymbol> {
 template <>
 struct std::hash<arena::sema::TypeId> {
     size_t operator()(const arena::sema::TypeId &id) const { return std::hash<size_t>()(id.t_id); }
+};
+
+template <>
+struct std::hash<arena::sema::StructSymbol> {
+    size_t operator()(const arena::sema::StructSymbol &symbol) const {
+        return std::hash<std::string_view>()(symbol.name);
+    }
+};
+
+template <>
+struct std::hash<arena::sema::StructId> {
+    size_t operator()(const arena::sema::StructId &id) const {
+        return std::hash<size_t>()(id.s_id);
+    }
 };
 
 namespace arena::sema {
@@ -416,6 +444,57 @@ namespace arena::sema {
         const TypeSymbolRegistry *registry;
     };
 
+    /**
+     * A class to turn struct member names into unique IDs, and to intern their names for later use
+     * via `string_view`s.
+     *
+     * Note that a member symbol and ID is shared across struct types, so "Foo::bar" and "Baz::bar"
+     * will have the same member ID.
+     */
+    class StructSymbolRegistry {
+    public:
+        StructSymbolRegistry() { rena_arena_init(&registry_arena, RENA_ARENA_LARGE_PAGE_SIZE, 0); }
+
+        StructSymbolRegistry(const StructSymbolRegistry &) = delete;
+        StructSymbolRegistry(StructSymbolRegistry &&) = delete;
+        StructSymbolRegistry &operator=(const StructSymbolRegistry &) = delete;
+        StructSymbolRegistry &operator=(StructSymbolRegistry &&) = delete;
+
+        ~StructSymbolRegistry() { rena_arena_free(&registry_arena); }
+
+        StructId get_struct_id(StructSymbol symbol) const { return get_struct_id(symbol.name); }
+
+        StructId get_struct_id(std::string_view name) const {
+            auto it = name_to_id.find(name);
+            if (it != name_to_id.end()) {
+                return it->second;
+            }
+            auto id = StructId{symbols.size()};
+            auto interned_name = intern(name);
+            name_to_id[interned_name] = id;
+            symbols.push_back(StructSymbol{interned_name});
+            return id;
+        }
+
+        StructSymbol get_struct_symbol(StructId id) const {
+            if (id.s_id >= symbols.size()) {
+                throw std::runtime_error("Struct ID not found");
+            }
+            return symbols[id.s_id];
+        }
+
+        std::string_view intern(std::string_view name) const {
+            void *interned;
+            rena_arena_alloc(&registry_arena, name.size(), alignof(char), &interned);
+            std::memcpy(interned, name.data(), name.size());
+            return std::string_view(static_cast<char *>(interned), name.size());
+        }
+
+    private:
+        mutable std::unordered_map<std::string_view, StructId> name_to_id;
+        mutable std::vector<StructSymbol> symbols;
+        mutable rena_arena registry_arena;
+    };
 
 } // namespace arena::sema
 

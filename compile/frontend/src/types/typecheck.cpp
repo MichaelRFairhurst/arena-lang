@@ -317,9 +317,38 @@ namespace {
         }
 
         TypeId operator()(ExprTransformStep<ast::MemberAccessExpression> step) {
-            // For now we do not support member access, so this is always an error.
-            // ops.get_errors().report(step.ast, "here", "Member access is not supported yet");
-            return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            auto object_inference_ctx = make_child_context(step, 0);
+            auto object_type_id = resolve_child(step, 0, &object_inference_ctx);
+
+            auto strct = ops.get_struct(object_type_id);
+            if (!strct) {
+                auto type = ops.get_type(object_type_id);
+                ops.get_errors().E_T_NOT_A_STRUCT(step.ast,
+                                                  step.ast->get_object(),
+                                                  std::string{type.get_name()});
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            auto member = ops.get_struct_member(*strct, step.ast->get_member_name());
+
+            if (!member) {
+                ops.get_errors().E_R_UNKN_MEMBER(step.ast,
+                                                 step.ast->get_object(),
+                                                 std::string{strct->name},
+                                                 step.ast->get_member_token());
+
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            step.out->info = ResolvedMemberInfo{
+                .struct_type_id = object_type_id,
+                .member_idx = static_cast<size_t>(&*member - strct->members),
+            };
+
+            inference_ctx->constrain_context_type(member->type_id,
+                                                  error::LocatedText(step.ast, "member access"));
+
+            return set_type_info(step.type_out(), ResolvedLValue{});
         }
 
         TypeId operator()(ExprTransformStep<ast::UnaryPrefixExpression> step) {
@@ -473,7 +502,7 @@ ResolvedExpressionsResult TypeChecker::type_check(
         // Copy lifetime group
         auto lifetime_group = decl->lifetimes;
 
-        TypeOperations ops(ftable, ttable, variables, &lifetime_group, &errors);
+        TypeOperations ops(ftable, ttable, struct_table, variables, &lifetime_group, &errors);
         TypeCheckTransform typecheck(&arena, ops);
         StatementTypeCheckTransform stmt_typecheck(&arena, &typecheck, ops);
 

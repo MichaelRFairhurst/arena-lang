@@ -151,6 +151,10 @@ namespace arena::ast {
 
         const Expression *get_object() const { return object; }
 
+        const Token *get_member_token() const { return member; }
+
+        const std::string_view get_member_name() const { return member->text; }
+
     private:
         Expression *object;
         Token *dot;

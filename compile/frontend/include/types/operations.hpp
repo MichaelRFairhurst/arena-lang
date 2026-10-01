@@ -5,17 +5,19 @@
 #include "signatures/types.hpp"
 #include "resolve/variables.hpp"
 #include "signatures/lifetimes.hpp"
+#include "signatures/structs.hpp"
 
 namespace arena::sema {
     class TypeOperations {
     public:
         TypeOperations(const FunctionTable *ftable,
                        const TypeTable *ttable,
+                       const StructTable *stable,
                        const VariableRegistry *variables,
                        LifetimeGroup *lifetimes,
                        error::Reporter *errors)
-            : ftable(ftable), ttable(ttable), variables(variables), lifetimes(lifetimes),
-              errors(errors) {}
+            : ftable(ftable), ttable(ttable), stable(stable), variables(variables),
+              lifetimes(lifetimes), errors(errors) {}
 
         ResolvedType get_type(TypeId id) const;
 
@@ -23,6 +25,11 @@ namespace arena::sema {
         std::string get_type_name(TypeId id, const LifetimeGroup &type_lifetimes) const;
 
         ResolvedType get_error_type() const;
+
+        std::optional<ResolvedStruct> get_struct(TypeId type_id) const;
+
+        std::optional<ResolvedStructMember> get_struct_member(const ResolvedStruct &strct,
+                                                              std::string_view member_name) const;
 
         std::optional<ResolvedType> dereference(TypeId id) const;
         std::optional<LifetimeId> pointed_lifetime(TypeId id) const;
@@ -81,8 +88,9 @@ namespace arena::sema {
 
     private:
         const FunctionTable *ftable;
-        const VariableRegistry *variables;
         const TypeTable *ttable;
+        const StructTable *stable;
+        const VariableRegistry *variables;
         LifetimeGroup *lifetimes;
         error::Reporter *errors;
     };

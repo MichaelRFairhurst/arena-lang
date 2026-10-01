@@ -62,6 +62,15 @@ TypeTable arena::sema::compute_query_result(const QueryEngineContext &ctx, TypeT
     return builder.build(ast.declarations);
 };
 
+StructTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                              StructTableQuery query) {
+    const auto &path = query.input;
+    auto &ast = ctx.run_query(ParseQuery{path});
+    TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
+    StructTableBuilder builder(&ctx.get_struct_registry(), &ttable);
+    return builder.build(ast.declarations);
+};
+
 FunctionSymbolSet arena::sema::compute_query_result(const QueryEngineContext &ctx,
                                                     FunctionIdsQuery query) {
     const auto &path = query.input;
@@ -141,6 +150,23 @@ TypeTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
     return ttable;
 }
 
+StructTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
+                                              AvailableStructsTableQuery query) {
+    const auto &path = query.input;
+    auto &imports = ctx.run_query(ImportedPathsQuery{path});
+
+    StructTable mtable(ctx.get_struct_registry());
+
+    for (const auto &import : imports) {
+        auto &imported_mtable = ctx.run_query(StructTableQuery{import});
+        mtable.import(imported_mtable);
+    }
+    auto &my_mtable = ctx.run_query(StructTableQuery{path});
+    mtable.import(my_mtable);
+
+    return mtable;
+}
+
 arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
     const QueryEngineContext &ctx, ResolvedCallsQuery query) {
     const auto &path = query.input;
@@ -163,9 +189,10 @@ arena::sema::ResolvedExpressionsResult arena::sema::compute_query_result(
     const FunctionTable &ftable = ctx.run_query(AvailableFunctionsTableQuery{path});
     const TypeTable &ttable = ctx.run_query(AvailableTypesTableQuery{path});
     auto &resolved_calls = ctx.run_query(ResolvedCallsQuery{path});
+    auto &all_structs = ctx.run_query(AvailableStructsTableQuery{path});
 
     auto &ast = ctx.run_query(ParseQuery{path});
-    TypeChecker typechecker(ftable, ttable);
+    TypeChecker typechecker(ftable, ttable, all_structs);
 
     return typechecker.type_check(resolved_calls.get_resolved_decls(),
                                   resolved_calls.get_resolved_variables());

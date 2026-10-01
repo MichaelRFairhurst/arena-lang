@@ -33,10 +33,15 @@ namespace arena::sema {
         VariableId variable_id;
     };
 
+    struct ResolvedMemberInfo {
+        std::optional<TypeId> struct_type_id;
+        size_t member_idx;
+    };
+
     struct UnresolvedExprInfo {};
 
-    using ResolvedExpressionInfo =
-        std::variant<UnresolvedExprInfo, ResolvedFunctionInfo, ResolvedVariableInfo>;
+    using ResolvedExpressionInfo = std::
+        variant<UnresolvedExprInfo, ResolvedFunctionInfo, ResolvedVariableInfo, ResolvedMemberInfo>;
 
     struct ResolvedExpression;
 

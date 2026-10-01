@@ -376,10 +376,13 @@ namespace arena::error {
                 "E-T_LIT_OOR",
                 l,
                 "Literal out of range here",
-                std::vector<Chunk>{"Literal value can not be represented as ", integral_type, " for ",
-                                    Link{.link_text = context.second,
-                                        .label_text = "required by " + context.second,
-                                        .location = context.first},
+                std::vector<Chunk>{
+                    "Literal value can not be represented as ",
+                    integral_type,
+                    " for ",
+                    Link{.link_text = context.second,
+                         .label_text = "required by " + context.second,
+                         .location = context.first},
                 },
             });
         }
@@ -397,6 +400,21 @@ namespace arena::error {
             });
         }
 
+        Error &E_T_NOT_A_STRUCT(Location l, Location target, std::string type_name) {
+            return report({
+                "E-T_NOT_A_STRUCT",
+                l,
+                "A non-struct type was used in member access expression here",
+                std::vector<Chunk>{
+                    "The left side of this member access has type ",
+                    Link{.link_text = type_name,
+                         .label_text = "expression has type " + std::string(type_name),
+                         .location = target},
+                    ", which is not a struct type",
+                },
+            });
+        }
+
         Error &E_R_UNKN_FUNC(Location l, Location target) {
             return report({
                 "E-R_UNKN_FUNC",
@@ -410,6 +428,33 @@ namespace arena::error {
                         .location = target,
                     },
                     " in call expression",
+                },
+            });
+        }
+
+        Error &E_R_UNKN_MEMBER(Location l,
+                               Location target,
+                               std::string struct_type_name,
+                               const ast::Token *member) {
+            return report({
+                "E-R_UNKN_MEMBER",
+                l,
+                "Unknown member " + std::string{member->text} + " of type " + struct_type_name,
+                std::vector<Chunk>{
+                    "Struct type ",
+                    Link{
+                        .link_text = struct_type_name,
+                        .label_text = "target of member access has type " + struct_type_name,
+                        .location = target,
+                    },
+                    " has no member named ",
+                    Link{
+                        .link_text = std::string{member->text},
+                        .label_text = "requested member named '" + std::string{member->text} +
+                                      "' does not exist",
+                        .location = member,
+                    },
+                    " in member access expression",
                 },
             });
         }

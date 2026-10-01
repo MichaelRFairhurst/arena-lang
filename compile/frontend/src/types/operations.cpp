@@ -57,6 +57,24 @@ std::string TypeOperations::get_type_name(TypeId id, const LifetimeGroup &type_l
     return std::string(ttable->get_type(id, &type_lifetimes).get_name());
 }
 
+std::optional<ResolvedStruct> TypeOperations::get_struct(TypeId type_id) const {
+    auto type = get_type(type_id);
+    if (auto struct_type = std::get_if<StructType>(&type.get_program_type())) {
+        return stable->get_struct(struct_type->name);
+    }
+    return std::nullopt;
+}
+
+std::optional<ResolvedStructMember> TypeOperations::get_struct_member(
+    const ResolvedStruct &strct, std::string_view member_name) const {
+    for (int i = 0; i < strct.num_members; ++i) {
+        if (strct.members[i].name == member_name) {
+            return strct.members[i];
+        }
+    }
+    return std::nullopt;
+}
+
 std::optional<ResolvedType> TypeOperations::dereference(TypeId id) const {
     return std::visit(DereferenceVisitor(this), get_type(id).get_program_type());
 }
@@ -225,7 +243,11 @@ error::Error *TypeOperations::require_assignable(TypeId lhs,
             return &errors->E_T_ARR_SZ_MIS(node, message, lhs_array->size, rhs_array->size);
         }
 
-        auto err = require_assignable(lhs_array->element_type, rhs_array->element_type, node, message, context);
+        auto err = require_assignable(lhs_array->element_type,
+                                      rhs_array->element_type,
+                                      node,
+                                      message,
+                                      context);
         if (err != nullptr) {
             err->add_cause("Array element type mismatch",
                            "Array elements of " + get_type_name(lhs) + " must be compatible with " +
@@ -242,9 +264,10 @@ error::Error *TypeOperations::require_assignable(TypeId lhs,
         }
         auto rhs_pointee_id = right_ptr->pointee_type;
         auto rhs_pointee = get_type(rhs_pointee_id);
-        auto constraint = context.is_const || (!is_lifetime_strict(lhs_pointee_id) && context.is_copy)
-                              ? LifetimeRelation::LessEqual
-                              : LifetimeRelation::Equals;
+        auto constraint =
+            context.is_const || (!is_lifetime_strict(lhs_pointee_id) && context.is_copy)
+                ? LifetimeRelation::LessEqual
+                : LifetimeRelation::Equals;
         std::vector<error::Supplement> supplements;
 
         if (is_lifetime_strict(lhs_pointee_id) && !context.is_const) {
