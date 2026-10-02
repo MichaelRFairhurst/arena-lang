@@ -9,7 +9,11 @@ namespace {
                                   const std::unordered_map<LifetimeId, LifetimeId> *substitutions)
             : ttable(ttable), type_lifetimes(type_lifetimes), substitutions(substitutions) {}
 
-        TypeId substitute(TypeId type) { return substitute(ttable->get_type(type, type_lifetimes)); }
+        TypeId substitute(TypeId type) {
+            auto resolved = ttable->get_type(type, type_lifetimes);
+            return substitute(ttable->get_type(type, type_lifetimes));
+
+        }
         TypeId substitute(ResolvedType type) {
             auto symbol = std::visit(*this, type.get_symbol());
             return ttable->get_type_id(symbol);

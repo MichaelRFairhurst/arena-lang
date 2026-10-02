@@ -1,6 +1,6 @@
 fun main(argc: int, argv: char**) -> int {
     let x: int = 10;
-    let d: double = 15.0;
+    let d: double64 = 15.0;
 
     if (d == -15.0) {
         ret 1;

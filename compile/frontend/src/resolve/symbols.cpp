@@ -12,14 +12,20 @@ using namespace arena;
 namespace {
     class TypeSymbolResolverVisitor : public ast::Visitor {
     public:
-        TypeSymbolResolverVisitor(const TypeSymbolRegistry &registry, LifetimeTable *lifetimes)
-            : registry(&registry), lifetimes(lifetimes) {}
+        TypeSymbolResolverVisitor(const TypeSymbolRegistry &registry,
+                                  LifetimeTable *lifetimes,
+                                  std::vector<const ast::NamedType *> *type_references)
+            : registry(&registry), lifetimes(lifetimes), type_references(type_references) {}
 
         void visit(const ast::NamedType *named_type) override {
             using namespace std::string_view_literals;
             if (named_type->get_name() == "void"sv) {
                 result = registry->get_interned(VoidTypeSymbol{});
                 return;
+            }
+
+            if (type_references != nullptr) {
+                type_references->push_back(named_type);
             }
 
             result = registry->get_interned(NamedTypeSymbol{named_type->get_name()});
@@ -64,6 +70,7 @@ namespace {
         const TypeSymbolRegistry *registry;
         TypeSymbol result;
         LifetimeTable *lifetimes;
+        std::vector<const ast::NamedType *> *type_references;
     };
 
 }; // namespace
@@ -193,8 +200,9 @@ bool TypeSymbolSet::operator==(const TypeSymbolSet &other) const {
     return true;
 }
 
-TypeSymbol TypeSymbolResolver::resolve(const ast::Type *type) const {
-    TypeSymbolResolverVisitor visitor(*registry, lifetimes);
+TypeSymbol TypeSymbolResolver::resolve(const ast::Type *type,
+                                       std::vector<const ast::NamedType *> *type_references) const {
+    TypeSymbolResolverVisitor visitor(*registry, lifetimes, type_references);
     type->accept(&visitor);
     return visitor.get_result();
 }

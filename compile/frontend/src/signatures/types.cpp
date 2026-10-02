@@ -198,7 +198,7 @@ ResolvedType TypeTable::get_type(const ast::Type *type, LifetimeGroup *lifetimes
     // in the expression resolver.
     LifetimeTable lt_table{lifetimes, false};
     TypeSymbolResolver symbol_resolver(registry, &lt_table);
-    auto symbol = symbol_resolver.resolve(type);
+    auto symbol = symbol_resolver.resolve(type, nullptr);
     TypeMaterializer materializer{this, registry, lifetimes};
     return std::visit(materializer, symbol);
 }
@@ -208,7 +208,9 @@ ResolvedType TypeTable::get_named_type(NamedTypeSymbol name) const {
 
     auto it = types.find(id);
     if (it == types.end()) {
-        throw std::runtime_error("Type ID not found for named type lookup");
+        // TODO: This would be a good thing to log at a debug level. Harmless but possibly
+        // unexpected and could cause unexpected behavior.
+        return get_type(registry->get_type_id(ErrorTypeSymbol{}), nullptr);
     }
     return it->second;
 }

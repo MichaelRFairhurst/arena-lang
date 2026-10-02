@@ -1,0 +1,30 @@
+struct S {
+    m_unused: UnknownMemberType; // E-R_TYPE_UNKN
+    m_used: UnknownMemberType;   // E-R_TYPE_UNKN
+}
+
+fun unused(
+    p: UnknownParameterType      // E-R_TYPE_UNKN
+) -> UnknownReturnType {         // E-R_TYPE_UNKN
+    let v: UnkknownVariableType; // E-R_TYPE_UNKN
+}
+
+fun get_unknown_return_type() -> UnknownReturnType;   // E-R_TYPE_UNKN
+fun take_unknown_param_type(p: UnknownParameterType); // E-R_TYPE_UNKN
+
+fun used(
+    p: UnknownParameterType     // E-R_TYPE_UNKN
+) -> UnknownReturnType {        // E-R_TYPE_UNKN
+    let v: UnknownVariableType; // E-R_TYPE_UNKN
+    let s: S;
+
+    p; v; s.m_used; get_unknown_return_type();
+
+    p == 1;
+    v == 1;
+    s.m_used == 1;
+    get_unknown_return_type() == 1;
+    take_unknown_param_type(1);
+
+    ret 1;
+}

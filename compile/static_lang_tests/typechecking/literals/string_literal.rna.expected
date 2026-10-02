@@ -49,3 +49,16 @@ at compile/static_lang_tests/typechecking/literals/string_literal.rna:37:19:37:2
  == note: got conflicting type char const*static for here
   :     let b: bool = "true";
   :                   ^^^^^^  --- string_literal.rna:37:19
+
+
+Error[E-T_ASGN_NOREL]: Expected double64 but got char const*static in here
+at compile/static_lang_tests/typechecking/literals/string_literal.rna:38:23:38:28
+  :     let d: double64 = "0.0";
+  :                       ^^^^^ type mismatch
+  .
+ == note: expected type double64 based on variable 'd'
+  :     let d: double64 = "0.0";
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^  --- string_literal.rna:38:5
+ == note: got conflicting type char const*static for here
+  :     let d: double64 = "0.0";
+  :                       ^^^^^  --- string_literal.rna:38:23

@@ -6,6 +6,7 @@
 #include <variant>
 #include <vector>
 #include "ast/node.hpp"
+#include "ast/types.hpp"
 
 /**
  * Arena errors have the following general structure:
@@ -652,6 +653,26 @@ namespace arena::error {
                     id,
                 },
             });
+        }
+
+        Error &E_R_TYPE_UNKN(const ast::NamedType *type_node, LocatedText declaration) {
+            std::string name = std::string{type_node->get_name()};
+            return report({
+                "E-R_TYPE_UNKN",
+                type_node,
+                "Unknown type " + name,
+                std::vector<Chunk>{
+                    "Type ",
+                    name,
+                    " is not recognized in ",
+                    Link{
+                        .link_text = declaration.second,
+                        .label_text = "In " + declaration.second,
+                        .location = declaration.first
+                    },
+                },
+            });
+
         }
 
         template <typename... Args>

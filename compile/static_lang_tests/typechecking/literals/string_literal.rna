@@ -35,5 +35,5 @@ fun bad() {
     let c: char = "str";
     let i: int = "1";
     let b: bool = "true";
-    let d: double = "0.0";
+    let d: double64 = "0.0";
 }

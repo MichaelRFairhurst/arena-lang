@@ -100,6 +100,11 @@ void InferenceContext::constrain_integral_literal(sema::TypeId default_type, con
     }
 
     auto type = ops->get_type(*context_type);
+    if (type.is_error()) {
+        context_type = type.get_id();
+        return;
+    }
+
     auto integral_type = std::get_if<IntegralType>(&type.get_program_type());
     if (integral_type == nullptr || integral_type->literal_kind != IntegralLiteralKind::Int) {
         ops->get_errors().E_T_NOT_INTGL(origin, {context_node, ops->get_type_name(*context_type)});

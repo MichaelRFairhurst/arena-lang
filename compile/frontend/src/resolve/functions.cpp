@@ -23,14 +23,14 @@ namespace {
             auto args = decl->get_params()->get_params();
             for (auto arg : args) {
                 auto arg_type = arg->get_type();
-                auto arg_type_id = type_table->get_type_id(symbolizer.resolve(arg_type));
+                auto arg_type_id = type_table->get_type_id(symbolizer.resolve(arg_type, nullptr));
                 param_types.push_back(arg_type_id);
             }
 
             std::optional<TypeId> return_type_id;
             if (decl->get_return_type()) {
                 return_type_id =
-                    type_table->get_type_id(symbolizer.resolve(decl->get_return_type()));
+                    type_table->get_type_id(symbolizer.resolve(decl->get_return_type(), nullptr));
             }
 
             ResolvedFunction function{id,

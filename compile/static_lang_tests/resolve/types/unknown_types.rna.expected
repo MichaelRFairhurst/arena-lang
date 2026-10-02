@@ -1,0 +1,71 @@
+
+Error[E-R_TYPE_UNKN]: Type UnknownReturnType is not recognized in return type of function unused
+at compile/static_lang_tests/resolve/types/unknown_types.rna:8:6:8:23
+  : ) -> UnknownReturnType {         // E-R_TYPE_UNKN
+  :      ^^^^^^^^^^^^^^^^^ Unknown type UnknownReturnType
+unknown_types.rna:8:6
+  : ) -> UnknownReturnType {         // E-R_TYPE_UNKN
+  :      ^^^^^^^^^^^^^^^^^ In return type of function unused
+
+
+Error[E-R_TYPE_UNKN]: Type // E-R_TYPE_UNKN is not recognized in parameter p of function unused
+at compile/static_lang_tests/resolve/types/unknown_types.rna:7:34:7:50
+  :     p: UnknownParameterType      // E-R_TYPE_UNKN
+  :                                  ^^^^^^^^^^^^^^^^ Unknown type // E-R_TYPE_UNKN
+unknown_types.rna:7:5
+  :     p: UnknownParameterType      // E-R_TYPE_UNKN
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ In parameter p of function unused
+
+
+Error[E-R_TYPE_UNKN]: Type UnkknownVariableType is not recognized in let-statement for variable v
+at compile/static_lang_tests/resolve/types/unknown_types.rna:9:12:9:32
+  :     let v: UnkknownVariableType; // E-R_TYPE_UNKN
+  :            ^^^^^^^^^^^^^^^^^^^^ Unknown type UnkknownVariableType
+unknown_types.rna:9:5
+  :     let v: UnkknownVariableType; // E-R_TYPE_UNKN
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ In let-statement for variable v
+
+
+Error[E-R_TYPE_UNKN]: Type UnknownReturnType is not recognized in return type of function get_unknown_return_type
+at compile/static_lang_tests/resolve/types/unknown_types.rna:12:34:12:51
+  : fun get_unknown_return_type() -> UnknownReturnType;   // E-R_TYPE_UNKN
+  :                                  ^^^^^^^^^^^^^^^^^ Unknown type UnknownReturnType
+unknown_types.rna:12:34
+  : fun get_unknown_return_type() -> UnknownReturnType;   // E-R_TYPE_UNKN
+  :                                  ^^^^^^^^^^^^^^^^^ In return type of function get_unknown_return_type
+
+
+Error[E-R_TYPE_UNKN]: Type UnknownParameterType is not recognized in parameter p of function take_unknown_param_type
+at compile/static_lang_tests/resolve/types/unknown_types.rna:13:32:13:52
+  : fun take_unknown_param_type(p: UnknownParameterType); // E-R_TYPE_UNKN
+  :                                ^^^^^^^^^^^^^^^^^^^^ Unknown type UnknownParameterType
+unknown_types.rna:13:29
+  : fun take_unknown_param_type(p: UnknownParameterType); // E-R_TYPE_UNKN
+  :                             ^^^^^^^^^^^^^^^^^^^^^^^ In parameter p of function take_unknown_param_type
+
+
+Error[E-R_TYPE_UNKN]: Type UnknownReturnType is not recognized in return type of function used
+at compile/static_lang_tests/resolve/types/unknown_types.rna:17:6:17:23
+  : ) -> UnknownReturnType {        // E-R_TYPE_UNKN
+  :      ^^^^^^^^^^^^^^^^^ Unknown type UnknownReturnType
+unknown_types.rna:17:6
+  : ) -> UnknownReturnType {        // E-R_TYPE_UNKN
+  :      ^^^^^^^^^^^^^^^^^ In return type of function used
+
+
+Error[E-R_TYPE_UNKN]: Type // E-R_TYPE_UNKN is not recognized in parameter p of function used
+at compile/static_lang_tests/resolve/types/unknown_types.rna:16:33:16:49
+  :     p: UnknownParameterType     // E-R_TYPE_UNKN
+  :                                 ^^^^^^^^^^^^^^^^ Unknown type // E-R_TYPE_UNKN
+unknown_types.rna:16:5
+  :     p: UnknownParameterType     // E-R_TYPE_UNKN
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ In parameter p of function used
+
+
+Error[E-R_TYPE_UNKN]: Type UnknownVariableType is not recognized in let-statement for variable v
+at compile/static_lang_tests/resolve/types/unknown_types.rna:18:12:18:31
+  :     let v: UnknownVariableType; // E-R_TYPE_UNKN
+  :            ^^^^^^^^^^^^^^^^^^^ Unknown type UnknownVariableType
+unknown_types.rna:18:5
+  :     let v: UnknownVariableType; // E-R_TYPE_UNKN
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ In let-statement for variable v

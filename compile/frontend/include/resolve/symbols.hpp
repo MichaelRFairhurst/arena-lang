@@ -437,7 +437,7 @@ namespace arena::sema {
         TypeSymbolResolver(const TypeSymbolRegistry *registry, LifetimeTable *lifetimes)
             : registry(registry), lifetimes(lifetimes) {}
 
-        TypeSymbol resolve(const ast::Type *type) const;
+        TypeSymbol resolve(const ast::Type *type, std::vector<const ast::NamedType *> *type_references) const;
 
     private:
         LifetimeTable *lifetimes;

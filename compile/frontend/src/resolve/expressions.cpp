@@ -96,7 +96,17 @@ namespace {
             auto name = let_stmt.original->get_name();
             auto type = let_stmt.original->get_type();
             if (type != nullptr) {
-                explicit_type_id = types->get_id(symbolizer.resolve(type));
+                std::vector<const ast::NamedType *> type_references;
+                explicit_type_id = types->get_id(symbolizer.resolve(type, &type_references))
+                                       .value_or(types->get_id(ErrorTypeSymbol{}).value());
+
+                for (auto &type_ref : type_references) {
+                    if (!types->is_available(NamedTypeSymbol{type_ref->get_name()})) {
+                        errors->E_R_TYPE_UNKN(type_ref,
+                                              {let_stmt.original,
+                                               "let-statement for variable " + std::string{name}});
+                    }
+                }
             }
 
             auto var = arena->alloc<ResolvedVariable>(name,
@@ -172,9 +182,11 @@ namespace {
                                       const TypeSymbolRegistry *registry,
                                       VariableScope *variable_scope,
                                       LifetimeTable *lifetimes,
-                                      ResolvedDeclaration *resolved_decl)
+                                      ResolvedDeclaration *resolved_decl,
+                                      error::Reporter *errors)
             : arena(arena), type_symbols(type_symbols), symbolizer(registry, lifetimes),
-              variable_scope(variable_scope), lifetimes(lifetimes), resolved_decl(resolved_decl) {}
+              variable_scope(variable_scope), lifetimes(lifetimes), resolved_decl(resolved_decl),
+              errors(errors) {}
 
         void visit(const ast::FunctionDefinition *func_def) override {
             auto scoped_stack_lifetime = lifetimes->push_stack(func_def->get_body());
@@ -187,8 +199,18 @@ namespace {
 
             std::optional<TypeId> return_type_id;
             if (func_decl->get_return_type() != nullptr) {
-                return_type_id =
-                    type_symbols->get_id(symbolizer.resolve(func_decl->get_return_type()));
+                std::vector<const ast::NamedType *> type_references;
+                return_type_id = type_symbols->get_id(
+                    symbolizer.resolve(func_decl->get_return_type(), &type_references));
+
+                for (auto &type_ref : type_references) {
+                    if (!type_symbols->is_available(NamedTypeSymbol{type_ref->get_name()})) {
+                        errors->E_R_TYPE_UNKN(type_ref,
+                                              {func_decl->get_return_type(),
+                                               "return type of function " +
+                                                   std::string{func_decl->get_name()}});
+                    }
+                }
             } else {
                 return_type_id = type_symbols->get_id(VoidTypeSymbol{});
             }
@@ -204,10 +226,12 @@ namespace {
 
             for (const auto &param : param_list) {
                 std::optional<TypeId> param_type;
+                std::vector<const ast::NamedType *> type_references;
 
                 if (param->get_type() != nullptr) {
-                    auto symbol = symbolizer.resolve(param->get_type());
-                    param_type = type_symbols->get_id(symbol);
+                    auto symbol = symbolizer.resolve(param->get_type(), &type_references);
+                    param_type = type_symbols->get_id(symbol).value_or(
+                        type_symbols->get_id(ErrorTypeSymbol{}).value());
                 }
 
                 auto variable = arena->alloc<ResolvedVariable>( // force line break
@@ -217,6 +241,16 @@ namespace {
                     param_type,
                     std::nullopt // No inferred type for parameters
                 );
+
+                for (auto &type_ref : type_references) {
+                    if (!type_symbols->is_available(NamedTypeSymbol{type_ref->get_name()})) {
+                        errors->E_R_TYPE_UNKN(type_ref,
+                                              {param,
+                                               "parameter " + std::string{param->get_name()} +
+                                                   " of function " +
+                                                   std::string{func_decl->get_name()}});
+                    }
+                }
 
                 auto variable_id = variable_scope->add_variable(param->get_name(), variable);
                 *p_resolved_param = variable_id;
@@ -232,6 +266,7 @@ namespace {
         TypeSymbolResolver symbolizer;
         LifetimeTable *lifetimes;
         ResolvedDeclaration *resolved_decl;
+        error::Reporter *errors;
     };
 
 } // namespace
@@ -290,7 +325,8 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
                                                 registry,
                                                 &variable_scope,
                                                 &public_lifetimes,
-                                                tree};
+                                                tree,
+                                                &errors};
 
         decl->accept(&func_scope_visitor);
 

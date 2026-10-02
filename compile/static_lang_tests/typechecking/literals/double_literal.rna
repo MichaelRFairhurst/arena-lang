@@ -1,9 +1,9 @@
 fun zero() {
-    let x: double = 0.0;
+    let x: double64 = 0.0;
 }
 
 fun giant() {
-    let x: double = 12340234.0;
+    let x: double64 = 12340234.0;
 }
 
 fun bad() {

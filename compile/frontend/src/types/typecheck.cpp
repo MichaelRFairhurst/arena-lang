@@ -320,6 +320,10 @@ namespace {
             auto object_inference_ctx = make_child_context(step, 0);
             auto object_type_id = resolve_child(step, 0, &object_inference_ctx);
 
+            if (object_type_id == ops.get_error_type().get_id()) {
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
             auto strct = ops.get_struct(object_type_id);
             if (!strct) {
                 auto type = ops.get_type(object_type_id);
