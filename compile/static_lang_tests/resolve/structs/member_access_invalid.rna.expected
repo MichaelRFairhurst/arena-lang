@@ -1,0 +1,313 @@
+
+Error[E-R_ID_UNKN]: Unresolved identifier unknown_id
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:72:5:72:15
+  :     unknown_id.foo; // E-R_ID_UNKN
+  :     ^^^^^^^^^^ For this identifier expression
+
+
+Error[E-R_TYPE_UNKN]: Type NoSuchStructKnown is not recognized in parameter s of function use_unrecognized_struct
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:82:8:82:25
+  :     s: NoSuchStructKnown, // E-R_TYPE_UNKN
+  :        ^^^^^^^^^^^^^^^^^ Unknown type NoSuchStructKnown
+member_access_invalid.rna:82:5
+  :     s: NoSuchStructKnown, // E-R_TYPE_UNKN
+  :     ^^^^^^^^^^^^^^^^^^^^ In parameter s of function use_unrecognized_struct
+
+
+Error[E-R_TYPE_UNKN]: Type NoSuchStructKnown is not recognized in parameter p of function use_unrecognized_struct
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:83:8:83:25
+  :     p: NoSuchStructKnown* // E-R_TYPE_UNKN
+  :        ^^^^^^^^^^^^^^^^^ Unknown type NoSuchStructKnown
+member_access_invalid.rna:83:5
+  :     p: NoSuchStructKnown* // E-R_TYPE_UNKN
+  :     ^^^^^^^^^^^^^^^^^^^^ In parameter p of function use_unrecognized_struct
+
+
+Error[E-R_UNKN_MEMBER]: Struct type S1 has no member named width in member access expression
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:12:5:12:13
+  :     s1.width; // E-R_UNKN_MEMBER
+  :     ^^^^^^^^ Unknown member width of type S1
+member_access_invalid.rna:12:5
+  :     s1.width; // E-R_UNKN_MEMBER
+  :     ^^ target of member access has type S1
+member_access_invalid.rna:12:8
+  :     s1.width; // E-R_UNKN_MEMBER
+  :        ^^^^^ requested member named 'width' does not exist
+
+
+Error[E-R_UNKN_MEMBER]: Struct type S2 has no member named width in member access expression
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:13:5:13:13
+  :     s2.width; // E-R_UNKN_MEMBER
+  :     ^^^^^^^^ Unknown member width of type S2
+member_access_invalid.rna:13:5
+  :     s2.width; // E-R_UNKN_MEMBER
+  :     ^^ target of member access has type S2
+member_access_invalid.rna:13:8
+  :     s2.width; // E-R_UNKN_MEMBER
+  :        ^^^^^ requested member named 'width' does not exist
+
+
+Error[E-R_UNKN_MEMBER]: Struct type S2 has no member named name in member access expression
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:15:5:15:12
+  :     s2.name; // E-R_UNKN_MEMBER
+  :     ^^^^^^^ Unknown member name of type S2
+member_access_invalid.rna:15:5
+  :     s2.name; // E-R_UNKN_MEMBER
+  :     ^^ target of member access has type S2
+member_access_invalid.rna:15:8
+  :     s2.name; // E-R_UNKN_MEMBER
+  :        ^^^^ requested member named 'name' does not exist
+
+
+Error[E-R_UNKN_MEMBER]: Struct type S1 has no member named s1 in member access expression
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:16:5:16:10
+  :     s1.s1;   // E-R_UNKN_MEMBER
+  :     ^^^^^ Unknown member s1 of type S1
+member_access_invalid.rna:16:5
+  :     s1.s1;   // E-R_UNKN_MEMBER
+  :     ^^ target of member access has type S1
+member_access_invalid.rna:16:8
+  :     s1.s1;   // E-R_UNKN_MEMBER
+  :        ^^ requested member named 's1' does not exist
+
+
+Error[E-R_UNKN_MEMBER]: Struct type S1 has no member named width in member access expression
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:18:5:18:16
+  :     s2.s1.width; // E-R_UNKN_MEMBER
+  :     ^^^^^^^^^^^ Unknown member width of type S1
+member_access_invalid.rna:18:5
+  :     s2.s1.width; // E-R_UNKN_MEMBER
+  :     ^^^^^ target of member access has type S1
+member_access_invalid.rna:18:11
+  :     s2.s1.width; // E-R_UNKN_MEMBER
+  :           ^^^^^ requested member named 'width' does not exist
+
+
+Error[E-R_UNKN_MEMBER]: Struct type S1 has no member named s1 in member access expression
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:19:5:19:13
+  :     s2.s1.s1;    // E-R_UNKN_MEMBER
+  :     ^^^^^^^^ Unknown member s1 of type S1
+member_access_invalid.rna:19:5
+  :     s2.s1.s1;    // E-R_UNKN_MEMBER
+  :     ^^^^^ target of member access has type S1
+member_access_invalid.rna:19:11
+  :     s2.s1.s1;    // E-R_UNKN_MEMBER
+  :           ^^ requested member named 's1' does not exist
+
+
+Error[E-T_ASGN_NOREL]: Expected short but got int in member access
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:27:10:27:19
+  :     sh = s1.length;    // E-T_ASGN_NOREL
+  :          ^^^^^^^^^ type mismatch
+  .
+ == note: expected type short based on lvalue in assignment here
+  :     sh = s1.length;    // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^  --- member_access_invalid.rna:27:5
+ == note: got conflicting type int for member access
+  :     sh = s1.length;    // E-T_ASGN_NOREL
+  :          ^^^^^^^^^  --- member_access_invalid.rna:27:10
+
+
+Error[E-T_ASGN_NOREL]: Expected short but got int in member access
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:28:10:28:22
+  :     sh = s2.s1.length; // E-T_ASGN_NOREL
+  :          ^^^^^^^^^^^^ type mismatch
+  .
+ == note: expected type short based on lvalue in assignment here
+  :     sh = s2.s1.length; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^^^^  --- member_access_invalid.rna:28:5
+ == note: got conflicting type int for member access
+  :     sh = s2.s1.length; // E-T_ASGN_NOREL
+  :          ^^^^^^^^^^^^  --- member_access_invalid.rna:28:10
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got short in member access
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:30:9:30:18
+  :     i = s2.length; // E-T_ASGN_NOREL
+  :         ^^^^^^^^^ type mismatch
+  .
+ == note: expected type int based on lvalue in assignment here
+  :     i = s2.length; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^  --- member_access_invalid.rna:30:5
+ == note: got conflicting type short for member access
+  :     i = s2.length; // E-T_ASGN_NOREL
+  :         ^^^^^^^^^  --- member_access_invalid.rna:30:9
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got char const*stack in member access
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:32:9:32:16
+  :     i = s1.name;    // E-T_ASGN_NOREL
+  :         ^^^^^^^ type mismatch
+  .
+ == note: expected type int based on lvalue in assignment here
+  :     i = s1.name;    // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^  --- member_access_invalid.rna:32:5
+ == note: got conflicting type char const*stack for member access
+  :     i = s1.name;    // E-T_ASGN_NOREL
+  :         ^^^^^^^  --- member_access_invalid.rna:32:9
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got char const*stack in member access
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:33:9:33:19
+  :     i = s2.s1.name; // E-T_ASGN_NOREL
+  :         ^^^^^^^^^^ type mismatch
+  .
+ == note: expected type int based on lvalue in assignment here
+  :     i = s2.s1.name; // E-T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^^  --- member_access_invalid.rna:33:5
+ == note: got conflicting type char const*stack for member access
+  :     i = s2.s1.name; // E-T_ASGN_NOREL
+  :         ^^^^^^^^^^  --- member_access_invalid.rna:33:9
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type bool, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:55:5:55:14
+  :     bool_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:55:5
+  :     bool_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^ expression has type bool
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type char, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:56:5:56:14
+  :     char_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:56:5
+  :     char_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^ expression has type char
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type byte, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:57:5:57:14
+  :     byte_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:57:5
+  :     byte_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^ expression has type byte
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type short, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:58:5:58:15
+  :     short_.foo;    // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:58:5
+  :     short_.foo;    // E-T_NOT_A_STRUCT
+  :     ^^^^^^ expression has type short
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type ushort, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:59:5:59:16
+  :     ushort_.foo;   // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:59:5
+  :     ushort_.foo;   // E-T_NOT_A_STRUCT
+  :     ^^^^^^^ expression has type ushort
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type int, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:60:5:60:13
+  :     int_.foo;      // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:60:5
+  :     int_.foo;      // E-T_NOT_A_STRUCT
+  :     ^^^^ expression has type int
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type uint, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:61:5:61:14
+  :     uint_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:61:5
+  :     uint_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^ expression has type uint
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type long, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:62:5:62:14
+  :     long_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:62:5
+  :     long_.foo;     // E-T_NOT_A_STRUCT
+  :     ^^^^^ expression has type long
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type ulong, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:63:5:63:15
+  :     ulong_.foo;    // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:63:5
+  :     ulong_.foo;    // E-T_NOT_A_STRUCT
+  :     ^^^^^^ expression has type ulong
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type ssize, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:64:5:64:15
+  :     ssize_.foo;    // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:64:5
+  :     ssize_.foo;    // E-T_NOT_A_STRUCT
+  :     ^^^^^^ expression has type ssize
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type usize, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:65:5:65:15
+  :     usize_.foo;    // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:65:5
+  :     usize_.foo;    // E-T_NOT_A_STRUCT
+  :     ^^^^^^ expression has type usize
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type float32, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:66:5:66:17
+  :     float32_.foo;  // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:66:5
+  :     float32_.foo;  // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^ expression has type float32
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type double64, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:67:5:67:18
+  :     double64_.foo; // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:67:5
+  :     double64_.foo; // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^ expression has type double64
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type int[4], which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:68:5:68:12
+  :     arr.foo;       // E-T_NOT_A_STRUCT
+  :     ^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:68:5
+  :     arr.foo;       // E-T_NOT_A_STRUCT
+  :     ^^^ expression has type int[4]
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type int*<free>, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:69:5:69:12
+  :     ptr.foo;       // E-T_NOT_A_STRUCT
+  :     ^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:69:5
+  :     ptr.foo;       // E-T_NOT_A_STRUCT
+  :     ^^^ expression has type int*<free>
+
+
+Error[E-T_NOT_A_STRUCT]: The left side of this member access has type <void>, which is not a struct type
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:71:5:71:19
+  :     get_void().foo; // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^^^^^ A non-struct type was used in member access expression here
+member_access_invalid.rna:71:5
+  :     get_void().foo; // E-T_NOT_A_STRUCT
+  :     ^^^^^^^^^^ expression has type <void>
+
+
+Error[E-T_INCMPLT_STRUCT]: Struct type IncompleteStruct is incomplete in this member access
+at compile/static_lang_tests/resolve/structs/member_access_invalid.rna:78:5:78:12
+  :     s.*.foo; // E-T_INCMPLT_STRUCT
+  :     ^^^^^^^ Member access with an incomplete struct type
+member_access_invalid.rna:78:5
+  :     s.*.foo; // E-T_INCMPLT_STRUCT
+  :     ^^^ expression's struct type IncompleteStruct is incomplete here

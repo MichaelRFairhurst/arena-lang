@@ -28,7 +28,7 @@ namespace arena::sema {
 
         std::optional<ResolvedStruct> get_struct(TypeId type_id) const;
 
-        std::optional<ResolvedStructMember> get_struct_member(const ResolvedStruct &strct,
+        std::optional<ResolvedStructMember> get_struct_member(const CompleteStructInfo &strct,
                                                               std::string_view member_name) const;
 
         std::optional<ResolvedType> dereference(TypeId id) const;

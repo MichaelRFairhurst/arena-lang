@@ -43,7 +43,13 @@ namespace {
     };
 } // namespace
 
-ResolvedType TypeOperations::get_type(TypeId id) const { return ttable->get_type(id, lifetimes); }
+ResolvedType TypeOperations::get_type(TypeId id) const {
+    //try {
+        return ttable->get_type(id, lifetimes);
+    //} catch (const std::exception &e) {
+    //    return get_error_type();
+    //}
+}
 
 std::string TypeOperations::get_type_name(TypeId id) const {
     return std::string(get_type(id).get_name());
@@ -59,14 +65,25 @@ std::string TypeOperations::get_type_name(TypeId id, const LifetimeGroup &type_l
 
 std::optional<ResolvedStruct> TypeOperations::get_struct(TypeId type_id) const {
     auto type = get_type(type_id);
-    if (auto struct_type = std::get_if<StructType>(&type.get_program_type())) {
-        return stable->get_struct(struct_type->name);
+    auto struct_type = std::get_if<StructType>(&type.get_program_type());
+    if (!struct_type) {
+        return std::nullopt;
     }
-    return std::nullopt;
+
+    auto resolved_struct = stable->get_struct(struct_type->name);
+    if (!resolved_struct) {
+        return ResolvedStruct{
+            .id = stable->get_struct_id(struct_type->name),
+            .name = struct_type->name,
+            .complete_info = std::nullopt
+        };
+    }
+
+    return resolved_struct;
 }
 
 std::optional<ResolvedStructMember> TypeOperations::get_struct_member(
-    const ResolvedStruct &strct, std::string_view member_name) const {
+    const CompleteStructInfo &strct, std::string_view member_name) const {
     for (int i = 0; i < strct.num_members; ++i) {
         if (strct.members[i].name == member_name) {
             return strct.members[i];

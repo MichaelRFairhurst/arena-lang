@@ -1,0 +1,87 @@
+struct S1 {
+    length: int;
+    name: char const *;
+}
+
+struct S2 {
+    length: short;
+    s1: S1;
+}
+
+fun no_such_member(s1: S1, s2: S2) {
+    s1.width; // E-R_UNKN_MEMBER
+    s2.width; // E-R_UNKN_MEMBER
+
+    s2.name; // E-R_UNKN_MEMBER
+    s1.s1;   // E-R_UNKN_MEMBER
+
+    s2.s1.width; // E-R_UNKN_MEMBER
+    s2.s1.s1;    // E-R_UNKN_MEMBER
+}
+
+fun wrong_member_type(s1: S1, s2: S2) {
+    let i: int = 0;
+    let sh: short = 0;
+    let str: char const * = "test";
+
+    sh = s1.length;    // E-T_ASGN_NOREL
+    sh = s2.s1.length; // E-T_ASGN_NOREL
+
+    i = s2.length; // E-T_ASGN_NOREL
+
+    i = s1.name;    // E-T_ASGN_NOREL
+    i = s2.s1.name; // E-T_ASGN_NOREL
+}
+
+fun get_void() -> void;
+
+fun not_a_struct() {
+    let bool_: bool;
+    let char_: char;
+    let byte_: byte;
+    let short_: short;
+    let ushort_: ushort;
+    let int_: int;
+    let uint_: uint;
+    let long_: long;
+    let ulong_: ulong;
+    let ssize_: ssize;
+    let usize_: usize;
+    let float32_: float32;
+    let double64_: double64;
+    let arr: int[4];
+    let ptr: int*;
+
+    bool_.foo;     // E-T_NOT_A_STRUCT
+    char_.foo;     // E-T_NOT_A_STRUCT
+    byte_.foo;     // E-T_NOT_A_STRUCT
+    short_.foo;    // E-T_NOT_A_STRUCT
+    ushort_.foo;   // E-T_NOT_A_STRUCT
+    int_.foo;      // E-T_NOT_A_STRUCT
+    uint_.foo;     // E-T_NOT_A_STRUCT
+    long_.foo;     // E-T_NOT_A_STRUCT
+    ulong_.foo;    // E-T_NOT_A_STRUCT
+    ssize_.foo;    // E-T_NOT_A_STRUCT
+    usize_.foo;    // E-T_NOT_A_STRUCT
+    float32_.foo;  // E-T_NOT_A_STRUCT
+    double64_.foo; // E-T_NOT_A_STRUCT
+    arr.foo;       // E-T_NOT_A_STRUCT
+    ptr.foo;       // E-T_NOT_A_STRUCT
+
+    get_void().foo; // E-T_NOT_A_STRUCT
+    unknown_id.foo; // E-R_ID_UNKN
+}
+
+struct IncompleteStruct;
+
+fun use_incomplete_struct(s: IncompleteStruct*) {
+    s.*.foo; // E-T_INCMPLT_STRUCT
+}
+
+fun use_unrecognized_struct(
+    s: NoSuchStructKnown, // E-R_TYPE_UNKN
+    p: NoSuchStructKnown* // E-R_TYPE_UNKN
+) {
+    s.foo;
+    p.*.foo;
+}

@@ -333,7 +333,15 @@ namespace {
                 return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
             }
 
-            auto member = ops.get_struct_member(*strct, step.ast->get_member_name());
+            if (!strct->complete_info.has_value()) {
+                ops.get_errors().E_T_INCMPLT_STRUCT(step.ast,
+                                                    step.ast->get_object(),
+                                                    std::string{strct->name});
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            auto member =
+                ops.get_struct_member(strct->complete_info.value(), step.ast->get_member_name());
 
             if (!member) {
                 ops.get_errors().E_R_UNKN_MEMBER(step.ast,
@@ -346,7 +354,7 @@ namespace {
 
             step.out->info = ResolvedMemberInfo{
                 .struct_type_id = object_type_id,
-                .member_idx = static_cast<size_t>(&*member - strct->members),
+                .member_idx = static_cast<size_t>(&*member - strct->complete_info->members),
             };
 
             inference_ctx->constrain_context_type(member->type_id,

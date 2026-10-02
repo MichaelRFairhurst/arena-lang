@@ -66,8 +66,7 @@ StructTable arena::sema::compute_query_result(const QueryEngineContext &ctx,
                                               StructTableQuery query) {
     const auto &path = query.input;
     auto &ast = ctx.run_query(ParseQuery{path});
-    TypeTable ttable = TypeTable::builtin_type_table(ctx.get_type_registry());
-    StructTableBuilder builder(&ctx.get_struct_registry(), &ttable);
+    StructTableBuilder builder(&ctx.get_struct_registry(), &ctx.get_type_registry());
     return builder.build(ast.declarations);
 };
 

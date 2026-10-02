@@ -1,0 +1,23 @@
+struct S1 {
+    length: int;
+    name: char const *;
+}
+
+struct S2 {
+    length: short;
+    s1: S1;
+}
+
+fun f(s1: S1, s2: S2) {
+    let i: int = 0;
+    let sh: short = 0;
+    let str: char const* = "test";
+
+    i = s1.length;
+    i = s2.s1.length;
+
+    sh = s2.length;
+
+    str = s1.name;
+    str = s2.s1.name;
+}

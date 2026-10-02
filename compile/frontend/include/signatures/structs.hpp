@@ -15,20 +15,13 @@ namespace arena::sema {
         bool operator!=(const ResolvedStructMember &other) const { return !(*this == other); }
     };
 
-    struct ResolvedStruct {
-        StructId id;
-        std::string_view name;
+    struct CompleteStructInfo {
         size_t num_members;
         ResolvedStructMember *members;
         LifetimeGroup lifetimes;
+        std::vector<const ast::NamedType *> type_references;
 
-        bool operator==(const ResolvedStruct &other) const {
-            if (id != other.id)
-                return false;
-            if (name != other.name)
-                return false;
-            if (members != other.members)
-                return false;
+        bool operator==(const CompleteStructInfo &other) const {
             for (size_t i = 0; i < num_members; ++i) {
                 if (members[i] != other.members[i])
                     return false;
@@ -38,8 +31,20 @@ namespace arena::sema {
             return true;
         }
 
+        bool operator!=(const CompleteStructInfo &other) const { return !(*this == other); }
+    };
+
+    struct ResolvedStruct {
+        StructId id;
+        std::string_view name;
+        std::optional<CompleteStructInfo> complete_info;
+
+        bool operator==(const ResolvedStruct &other) const {
+            return id == other.id && name == other.name && complete_info == other.complete_info;
+        }
         bool operator!=(const ResolvedStruct &other) const { return !(*this == other); }
     };
+
 } // namespace arena::sema
 
 namespace arena::sema {
@@ -90,47 +95,54 @@ namespace arena::sema {
 
     class StructTableBuilder {
     public:
-        StructTableBuilder(const StructSymbolRegistry *registry, const TypeTable *type_table)
-            : registry(registry), type_table(type_table) {}
+        StructTableBuilder(const StructSymbolRegistry *registry,
+                           const TypeSymbolRegistry *type_registry)
+            : registry(registry), type_registry(type_registry) {}
 
         class StructTableBuilderVisitor : public arena::ast::Visitor {
         public:
             StructTableBuilderVisitor(const StructSymbolRegistry *registry,
-                                      const TypeTable *type_table,
+                                      const TypeSymbolRegistry *type_registry,
                                       StructTable *struct_table)
-                : registry(registry), type_table(type_table), struct_table(struct_table) {}
+                : registry(registry), type_registry(type_registry), struct_table(struct_table) {}
 
             void visit(const arena::ast::StructDefinition *strct) override {
-                TypeId struct_type_id = type_table->get_type_id(NamedTypeSymbol{strct->get_name()});
+                TypeId struct_type_id =
+                    type_registry->get_type_id(NamedTypeSymbol{strct->get_name()});
                 StructId struct_id = registry->get_struct_id(strct->get_name());
 
                 auto resolved_struct = ResolvedStruct{.id = struct_id, .name = strct->get_name()};
+                auto struct_info = CompleteStructInfo{};
                 auto fields = strct->get_fields();
 
-                resolved_struct.num_members = fields->size();
-                resolved_struct.members = struct_table->alloc_members(resolved_struct.num_members);
-                auto resolved_member = resolved_struct.members;
+                struct_info.num_members = fields->size();
+                struct_info.members = struct_table->alloc_members(struct_info.num_members);
+                auto resolved_member = struct_info.members;
 
+                LifetimeTable lifetime_table{&struct_info.lifetimes, true};
+                TypeSymbolResolver type_symbolizer{type_registry, &lifetime_table};
                 for (const auto &field : *strct->get_fields()) {
-                    auto type = type_table->get_type(field->get_type(), &resolved_struct.lifetimes);
+                    auto type_id = type_registry->get_type_id(
+                        type_symbolizer.resolve(field->get_type(), &struct_info.type_references));
                     resolved_member->name = field->get_name();
-                    resolved_member->type_id = type.get_id();
+                    resolved_member->type_id = type_id;
 
                     ++resolved_member;
                 }
 
+                resolved_struct.complete_info = struct_info;
                 struct_table->add_struct(resolved_struct);
             }
 
         private:
             const StructSymbolRegistry *registry;
             StructTable *struct_table;
-            const TypeTable *type_table;
+            const TypeSymbolRegistry *type_registry;
         };
 
         StructTable build(const std::vector<arena::ast::Declaration *> &declarations) const {
             StructTable table(*registry);
-            StructTableBuilderVisitor visitor(registry, type_table, &table);
+            StructTableBuilderVisitor visitor(registry, type_registry, &table);
             for (const auto *decl : declarations) {
                 decl->accept(&visitor);
             }
@@ -139,7 +151,7 @@ namespace arena::sema {
 
     private:
         const StructSymbolRegistry *registry;
-        const TypeTable *type_table;
+        const TypeSymbolRegistry *type_registry;
     };
 } // namespace arena::sema
 

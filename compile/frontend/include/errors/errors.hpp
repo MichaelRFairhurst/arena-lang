@@ -416,6 +416,22 @@ namespace arena::error {
             });
         }
 
+        Error &E_T_INCMPLT_STRUCT(Location l, Location target, std::string type_name) {
+            return report({
+                "E-T_INCMPLT_STRUCT",
+                l,
+                "Member access with an incomplete struct type",
+                std::vector<Chunk>{
+                    "Struct type ",
+                    Link{.link_text = type_name,
+                         .label_text = "expression's struct type " + std::string(type_name) +
+                                       " is incomplete here",
+                         .location = target},
+                    " is incomplete in this member access",
+                },
+            });
+        }
+
         Error &E_R_UNKN_FUNC(Location l, Location target) {
             return report({
                 "E-R_UNKN_FUNC",
