@@ -99,7 +99,18 @@ namespace arena::sema {
         std::optional<TypeId> return_type;
     };
 
-    using ResolvedDeclarationInfo = std::variant<ResolvedFunctionDeclaration>;
+    struct ResolvedStructDeclarationMember {
+        TypeId type_id;
+        std::string_view name;
+    };
+
+    struct ResolvedStructDeclaration {
+        size_t num_members = 0;
+        ResolvedStructDeclarationMember *members = nullptr;
+    };
+
+    using ResolvedDeclarationInfo =
+        std::variant<ResolvedFunctionDeclaration, ResolvedStructDeclaration>;
 
     struct ResolvedDeclaration {
         const ast::Declaration *original = nullptr;
@@ -338,6 +349,15 @@ namespace arena::sema {
 
             ResolvedStatementBuilder stmt_builder(*arena);
             result->resolved_stmt = stmt_builder.get_resolved_stmt(func_def->get_body());
+        }
+
+        void visit(const ast::StructDefinition *struct_def) override {
+            result = arena->alloc<ResolvedDeclaration>();
+            result->original = struct_def;
+
+            // TODO: set result->lifetimes ?
+            result->resolved_stmt = nullptr;
+            result->resolved_stmt = nullptr;
         }
 
         ResolvedDeclaration *get_resolved_decl() { return result; }

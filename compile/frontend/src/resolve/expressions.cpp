@@ -175,15 +175,15 @@ namespace {
         bool visited_root = false;
     };
 
-    class FunctionScopeVisitor : public ast::Visitor {
+    class DeclarationVisitor : public ast::Visitor {
     public:
-        explicit FunctionScopeVisitor(util::Arena *arena,
-                                      const TypeSymbolSet *type_symbols,
-                                      const TypeSymbolRegistry *registry,
-                                      VariableScope *variable_scope,
-                                      LifetimeTable *lifetimes,
-                                      ResolvedDeclaration *resolved_decl,
-                                      error::Reporter *errors)
+        explicit DeclarationVisitor(util::Arena *arena,
+                                    const TypeSymbolSet *type_symbols,
+                                    const TypeSymbolRegistry *registry,
+                                    VariableScope *variable_scope,
+                                    LifetimeTable *lifetimes,
+                                    ResolvedDeclaration *resolved_decl,
+                                    error::Reporter *errors)
             : arena(arena), type_symbols(type_symbols), symbolizer(registry, lifetimes),
               variable_scope(variable_scope), lifetimes(lifetimes), resolved_decl(resolved_decl),
               errors(errors) {}
@@ -258,6 +258,45 @@ namespace {
             }
         }
 
+        void visit(const ast::StructDefinition *struct_def) override {
+            auto &fields = *struct_def->get_fields();
+            auto resolved = ResolvedStructDeclaration{
+                .num_members = fields.size(),
+            };
+
+            if (fields.empty()) {
+                resolved.members = nullptr;
+                resolved_decl->info = resolved;
+                return;
+            }
+
+            resolved.members = arena->alloc<ResolvedStructDeclarationMember>(fields.size());
+            auto p_resolved_field = resolved.members;
+
+            for (const auto &field : fields) {
+                std::vector<const ast::NamedType *> type_references;
+                p_resolved_field->name = field->get_name();
+                auto field_type_symbol = symbolizer.resolve(field->get_type(), &type_references);
+                p_resolved_field->type_id =
+                    type_symbols->get_id(field_type_symbol)
+                        .value_or(type_symbols->get_id(ErrorTypeSymbol{}).value());
+
+                for (auto &type_ref : type_references) {
+                    if (!type_symbols->is_available(NamedTypeSymbol{type_ref->get_name()})) {
+                        errors->E_R_TYPE_UNKN( // force line break
+                            type_ref,
+                            {
+                                field,
+                                "declaration of member " + std::string{field->get_name()} +
+                                    " in struct " + std::string{struct_def->get_name()},
+                            });
+                    }
+                }
+
+                ++p_resolved_field;
+            }
+        }
+
     private:
         util::Arena *arena;
         VariableScope *variable_scope;
@@ -320,15 +359,15 @@ ResolvedExpressionsResult ExpressionResolver::resolve(const std::vector<ast::Dec
         resolved_decls.push_back(tree);
         // Resolve parameters into the scope
         LifetimeTable public_lifetimes(&tree->lifetimes, true);
-        FunctionScopeVisitor func_scope_visitor{&arena,
-                                                types,
-                                                registry,
-                                                &variable_scope,
-                                                &public_lifetimes,
-                                                tree,
-                                                &errors};
+        DeclarationVisitor decl_visitor{&arena,
+                                        types,
+                                        registry,
+                                        &variable_scope,
+                                        &public_lifetimes,
+                                        tree,
+                                        &errors};
 
-        decl->accept(&func_scope_visitor);
+        decl->accept(&decl_visitor);
 
         if (tree->resolved_stmt) {
             // Resolve expressions in the function body

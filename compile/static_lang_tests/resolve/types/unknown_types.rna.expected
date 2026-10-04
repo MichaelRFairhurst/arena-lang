@@ -1,4 +1,22 @@
 
+Error[E-R_TYPE_UNKN]: Type UnknownMemberType is not recognized in declaration of member m_unused in struct S
+at compile/static_lang_tests/resolve/types/unknown_types.rna:2:15:2:32
+  :     m_unused: UnknownMemberType; // E-R_TYPE_UNKN
+  :               ^^^^^^^^^^^^^^^^^ Unknown type UnknownMemberType
+unknown_types.rna:2:5
+  :     m_unused: UnknownMemberType; // E-R_TYPE_UNKN
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ In declaration of member m_unused in struct S
+
+
+Error[E-R_TYPE_UNKN]: Type UnknownMemberType is not recognized in declaration of member m_used in struct S
+at compile/static_lang_tests/resolve/types/unknown_types.rna:3:13:3:30
+  :     m_used: UnknownMemberType;   // E-R_TYPE_UNKN
+  :             ^^^^^^^^^^^^^^^^^ Unknown type UnknownMemberType
+unknown_types.rna:3:5
+  :     m_used: UnknownMemberType;   // E-R_TYPE_UNKN
+  :     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ In declaration of member m_used in struct S
+
+
 Error[E-R_TYPE_UNKN]: Type UnknownReturnType is not recognized in return type of function unused
 at compile/static_lang_tests/resolve/types/unknown_types.rna:8:6:8:23
   : ) -> UnknownReturnType {         // E-R_TYPE_UNKN
