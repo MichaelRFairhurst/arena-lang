@@ -270,7 +270,7 @@ namespace {
                 return;
             }
 
-            resolved.members = arena->alloc<ResolvedStructDeclarationMember>(fields.size());
+            resolved.members = arena->alloc_array<ResolvedStructDeclarationMember>(fields.size());
             auto p_resolved_field = resolved.members;
 
             for (const auto &field : fields) {
@@ -295,6 +295,8 @@ namespace {
 
                 ++p_resolved_field;
             }
+
+            resolved_decl->info = resolved;
         }
 
     private:
