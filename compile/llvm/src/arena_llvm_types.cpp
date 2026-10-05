@@ -22,8 +22,8 @@ namespace {
             }
         }
 
-        ::llvm::Type *operator()(const arena::sema::StructType &) const {
-            throw std::runtime_error("StructType not yet supported in LLVM type resolution");
+        ::llvm::Type *operator()(const arena::sema::StructType &struct_type) const {
+            return ::llvm::StructType::getTypeByName(builder->getContext(), struct_type.name);
         }
 
         ::llvm::Type *operator()(const arena::sema::PointerType &p) const { return builder->getPtrTy(); }

@@ -126,6 +126,23 @@ namespace {
 
         void visit(const arena::ast::FunctionDeclaration *node) override { declare_function(node); }
 
+        void visit(const arena::ast::StructDefinition *node) override {
+            auto struct_info =
+                std::get_if<arena::sema::ResolvedStructDeclaration>(&current_decl->info);
+
+            if (!struct_info) {
+                throw std::runtime_error("Struct info not available");
+            }
+
+            std::vector<::llvm::Type *> members;
+            for (size_t i = 0; i < struct_info->num_members; ++i) {
+                auto member_type_id = struct_info->members[i].type_id;
+                members.push_back(getLLVMType(member_type_id));
+            }
+
+            auto type = ::llvm::StructType::create(*context, members, node->get_name());
+        }
+
         void visit(const arena::ast::FunctionDefinition *node) override {
             auto [llvm_function, func_info] = declare_function(node);
             current_function = llvm_function;
