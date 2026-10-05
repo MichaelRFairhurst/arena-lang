@@ -1,0 +1,13 @@
+struct MyStruct {
+    value: int;
+}
+
+fun get_my_struct() -> MyStruct {
+    let my_struct: MyStruct; // TODO: This won't compile for long.
+    my_struct.value = 10;
+    ret my_struct;
+}
+
+fun main(argc: int, argv: char const**) -> int {
+    ret get_my_struct().value;
+}

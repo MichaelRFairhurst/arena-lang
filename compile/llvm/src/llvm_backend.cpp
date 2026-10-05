@@ -653,9 +653,23 @@ namespace {
                                      .alignment = 1, // TODO: get proper alignment
                                      .name = ast->get_member_name()};
             } else {
-                // Required to handle a case like `foo().bar`, which is a member access on a
-                // register value, which requires `extractvalue`.
-                throw std::runtime_error("Member access on a non-memory value not yet supported");
+                // TODO: Consider whether support `insertvalue` for members of non-memory values.
+                //
+                // The version that uses `getelementptr` produces a "value" that resides in memory,
+                // and therefore can be "assigned" via a store operation.
+                //
+                // This branch uses `extractvalue` because it operates on a value that resides in a
+                // register. This only happens in, for instance, `foo().bar`. If that member `.bar`
+                // is assigned to, we need to generate an `insertvalue` instruction, which is not
+                // handled yet here or in the implementation of '='.
+                //
+                // Alternatively, the language may choose that `foo().bar` is not an lvalue, or we
+                // could generate an `alloca` here to put this value in memory.
+                //
+                // For now, `foo().bar = x` will crash.
+                set_current_reg(builder->CreateExtractValue( // force line break
+                    current_value.reg,
+                    {static_cast<unsigned int>(member_index)}));
             }
         }
     };
