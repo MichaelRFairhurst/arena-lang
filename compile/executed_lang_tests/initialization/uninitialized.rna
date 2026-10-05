@@ -1,0 +1,5 @@
+fun main(argc: int, argv: char const**) {
+    let x: int;
+    x = 1;
+    ret x;
+}

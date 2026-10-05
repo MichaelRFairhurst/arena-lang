@@ -268,9 +268,11 @@ namespace {
                 stack_var.name = variable->name;
                 visitor->variable_map[variable_id] = stack_var;
 
-                visitor->visitExpression(resolved_stmt.initializer);
-                auto value = visitor->read_current_value();
-                builder->CreateStore(value, stack_var.alloca);
+                if (resolved_stmt.initializer != nullptr) {
+                    visitor->visitExpression(resolved_stmt.initializer);
+                    auto value = visitor->read_current_value();
+                    builder->CreateStore(value, stack_var.alloca);
+                }
             }
 
             void operator()(const arena::sema::ResolvedReturnStatement &resolved_stmt) {
