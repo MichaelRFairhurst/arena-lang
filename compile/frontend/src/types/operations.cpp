@@ -44,11 +44,7 @@ namespace {
 } // namespace
 
 ResolvedType TypeOperations::get_type(TypeId id) const {
-    //try {
-        return ttable->get_type(id, lifetimes);
-    //} catch (const std::exception &e) {
-    //    return get_error_type();
-    //}
+    return ttable->get_type(id, lifetimes);
 }
 
 std::string TypeOperations::get_type_name(TypeId id) const {
@@ -72,17 +68,15 @@ std::optional<ResolvedStruct> TypeOperations::get_struct(TypeId type_id) const {
 
     auto resolved_struct = stable->get_struct(struct_type->name);
     if (!resolved_struct) {
-        return ResolvedStruct{
-            .id = stable->get_struct_id(struct_type->name),
-            .name = struct_type->name,
-            .complete_info = std::nullopt
-        };
+        return ResolvedStruct{.id = stable->get_struct_id(struct_type->name),
+                              .name = struct_type->name,
+                              .complete_info = std::nullopt};
     }
 
     return resolved_struct;
 }
 
-std::optional<ResolvedStructMember> TypeOperations::get_struct_member(
+std::optional<std::pair<ResolvedStructMember, size_t>> TypeOperations::get_struct_member(
     const CompleteStructInfo &strct, std::string_view member_name) const {
     for (int i = 0; i < strct.num_members; ++i) {
         if (strct.members[i].name == member_name) {
