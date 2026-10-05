@@ -5,7 +5,9 @@ namespace {
         ::llvm::IRBuilder<> *builder;
         arena::llvm::TypeResolver *resolver;
 
-        ::llvm::Type *operator()(const arena::sema::VoidType &) const { return builder->getVoidTy(); }
+        ::llvm::Type *operator()(const arena::sema::VoidType &) const {
+            return builder->getVoidTy();
+        }
 
         ::llvm::Type *operator()(const arena::sema::IntegralType &i) const {
             return builder->getIntNTy(i.size_bits);
@@ -26,7 +28,9 @@ namespace {
             return ::llvm::StructType::getTypeByName(builder->getContext(), struct_type.name);
         }
 
-        ::llvm::Type *operator()(const arena::sema::PointerType &p) const { return builder->getPtrTy(); }
+        ::llvm::Type *operator()(const arena::sema::PointerType &p) const {
+            return builder->getPtrTy();
+        }
 
         ::llvm::Type *operator()(const arena::sema::ConstType &c) const {
             return resolver->getLLVMType(c.const_type);
