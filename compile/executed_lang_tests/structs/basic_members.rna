@@ -1,0 +1,16 @@
+struct MyStruct {
+    return_code: int;
+    floating_twenty: double64;
+}
+
+fun main(argc: int, argv: char const **) -> int {
+    let my_struct: MyStruct; // TODO: this initialization won't compile for long.
+    my_struct.return_code = 2;
+    my_struct.floating_twenty = 20.0;
+
+    if (my_struct.floating_twenty == 20.0) {
+        ret my_struct.return_code;
+    }
+
+    ret 1;
+}

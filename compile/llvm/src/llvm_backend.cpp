@@ -625,6 +625,39 @@ namespace {
                 throw std::runtime_error("Unsupported unary prefix operator");
             }
         }
+
+        void visit(const arena::ast::MemberAccessExpression *ast) override {
+            visitExpression(&current_expr->children[0]);
+            auto member_use_info =
+                std::get_if<arena::sema::ResolvedMemberInfo>(&current_expr->info);
+            auto member_type_info = current_expr->type;
+
+            if (!member_type_info) {
+                throw std::runtime_error("Member access expression has no type information");
+            }
+
+            if (!member_use_info) {
+                throw std::runtime_error("Member access expression has no resolved member info");
+            }
+
+            auto member_type = getLLVMType(member_type_info->type_id);
+            auto member_index = member_use_info->member_idx;
+            auto struct_type = getLLVMType(member_use_info->struct_type_id.value());
+
+            if (current_value.mem) {
+                auto base_value = current_value.mem->alloca;
+                current_value.mem = {.alloca = builder->CreateStructGEP(struct_type,
+                                                                        base_value,
+                                                                        member_index),
+                                     .type = member_type,
+                                     .alignment = 1, // TODO: get proper alignment
+                                     .name = ast->get_member_name()};
+            } else {
+                // Required to handle a case like `foo().bar`, which is a member access on a
+                // register value, which requires `extractvalue`.
+                throw std::runtime_error("Member access on a non-memory value not yet supported");
+            }
+        }
     };
 
     void optimize(::llvm::Module &module, arena::backend::OptimizationLevel level) {
