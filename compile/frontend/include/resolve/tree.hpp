@@ -357,7 +357,6 @@ namespace arena::sema {
 
             // TODO: set result->lifetimes ?
             result->resolved_stmt = nullptr;
-            result->resolved_stmt = nullptr;
         }
 
         ResolvedDeclaration *get_resolved_decl() { return result; }
