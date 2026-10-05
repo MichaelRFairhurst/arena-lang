@@ -28,8 +28,8 @@ namespace arena::sema {
 
         std::optional<ResolvedStruct> get_struct(TypeId type_id) const;
 
-        std::optional<ResolvedStructMember> get_struct_member(const CompleteStructInfo &strct,
-                                                              std::string_view member_name) const;
+        std::optional<std::pair<ResolvedStructMember, size_t>> get_struct_member(
+            const CompleteStructInfo &strct, std::string_view member_name) const;
 
         std::optional<ResolvedType> dereference(TypeId id) const;
         std::optional<LifetimeId> pointed_lifetime(TypeId id) const;

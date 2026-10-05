@@ -86,7 +86,7 @@ std::optional<ResolvedStructMember> TypeOperations::get_struct_member(
     const CompleteStructInfo &strct, std::string_view member_name) const {
     for (int i = 0; i < strct.num_members; ++i) {
         if (strct.members[i].name == member_name) {
-            return strct.members[i];
+            return std::make_pair(strct.members[i], i);
         }
     }
     return std::nullopt;

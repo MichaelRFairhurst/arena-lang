@@ -340,10 +340,10 @@ namespace {
                 return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
             }
 
-            auto member =
+            auto member_lookup =
                 ops.get_struct_member(strct->complete_info.value(), step.ast->get_member_name());
 
-            if (!member) {
+            if (!member_lookup) {
                 ops.get_errors().E_R_UNKN_MEMBER(step.ast,
                                                  step.ast->get_object(),
                                                  std::string{strct->name},
@@ -351,13 +351,14 @@ namespace {
 
                 return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
             }
+            auto [member, member_index] = *member_lookup;
 
             step.out->info = ResolvedMemberInfo{
                 .struct_type_id = object_type_id,
-                .member_idx = static_cast<size_t>(&*member - strct->complete_info->members),
+                .member_idx = member_index,
             };
 
-            inference_ctx->constrain_context_type(member->type_id,
+            inference_ctx->constrain_context_type(member.type_id,
                                                   error::LocatedText(step.ast, "member access"));
 
             return set_type_info(step.type_out(), ResolvedLValue{});
