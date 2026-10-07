@@ -128,37 +128,46 @@ namespace {
         }
 
         TypeId operator()(ExprTransformStep<ast::BinaryExpression> step) {
-            if (step.ast->get_operator() == ast::TokenType::EQUAL) {
-                return handle_assignment(step);
-            }
-
-            auto left_inference_ctx = make_child_context(step, 0);
-            auto left_type_id = resolve_child(step, 0, &left_inference_ctx);
-
-            auto right_inference_ctx = make_child_context(step, 1);
-            auto right_type_id = resolve_child(step, 1, &right_inference_ctx);
-
-            // We do not support many implicit conversions. For now, the types must match exactly,
-            // or we produce an error type.
-            if (!ops.types_equal(left_type_id, right_type_id)) {
-                auto type_left = ops.get_type_name(left_type_id);
-                auto type_right = ops.get_type_name(right_type_id);
-                auto link_left = error::LocatedText{step.ast->get_left(), std::string(type_left)};
-                auto link_right =
-                    error::LocatedText{step.ast->get_right(), std::string(type_right)};
-                ops.get_errors().E_T_BIN_MIS(step.ast, link_left, link_right);
-            }
-
             switch (step.ast->get_operator()) {
+            case ast::TokenType::EQUAL:
+                return handle_assignment(step);
+
+            case ast::TokenType::PLUS:
+            case ast::TokenType::MINUS:
+            case ast::TokenType::STAR:
+            case ast::TokenType::SLASH:
+            case ast::TokenType::PERC:
+            case ast::TokenType::AMP:
+            case ast::TokenType::PIPE:
             case ast::TokenType::EQUAL_EQUAL:
             case ast::TokenType::NOT_EQUAL:
             case ast::TokenType::LESS:
             case ast::TokenType::LESS_EQUAL:
             case ast::TokenType::GREATER:
             case ast::TokenType::GREATER_EQUAL:
-                return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
+                return handle_binary_operation(step);
+
+            case ast::TokenType::PLUS_EQUAL:
+            case ast::TokenType::MINUS_EQUAL:
+            case ast::TokenType::STAR_EQUAL:
+            case ast::TokenType::SLASH_EQUAL:
+            case ast::TokenType::PERC_EQUAL:
+            case ast::TokenType::AMP_EQUAL:
+            case ast::TokenType::PIPE_EQUAL:
+                return handle_compound_assignment(step);
+
+            case ast::TokenType::SHIFT_LEFT:
+            case ast::TokenType::SHIFT_RIGHT:
+                /* TODO: handle shift operation slightly differently */
+                return handle_shift_operation(step);
+
+            case ast::TokenType::SHIFT_LEFT_EQUAL:
+            case ast::TokenType::SHIFT_RIGHT_EQUAL:
+                /* TODO: handle shift operation slightly differently */
+                return handle_compound_shift_assignment(step);
+
             default:
-                return set_type(step.out, left_type_id, ResolvedRValue{});
+                throw std::runtime_error("Unexpected binary expression operand in typechecker");
             }
         }
 
@@ -181,6 +190,135 @@ namespace {
             inference_ctx->constrain_context_type(left_type_id,
                                                   error::LocatedText{step.ast, "assignment"});
             return set_type_info(step.type_out(), ResolvedRValue{});
+        }
+
+        void require_operand_types_equal(TypeId left_id,
+                                         TypeId right_id,
+                                         const ast::BinaryExpression *ast) {
+            // We do not support many implicit conversions. For now, the types must match exactly,
+            // or we produce an error type.
+            if (!ops.types_equal(left_id, right_id)) {
+                auto type_left = ops.get_type_name(left_id);
+                auto type_right = ops.get_type_name(right_id);
+                auto link_left = error::LocatedText{ast->get_left(), std::string(type_left)};
+                auto link_right = error::LocatedText{ast->get_right(), std::string(type_right)};
+                ops.get_errors().E_T_BIN_MIS(ast, link_left, link_right);
+            }
+        }
+
+        std::pair<TypeId, TypeId> infer_equal_binary_operands(
+            ExprTransformStep<ast::BinaryExpression> step) {
+            auto left_inference_ctx = make_child_context(step, 0);
+            auto left_type_id = resolve_child(step, 0, &left_inference_ctx);
+
+            auto right_inference_ctx = make_child_context(step, 1);
+            right_inference_ctx
+                .constrain_context_type(left_type_id,
+                                        error::LocatedText{step.ast, "left operand"},
+                                        InferenceContext::ConstraintKind::Suggestion);
+            auto right_type_id = resolve_child(step, 1, &right_inference_ctx);
+
+            return std::make_pair(left_type_id, right_type_id);
+        }
+
+        TypeId handle_compound_assignment(ExprTransformStep<ast::BinaryExpression> step) {
+            auto [left_type_id, right_type_id] = infer_equal_binary_operands(step);
+
+            auto left_type_info = step.out->children[0].type.value();
+            if (!std::holds_alternative<ResolvedLValue>(left_type_info.value_category)) {
+                ops.get_errors().E_T_ASGN_RV(step.ast, step.ast->get_left());
+            }
+
+            inference_ctx->constrain_context_type(left_type_id,
+                                                  error::LocatedText{step.ast, "assignment"});
+            return set_type_info(step.type_out(), ResolvedRValue{});
+        }
+
+        TypeId handle_binary_operation(ExprTransformStep<ast::BinaryExpression> step) {
+            auto [left_type_id, right_type_id] = infer_equal_binary_operands(step);
+
+            // We do not support many implicit conversions. For now, the types must match exactly,
+            // or we produce an error type.
+            require_operand_types_equal(left_type_id, right_type_id, step.ast);
+
+            switch (step.ast->get_operator()) {
+            case ast::TokenType::PLUS:
+            case ast::TokenType::MINUS:
+            case ast::TokenType::STAR:
+            case ast::TokenType::SLASH:
+            case ast::TokenType::PERC:
+            case ast::TokenType::LESS:
+            case ast::TokenType::LESS_EQUAL:
+            case ast::TokenType::GREATER:
+            case ast::TokenType::GREATER_EQUAL:
+                if (!ops.is_numeric(left_type_id)) {
+                    ops.get_errors().E_T_MTHOPRND_NNUM(step.ast->get_left(),
+                                                       ops.get_type(left_type_id).get_name());
+                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+                } else if (!ops.is_numeric(right_type_id)) {
+                    ops.get_errors().E_T_MTHOPRND_NNUM(step.ast->get_right(),
+                                                       ops.get_type(right_type_id).get_name());
+                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+                }
+                break;
+
+            case ast::TokenType::AMP:
+            case ast::TokenType::PIPE:
+                if (!ops.is_integral(left_type_id, IntegralLiteralKind::Int)) {
+                    ops.get_errors().E_T_BINOPRND_NINT(step.ast->get_left(),
+                                                       ops.get_type(left_type_id).get_name());
+                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+                } else if (!ops.is_integral(right_type_id, IntegralLiteralKind::Int)) {
+                    ops.get_errors().E_T_BINOPRND_NINT(step.ast->get_right(),
+                                                       ops.get_type(right_type_id).get_name());
+                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+                }
+                break;
+            }
+
+            switch (step.ast->get_operator()) {
+            case ast::TokenType::EQUAL_EQUAL:
+            case ast::TokenType::NOT_EQUAL:
+            case ast::TokenType::LESS:
+            case ast::TokenType::LESS_EQUAL:
+            case ast::TokenType::GREATER:
+            case ast::TokenType::GREATER_EQUAL:
+                return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
+            default:
+                return set_type(step.out, left_type_id, ResolvedRValue{});
+            }
+        }
+
+        TypeId handle_shift_operation(ExprTransformStep<ast::BinaryExpression> step) {
+            auto [left_type_id, right_type_id] = infer_equal_binary_operands(step);
+
+            if (!ops.is_integral(left_type_id, IntegralLiteralKind::Int)) {
+                ops.get_errors().E_T_SHFT_NINT(step.ast->get_left(),
+                                               ops.get_type(left_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            if (!ops.is_integral(right_type_id, IntegralLiteralKind::Int)) {
+                ops.get_errors().E_T_SHFT_NINT(step.ast->get_right(),
+                                               ops.get_type(right_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            inference_ctx->constrain_context_type(left_type_id,
+                                                  error::LocatedText{step.ast, "result of shift"});
+
+            return set_type(step.out, left_type_id, ResolvedRValue{});
+        }
+
+        TypeId handle_compound_shift_assignment(ExprTransformStep<ast::BinaryExpression> step) {
+            auto result = handle_shift_operation(step);
+
+            auto left_type_info = step.out->children[0].type.value();
+            if (!std::holds_alternative<ResolvedLValue>(left_type_info.value_category)) {
+                ops.get_errors().E_T_ASGN_RV(step.ast, step.ast->get_left());
+            }
+
+            return result;
         }
 
         TypeId operator()(ExprTransformStep<ast::CallExpression> step) {

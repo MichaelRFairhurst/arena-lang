@@ -1,5 +1,5 @@
 fun f(i: int, b: bool) {
     let x = i;
 
-    i + b;
+    i == b;
 }

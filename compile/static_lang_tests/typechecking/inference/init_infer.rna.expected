@@ -1,11 +1,11 @@
 
 Error[E-T_BIN_MIS]: Expected both binary operands to have matching types, but got int and bool
-at compile/static_lang_tests/typechecking/inference/init_infer.rna:4:5:4:10
-  :     i + b;
-  :     ^^^^^ In this binary expression
+at compile/static_lang_tests/typechecking/inference/init_infer.rna:4:5:4:11
+  :     i == b;
+  :     ^^^^^^ In this binary expression
 init_infer.rna:4:5
-  :     i + b;
+  :     i == b;
   :     ^ left operand type is int
-init_infer.rna:4:9
-  :     i + b;
-  :         ^ right operand type is bool
+init_infer.rna:4:10
+  :     i == b;
+  :          ^ right operand type is bool

@@ -36,6 +36,8 @@ namespace arena::sema {
 
         bool is_const_strict(TypeId id) const;
         bool is_lifetime_strict(TypeId id) const;
+        bool is_integral(TypeId id, IntegralLiteralKind kind) const;
+        bool is_numeric(TypeId id) const;
 
         TypeId substitute_lifetimes(
             TypeId type_id,

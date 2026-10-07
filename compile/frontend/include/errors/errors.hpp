@@ -508,6 +508,59 @@ namespace arena::error {
             });
         }
 
+        Error &E_T_MTHOPRND_NNUM(Location operand, std::string_view operand_type) {
+            return report({
+                "E-T_MTHOPRND_NNUM",
+                operand,
+                "In this operand of this arithmetic operation",
+                std::vector<Chunk>{
+                    Link{
+                        .link_text = "Operand",
+                        .label_text = "operand has type " + std::string{operand_type},
+                        .location = operand,
+                    },
+                    " requires numeric type in this arithmetic operation, but has non-numeric "
+                    "type " +
+                        std::string{operand_type},
+                },
+            });
+        }
+
+        Error &E_T_BINOPRND_NINT(Location operand, std::string_view operand_type) {
+            return report({
+                "E-T_BINOPRND_NINT",
+                operand,
+                "In this operand of this bitwise operation",
+                std::vector<Chunk>{
+                    Link{
+                        .link_text = "Operand",
+                        .label_text = "operand has type " + std::string{operand_type},
+                        .location = operand,
+                    },
+                    " requires integral type in this bitwise operation, but has non-integral "
+                    "type " +
+                        std::string{operand_type},
+                },
+            });
+        }
+
+        Error &E_T_SHFT_NINT(Location operand, std::string_view operand_type) {
+            return report({
+                "E-T_SHFT_NINT",
+                operand,
+                "In this operand of a shift operation",
+                std::vector<Chunk>{
+                    Link{
+                        .link_text = "Operand",
+                        .label_text = "operand of shift has type " + std::string{operand_type},
+                        .location = operand,
+                    },
+                    " requires integral type to be bit-shifted, but has non-integral type " +
+                        std::string{operand_type},
+                },
+            });
+        }
+
         Error &E_L_ESC_STACK(Location l, std::vector<Cause> causes) {
             auto &err = report({
                 "E-L_ESC_STACK",

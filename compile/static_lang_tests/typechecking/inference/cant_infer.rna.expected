@@ -90,18 +90,6 @@ at compile/static_lang_tests/typechecking/inference/cant_infer.rna:18:13:18:14
 
 
 Error[E-T_CANT_INFER_V]: Cannot infer type for variable 'x'
-at compile/static_lang_tests/typechecking/inference/cant_infer.rna:18:5:18:19
-  :     let x = x + x;
-  :     ^^^^^^^^^^^^^^ At this variable declaration
-
-
-Error[E-T_CANT_INFER_EX]: Cannot infer type for expression here
-at compile/static_lang_tests/typechecking/inference/cant_infer.rna:18:17:18:18
-  :     let x = x + x;
-  :                 ^ For this expression
-
-
-Error[E-T_CANT_INFER_V]: Cannot infer type for variable 'x'
 at compile/static_lang_tests/typechecking/inference/cant_infer.rna:22:5:22:21
   :     let x = (x = x);
   :     ^^^^^^^^^^^^^^^^ At this variable declaration

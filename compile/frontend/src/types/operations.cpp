@@ -153,6 +153,28 @@ bool TypeOperations::is_lifetime_strict(TypeId id) const {
     return true;
 }
 
+bool TypeOperations::is_integral(TypeId id, IntegralLiteralKind kind) const {
+    auto type = get_type(id);
+    if (type.is_error()) {
+        return true;
+    }
+
+    if (auto integral = std::get_if<IntegralType>(&type.get_program_type())) {
+        return integral->literal_kind == kind;
+    }
+    return false;
+}
+
+bool TypeOperations::is_numeric(TypeId id) const {
+    auto type = get_type(id);
+    if (type.is_error()) {
+        return true;
+    }
+
+    return std::holds_alternative<FloatingType>(type.get_program_type()) ||
+           is_integral(id, IntegralLiteralKind::Int);
+}
+
 TypeId TypeOperations::substitute_lifetimes(
     TypeId type_id,
     const LifetimeGroup &type_lifetimes,
