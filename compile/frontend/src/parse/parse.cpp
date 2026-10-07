@@ -59,19 +59,31 @@ namespace arena::parse {
 
             switch (state[0]) {
             case '+':
-                return n_char_token(TokenType::PLUS, 1);
+                return lex_match("+=", TokenType::PLUS_EQUAL, [this]() {
+                    return lex_match("++", TokenType::INC, [this]() {
+                        return n_char_token(TokenType::PLUS, 1);
+                    });
+                });
             case '-':
                 if (state.size() > 1 && std::isdigit(state[1])) {
                     return lex_number();
                 }
 
                 return lex_match("->", TokenType::ARROW, [this]() {
-                    return n_char_token(TokenType::MINUS, 1);
+                    return lex_match("-=", TokenType::MINUS_EQUAL, [this]() {
+                        return lex_match("--", TokenType::DEC, [this]() {
+                            return n_char_token(TokenType::MINUS, 1);
+                        });
+                    });
                 });
             case '*':
-                return n_char_token(TokenType::STAR, 1);
+                return lex_match("*=", TokenType::STAR_EQUAL, [this]() {
+                    return n_char_token(TokenType::STAR, 1);
+                });
             case '/':
-                return n_char_token(TokenType::SLASH, 1);
+                return lex_match("/=", TokenType::SLASH_EQUAL, [this]() {
+                    return n_char_token(TokenType::SLASH, 1);
+                });
             case '=':
                 return lex_match("==", TokenType::EQUAL_EQUAL, [this]() {
                     return n_char_token(TokenType::EQUAL, 1);
@@ -86,11 +98,19 @@ namespace arena::parse {
                 return n_char_token(TokenType::CLOSE_BRACKET, 1);
             case '<':
                 return lex_match("<=", TokenType::LESS_EQUAL, [this]() {
-                    return n_char_token(TokenType::LESS, 1);
+                    return lex_match("<<=", TokenType::SHIFT_LEFT_EQUAL, [this]() {
+                        return lex_match("<<", TokenType::SHIFT_LEFT, [this]() {
+                            return n_char_token(TokenType::LESS, 1);
+                        });
+                    });
                 });
             case '>':
                 return lex_match(">=", TokenType::GREATER_EQUAL, [this]() {
-                    return n_char_token(TokenType::GREATER, 1);
+                    return lex_match(">>=", TokenType::SHIFT_RIGHT_EQUAL, [this]() {
+                        return lex_match(">>", TokenType::SHIFT_RIGHT, [this]() {
+                            return n_char_token(TokenType::GREATER, 1);
+                        });
+                    });
                 });
             case '.':
                 return n_char_token(TokenType::DOT, 1);
@@ -100,11 +120,19 @@ namespace arena::parse {
                 });
             case '&':
                 return lex_match("&&", TokenType::AND, [this]() {
-                    return n_char_token(TokenType::AMP, 1);
+                    return lex_match("&=", TokenType::AMP_EQUAL, [this]() {
+                        return n_char_token(TokenType::AMP, 1);
+                    });
                 });
             case '|':
                 return lex_match("||", TokenType::OR, [this]() {
-                    return n_char_token(TokenType::INVALID, 1);
+                    return lex_match("|=", TokenType::PIPE_EQUAL, [this]() {
+                        return n_char_token(TokenType::PIPE, 1);
+                    });
+                });
+            case '%':
+                return lex_match("%=", TokenType::PERC_EQUAL, [this]() {
+                    return n_char_token(TokenType::PERC, 1);
                 });
             case '{':
                 return n_char_token(TokenType::OPEN_BRACE, 1);
@@ -403,23 +431,37 @@ namespace arena::parse {
             case TokenType::OPEN_PAREN:
             case TokenType::NOT:
             case TokenType::DOT:
+            case TokenType::INC:
+            case TokenType::DEC:
                 return 0;
             case TokenType::STAR:
             case TokenType::SLASH:
+            case TokenType::PERC:
                 return 1;
             case TokenType::PLUS:
             case TokenType::MINUS:
                 return 2;
+            case TokenType::SHIFT_LEFT:
+            case TokenType::SHIFT_RIGHT:
+                return 3;
             case TokenType::LESS:
             case TokenType::LESS_EQUAL:
             case TokenType::GREATER:
             case TokenType::GREATER_EQUAL:
-                return 3;
+                return 4;
             case TokenType::EQUAL_EQUAL:
             case TokenType::NOT_EQUAL:
-                return 4;
-            default:
                 return 5;
+            case TokenType::AMP:
+                return 6;
+            case TokenType::PIPE:
+                return 7;
+            case TokenType::AND:
+                return 8;
+            case TokenType::OR:
+                return 9;
+            default:
+                return 10;
             }
         }
 
@@ -670,12 +712,24 @@ namespace arena::parse {
 
         Expression *parse_assignment_expression() {
             Expression *left = parse_bin_expression();
-            if (tokens.peek()->type == TokenType::EQUAL) {
-                Token *op = tokens.take();
-                Expression *right = parse_assignment_expression();
-                return arena->alloc<BinaryExpression>(left, op, right);
-            } else {
-                return left;
+            switch(tokens.peek()->type) {
+                case TokenType::EQUAL:
+                case TokenType::AMP_EQUAL:
+                case TokenType::PIPE_EQUAL:
+                case TokenType::PLUS_EQUAL:
+                case TokenType::MINUS_EQUAL:
+                case TokenType::STAR_EQUAL:
+                case TokenType::SLASH_EQUAL:
+                case TokenType::PERC_EQUAL:
+                case TokenType::SHIFT_LEFT_EQUAL:
+                case TokenType::SHIFT_RIGHT_EQUAL:
+                {
+                    Token *op = tokens.take();
+                    Expression *right = parse_assignment_expression();
+                    return arena->alloc<BinaryExpression>(left, op, right);
+                }
+                default:
+                    return left;
             }
         }
 
