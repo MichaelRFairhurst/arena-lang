@@ -531,6 +531,17 @@ namespace {
                     throw std::runtime_error("Unsupported division operation for given types");
                 }
                 break;
+            case arena::ast::TokenType::PERC:
+                if (integral_type != nullptr && integral_type->is_signed) {
+                    set_current_reg(builder->CreateSRem(lhs, rhs, "modtmp"));
+                } else if (integral_type != nullptr) {
+                    set_current_reg(builder->CreateURem(lhs, rhs, "modtmp"));
+                } else if (floating_type != nullptr) {
+                    set_current_reg(builder->CreateFRem(lhs, rhs, "modtmp"));
+                } else {
+                    throw std::runtime_error("Unsupported modulo operation for given types");
+                }
+                break;
             case arena::ast::TokenType::EQUAL_EQUAL:
                 if (floating_type != nullptr) {
                     set_current_reg(builder->CreateFCmpOEQ(lhs, rhs, "eqtmp"));
