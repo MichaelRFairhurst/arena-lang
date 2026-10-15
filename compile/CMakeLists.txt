@@ -36,6 +36,10 @@ foreach(TEST_FILE ${EXECUTED_TEST_FILES})
     
     file(RELATIVE_PATH TEST_FILE_REL ${CMAKE_SOURCE_DIR} ${TEST_FILE})
 
+    if (${TEST_FILE} MATCHES ".*stubs\\.rna$")
+        continue()
+    endif()
+
     # Language tests that execute a program and verify the output.
     foreach(OPT_LEVEL ${TEST_OPTIMIZATION_LEVELS})
         add_test(

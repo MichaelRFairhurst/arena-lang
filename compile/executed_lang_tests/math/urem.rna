@@ -1,0 +1,66 @@
+import stubs;
+
+fun pad_print_uint(x: uint) {
+    print_space();
+    print_uint(x);
+    putchar(44); // ','
+}
+
+fun main(argc: int, argv: char const**) -> int {
+    let nine: uint = 9;
+    let two: uint = 2;
+    let three: uint = 3;
+
+    printf("9 %% 2:");
+    // Result is 1
+    pad_print_uint((9).as(uint) % 2);
+    pad_print_uint(nine % two);
+    print_newline();
+
+    printf("9 %% 3:");
+    // Result is 0
+    pad_print_uint((9).as(uint) % 3);
+    pad_print_uint(nine % three);
+    print_newline();
+
+    printf("2 %% 9:");
+    // Result is 2
+    pad_print_uint((2).as(uint) % 9);
+    pad_print_uint(two % nine);
+    print_newline();
+
+    printf("3 %% 9:");
+    // Result is 3
+    pad_print_uint((3).as(uint) % 9);
+    pad_print_uint(three % nine);
+    print_newline();
+
+    printf("int max %% 0x10:");
+    // Result is 15
+    let imax: uint = 0x7fff_ffff;
+    pad_print_uint(imax % 0x10);
+    print_newline();
+
+    let four: uint = 4;
+    let five: uint = 5;
+    // These would be -5, -4 as unsigned ints
+    let nfour: uint = 0x8000_0004;
+    let nfive: uint = 0x8000_0005;
+    
+    printf("(-5).as(uint) %% 4:");
+    // Result is 1
+    pad_print_uint(nfive % four);
+    print_newline();
+
+    printf("5 %% (-4).as(uint):");
+    // Result is 5
+    pad_print_uint(five % nfour);
+    print_newline();
+
+    printf("(-5).as(uint) %% (-4).as(uint):");
+    // Result is 1
+    pad_print_uint(nfive % nfour);
+    print_newline();
+
+    ret 0;
+}

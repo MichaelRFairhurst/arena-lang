@@ -1,0 +1,68 @@
+import stubs;
+
+fun pad_print_int(x: int) {
+    print_space();
+    print_int(x);
+    putchar(44); // ','
+}
+
+fun main(argc: int, argv: char const**) -> int {
+    let nine = 9;
+    let two = 2;
+    let three = 3;
+
+    printf("9 %% 2:");
+    // Result is 1
+    pad_print_int(9 % 2);
+    pad_print_int(nine % two);
+    print_newline();
+
+    printf("9 %% 3:");
+    // Result is 0
+    pad_print_int(9 % 3);
+    pad_print_int(nine % three);
+    print_newline();
+
+    printf("2 %% 9:");
+    // Result is 2
+    pad_print_int(2 % 9);
+    pad_print_int(two % nine);
+    print_newline();
+
+    printf("3 %% 9:");
+    // Result is 3
+    pad_print_int(3 % 9);
+    pad_print_int(three % nine);
+    print_newline();
+
+    printf("int max %% 0x10:");
+    // Result is 15
+    let imax = 0x7fff_ffff;
+    pad_print_int(imax % 0x10);
+    print_newline();
+
+    let four = 4;
+    let five = 5;
+    let nfour = -4;
+    let nfive = -5;
+    
+    printf("-5 %% 4:");
+    // Result is -1
+    pad_print_int(-5 % 4);
+    pad_print_int(nfive % four);
+    print_newline();
+
+    printf("5 %% -4:");
+    // Result is 1
+    pad_print_int(5 % -4);
+    pad_print_int(five % nfour);
+    print_newline();
+
+    printf("-5 %% -4:");
+    // Result is -1
+    pad_print_int(-5 % -4);
+    pad_print_int(nfive % nfour);
+    print_newline();
+
+    ret 0;
+}
