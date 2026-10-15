@@ -73,6 +73,12 @@ namespace arena::sema {
         ResolvedStatement *else_branch = nullptr;
     };
 
+    struct ResolvedWhileStatement {
+        const ast::WhileStatement *original = nullptr;
+        ResolvedExpression *condition = nullptr;
+        ResolvedStatement *body = nullptr;
+    };
+
     struct ResolvedReturnStatement {
         const ast::ReturnStatement *original = nullptr;
         ResolvedExpression *expr = nullptr;
@@ -84,6 +90,7 @@ namespace arena::sema {
     };
 
     using ResolvedStatementType = std::variant<ResolvedIfStatement,
+                                               ResolvedWhileStatement,
                                                ResolvedLetStatement,
                                                ResolvedReturnStatement,
                                                ResolvedBlockStatement,
@@ -264,6 +271,17 @@ namespace arena::sema {
                 if_stmt->get_else()->accept(this);
                 stmt_stack.pop();
             }
+        }
+
+        void visit(const ast::WhileStatement *while_stmt) override {
+            auto *resolved = resolve_as<ResolvedWhileStatement>(while_stmt);
+
+            resolved->condition = resolve_expression(while_stmt->get_condition());
+
+            resolved->body = arena->alloc<ResolvedStatement>();
+            stmt_stack.push(resolved->body);
+            while_stmt->get_body()->accept(this);
+            stmt_stack.pop();
         }
 
         void visit(const ast::ReturnStatement *return_stmt) override {

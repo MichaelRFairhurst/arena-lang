@@ -90,6 +90,17 @@ namespace {
             variable_scope = outer;
         }
 
+        void operator()(ResolvedWhileStatement &while_stmt) {
+            (*this)(*while_stmt.condition);
+
+            VariableScope *outer = variable_scope;
+
+            VariableScope then_scope{outer};
+            variable_scope = &then_scope;
+            (*this)(*while_stmt.body);
+            variable_scope = outer;
+        }
+
         void operator()(ResolvedLetStatement &let_stmt) {
             std::optional<TypeId> explicit_type_id;
 

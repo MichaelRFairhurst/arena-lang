@@ -246,6 +246,43 @@ namespace {
                 }
             }
 
+            void operator()(const arena::sema::ResolvedWhileStatement &resolved_stmt) {
+                if (visitor->has_exited) {
+                    return;
+                }
+
+                auto loop_condition = llvm::BasicBlock::Create(*context, "loop_condition");
+                auto loop_body = llvm::BasicBlock::Create(*context, "loop_body");
+                auto merge_block = llvm::BasicBlock::Create(*context, "merge_block");
+
+                builder->CreateBr(loop_condition);
+                current_function->insert(current_function->end(), loop_condition);
+                builder->SetInsertPoint(loop_condition);
+                visitor->visitExpression(resolved_stmt.condition);
+
+                builder->CreateCondBr(visitor->read_current_value(), loop_body, merge_block);
+
+                current_function->insert(current_function->end(), loop_body);
+                builder->SetInsertPoint(loop_body);
+                visitor->visitStatement(resolved_stmt.body);
+
+                bool body_exits = visitor->has_exited;
+
+                // `while (x) { ret ... }` does not unconditionally exit.
+                visitor->has_exited = false;
+
+                if (body_exits) {
+                    // Ensure `while (x) { ret ... }` doesn't jump to the merge block after the
+                    // block terminator.
+                    return;
+                }
+
+                builder->CreateBr(loop_condition);
+
+                current_function->insert(current_function->end(), merge_block);
+                builder->SetInsertPoint(merge_block);
+            }
+
             void operator()(const arena::sema::ResolvedLetStatement &resolved_stmt) {
                 if (visitor->has_exited) {
                     return;

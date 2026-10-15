@@ -595,6 +595,11 @@ namespace {
             middleware.transform_if_else(step, *this);
         }
 
+        void operator()(StmtTransformStep<ResolvedWhileStatement> step) {
+            step.out->condition = expr_typecheck->typecheck_root(step.original->condition);
+            middleware.transform_while_body(step, *this);
+        }
+
         void operator()(StmtTransformStep<ResolvedLetStatement> step) {
             step.out->variable_id = step.original->variable_id;
             if (!step.original->initializer) {

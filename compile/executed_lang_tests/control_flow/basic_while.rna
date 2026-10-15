@@ -1,0 +1,10 @@
+fun main(argc: int, argv: char const **) -> int {
+    let x = 0;
+    let y = 1;
+    while (x < 4) {
+        x = x + 1;
+        y = y + y;
+    }
+
+    ret y;
+}

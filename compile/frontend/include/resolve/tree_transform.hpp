@@ -228,6 +228,25 @@ namespace arena::sema {
             return resolved;
         }
 
+        template <typename Return = void, typename Func>
+        Return transform_while_body(StmtTransformStep<ResolvedWhileStatement> while_step,
+                                 Func &transform_func) {
+            return transform_pair(StmtTransformStep<
+                                      ResolvedStatement>{.original = while_step.original->body,
+                                                         .out = while_step.out->body},
+                                  transform_func);
+        }
+
+        ResolvedWhileStatement &copy(const ResolvedWhileStatement &while_stmt, ResolvedStatement *out) {
+            out->info = ResolvedWhileStatement{};
+            auto &resolved = std::get<ResolvedWhileStatement>(out->info);
+            resolved.original = while_stmt.original;
+
+            resolved.condition = arena->alloc<ResolvedExpression>();
+            resolved.body = arena->alloc<ResolvedStatement>();
+            return resolved;
+        }
+
         ResolvedBlockStatement &copy(const ResolvedBlockStatement &block_in,
                                      ResolvedStatement *out) {
             out->info = ResolvedBlockStatement{};
@@ -303,6 +322,10 @@ namespace arena::sema {
         void operator()(StmtTransformStep<ResolvedIfStatement> step) {
             middleware.transform_if_then(step, *this);
             middleware.transform_if_else(step, *this);
+        }
+
+        void operator()(StmtTransformStep<ResolvedWhileStatement> step) {
+            middleware.transform_while_body(step, *this);
         }
 
         void operator()(StmtTransformStep<ResolvedLetStatement> step) {

@@ -751,6 +751,17 @@ namespace arena::parse {
             return arena->alloc<IfStatement>(if_token, condition, then_branch, else_branch);
         }
 
+        Statement *parse_while_statement() {
+            Token *while_token = require_take_token(TokenType::WHILE, "to start while statement");
+            Token *openParen = require_take_token(TokenType::OPEN_PAREN, "after 'while'");
+            Expression *condition = parse_expression();
+            Token *closeParen = require_take_token(TokenType::CLOSE_PAREN, "after 'while' condition");
+
+            Statement *body = parse_statement();
+
+            return arena->alloc<WhileStatement>(while_token, openParen, condition, closeParen, body);
+        }
+
         Statement *parse_let_statement() {
             // TODO multi-variable declarations, etc
             Token *letToken = require_take_token(TokenType::LET, "to start let declaration");
@@ -808,6 +819,8 @@ namespace arena::parse {
             // todo: while, for, switch, etc
             if (tokens.peek()->type == TokenType::IF) {
                 return parse_if_statement();
+            } else if (tokens.peek()->type == TokenType::WHILE) {
+                return parse_while_statement();
             } else if (tokens.peek()->type == TokenType::LET) {
                 return parse_let_statement();
             } else if (tokens.peek()->type == TokenType::RET) {

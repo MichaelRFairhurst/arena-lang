@@ -185,6 +185,32 @@ namespace arena::ast {
         BlockStatement *block;
     };
 
+    class WhileStatement : public Statement {
+    public:
+        WhileStatement(Token *whileToken, Token *openParen, Expression *condition, Token *closeParen, Statement *body)
+            : Statement(whileToken, body->end()), condition(condition), body(body) {}
+
+        virtual ~WhileStatement() = default;
+        
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        std::string to_string() const override {
+            return "while (" + condition->to_string() + ") " + body->to_string();
+        }
+
+        const Expression *get_condition() const {
+            return condition;
+        }
+
+        const Statement *get_body() const {
+            return body;
+        }
+
+    private:
+        Expression *condition;
+        Statement *body;
+    };
+
 } // namespace arena::ast
 
 #endif // ARENA_INCLUDE_AST_STATEMENTS_HPP

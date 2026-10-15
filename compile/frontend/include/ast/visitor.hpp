@@ -24,6 +24,7 @@ namespace arena::ast {
     class ExpressionStatement;
     class BlockStatement;
     class ArenaStatement;
+    class WhileStatement;
     
     // Types
     class Type;
@@ -74,6 +75,7 @@ namespace arena::ast {
         virtual void visit(const ExpressionStatement *node) {}
         virtual void visit(const BlockStatement *node) {}
         virtual void visit(const ArenaStatement *node) {}
+        virtual void visit(const WhileStatement *node) {}
 
         // Type visitors
         virtual void visit(const Type *node) {}
