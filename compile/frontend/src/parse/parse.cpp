@@ -367,8 +367,6 @@ namespace arena::parse {
                     }
                     decimal = 1;
                     continue;
-                } else if (decimal != -1) {
-                    decimal *= base;
                 }
 
                 int next_digit_value = -1;
@@ -377,13 +375,17 @@ namespace arena::parse {
                 } else if (std::isalpha(*it)) {
                     next_digit_value = std::tolower(*it) - 'a' + 10;
                 }
-                
+
                 if (next_digit_value < 0 || next_digit_value >= base) {
                     break;
                 }
 
                 if (value < std::numeric_limits<uint64_t>::max()) {
                     value = value * base + next_digit_value;
+                }
+
+                if (decimal != -1) {
+                    decimal *= base;
                 }
             }
 
