@@ -43,9 +43,7 @@ namespace {
     };
 } // namespace
 
-ResolvedType TypeOperations::get_type(TypeId id) const {
-    return ttable->get_type(id, lifetimes);
-}
+ResolvedType TypeOperations::get_type(TypeId id) const { return ttable->get_type(id, lifetimes); }
 
 std::string TypeOperations::get_type_name(TypeId id) const {
     return std::string(get_type(id).get_name());

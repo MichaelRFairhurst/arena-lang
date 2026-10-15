@@ -734,14 +734,11 @@ namespace arena::error {
                     "Type ",
                     name,
                     " is not recognized in ",
-                    Link{
-                        .link_text = declaration.second,
-                        .label_text = "In " + declaration.second,
-                        .location = declaration.first
-                    },
+                    Link{.link_text = declaration.second,
+                         .label_text = "In " + declaration.second,
+                         .location = declaration.first},
                 },
             });
-
         }
 
         template <typename... Args>
