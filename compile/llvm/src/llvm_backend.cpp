@@ -720,6 +720,78 @@ namespace {
                     {static_cast<unsigned int>(member_index)}));
             }
         }
+
+        void visit(const arena::ast::CastExpression *ast) override {
+            visitExpression(&current_expr->children[0]);
+
+            auto result_type_info = current_expr->type;
+            if (!result_type_info) {
+                throw std::runtime_error("Type information missing for cast expression");
+            }
+
+            auto operand_type_info = current_expr->children[0].type;
+            if (!operand_type_info) {
+                throw std::runtime_error("Type information missing for cast operand");
+            }
+
+            auto operand_llvm_type = getLLVMType(operand_type_info->type_id);
+            auto result_llvm_type = getLLVMType(result_type_info->type_id);
+
+            if (operand_llvm_type == result_llvm_type) {
+                // No cast needed
+                return;
+            }
+
+            auto operand_type =
+                ttable->get_type(operand_type_info->type_id, &current_decl->lifetimes);
+            auto result_type =
+                ttable->get_type(result_type_info->type_id, &current_decl->lifetimes);
+
+            auto operand_integral =
+                std::get_if<arena::sema::IntegralType>(&operand_type.get_program_type());
+            auto result_integral =
+                std::get_if<arena::sema::IntegralType>(&result_type.get_program_type());
+
+            auto operand_floating =
+                std::get_if<arena::sema::FloatingType>(&operand_type.get_program_type());
+            auto result_floating =
+                std::get_if<arena::sema::FloatingType>(&result_type.get_program_type());
+
+            // TODO:
+            // Converting int to float and vice versa can produce poison values inside LLVM IR. We
+            // should insert explicit checks or conversions to avoid undefined behavior, and support
+            // a means of skipping those checks as an unsafe operation.
+
+            if (operand_integral != nullptr && result_integral != nullptr) {
+                // int to int cast
+                auto current = read_current_value();
+                set_current_reg(
+                    builder->CreateIntCast(current, result_llvm_type, operand_integral->is_signed));
+            } else if (operand_floating != nullptr && result_floating != nullptr) {
+                // float to float cast
+                auto current = read_current_value();
+                set_current_reg(builder->CreateFPCast(current, result_llvm_type));
+            } else if (operand_integral != nullptr && result_floating != nullptr) {
+                // int to float cast
+                auto current = read_current_value();
+                if (operand_integral->is_signed) {
+                    set_current_reg(builder->CreateSIToFP(current, result_llvm_type));
+                } else {
+                    set_current_reg(builder->CreateUIToFP(current, result_llvm_type));
+                }
+            } else if (operand_floating != nullptr && result_integral != nullptr) {
+                // float to int cast
+                auto current = read_current_value();
+                if (result_integral->is_signed) {
+                    set_current_reg(builder->CreateFPToSI(current, result_llvm_type));
+                } else {
+                    set_current_reg(builder->CreateFPToUI(current, result_llvm_type));
+                }
+            } else {
+                // TODO: handle other valid casts such as pointer to int
+                throw std::runtime_error("Unsupported cast between operand and result types.");
+            }
+        }
     };
 
     void optimize(::llvm::Module &module, arena::backend::OptimizationLevel level) {

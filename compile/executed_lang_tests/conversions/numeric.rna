@@ -1,0 +1,131 @@
+import stubs;
+
+fun main(argc: int, argv: char const*) -> int {
+    let byte_max: byte = 255;
+    let byte_min: byte = 0;
+    let short_max: short = 32767;
+    let short_min: short = -32768;
+    let ushort_max: ushort = 65535;
+    let ushort_min: ushort = 0;
+    let int_max: int = 2147483647;
+    let int_min: int = -2147483648;
+    let uint_max: uint = 4294967295;
+    let uint_min: uint = 0;
+    let long_max: long = 9223372036854775807;
+    let long_min: long = -9223372036854775808;
+    let ulong_max: ulong = 18446744073709551615;
+    let ulong_min: ulong = 0;
+
+    printf("byte_max.(int) = ");
+    print_int(byte_max.as(int));
+    print_newline();
+    
+    printf("byte_min.(int) = ");
+    print_int(byte_min.as(int));
+    print_newline();
+
+    printf("short_max.(int) = ");
+    print_int(short_max.as(int));
+    print_newline();
+    
+    printf("short_min.(int) = ");
+    print_int(short_min.as(int));
+    print_newline();
+
+    printf("ushort_max.(int) = ");
+    print_int(ushort_max.as(int));
+    print_newline();
+    
+    printf("ushort_min.(int) = ");
+    print_int(ushort_min.as(int));
+    print_newline();
+
+    printf("int_max.(int) = ");
+    print_int(int_max.as(int));
+    print_newline();
+    
+    printf("int_min.(int) = ");
+    print_int(int_min.as(int));
+    print_newline();
+
+    printf("uint_max.(int) = ");
+    print_int(uint_max.as(int));
+    print_newline();
+    
+    printf("ushort_min.(int) = ");
+    print_int(ushort_min.as(int));
+    print_newline();
+
+    printf("long_max.(int) = ");
+    print_int(long_max.as(int));
+    print_newline();
+    
+    printf("long_min.(int) = ");
+    print_int(long_min.as(int));
+    print_newline();
+
+    printf("ulong_max.(int) = ");
+    print_int(ulong_max.as(int));
+    print_newline();
+    
+    printf("ulong_min.(int) = ");
+    print_int(ulong_min.as(int));
+    print_newline();
+
+    let twod: double64 = 2.0;
+    let twof = twod.as(float32);
+    
+    printf("(2.0f).(int) = ");
+    print_int(twof.as(int));
+    print_newline();
+
+    printf("(-2.0f).(int) = ");
+    print_int((-twof).as(int));
+    print_newline();
+
+    printf("2.0d.(int) = ");
+    print_int(twod.as(int));
+    print_newline();
+
+    printf("-2.0d.(int) = ");
+    print_int(-twod.as(int));
+    print_newline();
+    
+    printf("(2.0f).(uint).(int) = ");
+    print_int(twof.as(uint).as(int));
+    print_newline();
+
+    printf("short_max.(float32).(int) = ");
+    print_int(short_max.as(float32).as(int));
+    print_newline();
+
+    printf("short_min.(float32).(int) = ");
+    print_int(short_min.as(float32).as(int));
+    print_newline();
+
+    printf("int_max.(double64).(int) = ");
+    print_int(int_max.as(double64).as(int));
+    print_newline();
+
+    printf("int_min.(double64).(int) = ");
+    print_int(int_min.as(double64).as(int));
+    print_newline();
+
+    printf("ushort_max.(float32).(int) = ");
+    print_int(ushort_max.as(float32).as(int));
+    print_newline();
+
+    printf("ushort_max.(double64).(int) = ");
+    print_int(ushort_max.as(double64).as(int));
+    print_newline();
+
+    printf("ushort_max.(float32).(uint) = ");
+    print_int(ushort_max.as(float32).as(uint).as(int));
+    print_newline();
+
+    printf("ushort_max.(double64).(uint) = ");
+    print_int(ushort_max.as(double64).as(uint).as(int));
+    print_newline();
+
+    ret 0;
+}
