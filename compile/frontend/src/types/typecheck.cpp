@@ -345,7 +345,11 @@ namespace {
             auto params = func->get_param_types();
             auto return_type = func->get_return_type();
 
-            if (params->size() != step.original->num_children - 1) {
+            auto arg_count = step.original->num_children - 1;
+            bool correct_argc = (arg_count == params->size()) ||
+                                (func->get_is_variadic() && arg_count >= params->size());
+
+            if (!correct_argc) {
                 ops.get_errors().E_T_CALL_WRG_ARGC(step.ast,
                                                    func->get_symbol().name,
                                                    params->size(),
@@ -357,20 +361,23 @@ namespace {
             auto substitution_map = ops.get_lifetimes().import(func_lifetimes);
             substitution_map[func_lifetimes.get_ctx_lifetime()] = current_arena_lifetime;
 
-            for (size_t i = 1; i < step.original->num_children; ++i) {
-                // std::cout << "Original param type: "
-                //           << ops.get_type_name(params->at(i - 1), func_lifetimes) << std::endl;
-                auto param_type =
-                    ops.substitute_lifetimes(params->at(i - 1), func_lifetimes, substitution_map);
-                // std::cout << "Substituted param type: " << ops.get_type_name(param_type)
-                //           << std::endl;
-                auto arg_inference_ctx = make_child_context(step, i);
-                // TODO: Check assignability rather than exact type equality.
-                arg_inference_ctx.constrain_context_type(param_type,
-                                                         error::LocatedText(step.ast,
-                                                                            "argument " +
-                                                                                std::to_string(i)));
-                auto arg_id = resolve_child(step, i, &arg_inference_ctx);
+            for (size_t i = 0; i < arg_count; ++i) {
+                auto arg_inference_ctx = make_child_context(step, i + 1);
+
+                if (i < params->size()) {
+                    auto param_type =
+                        ops.substitute_lifetimes(params->at(i), func_lifetimes, substitution_map);
+
+                    // TODO: Check assignability rather than exact type equality.
+                    arg_inference_ctx.constrain_context_type( // force line break
+                        param_type,
+                        error::LocatedText(step.ast, "argument " + std::to_string(i)));
+                } else {
+                    // TODO: Check the extra arguments for validity. In c, certain argument types
+                    // will be promoted, but we will require an explicit cast in these cases.
+                }
+
+                auto arg_id = resolve_child(step, i + 1, &arg_inference_ctx);
             }
 
             if (return_type) {

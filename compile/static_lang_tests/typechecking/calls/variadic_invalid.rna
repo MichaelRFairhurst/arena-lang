@@ -1,0 +1,19 @@
+fun v1(x: int, ...);
+fun v2(x: int, y: int, ...);
+
+fun test() {
+    v1(); // E_WRG_ARGC
+    v1(123); // Ok
+    v1(123, 123); // Ok
+    v2(); // E_WRG_ARGC
+    v2(123); // E_WRG_ARGC
+    v2(123, 123); // Ok
+    v2(123, 123, 123); // Ok
+
+    v1(true); // E_T_ASGN_NOREL
+    v2(true, 123); // E_T_ASGN_NOREL
+    v2(123, true); // E_T_ASGN_NOREL
+
+    v1(123, true); // Ok
+    v2(123, 123, true); // Ok
+}

@@ -60,8 +60,8 @@
             return "'||'";
         case TokenType::NOT:
             return "'!'";
-        case TokenType::DOT:
-            return "'.'";
+        case TokenType::DOTS:
+            return "a sequence of one or more '.'s";
         case TokenType::AMP:
             return "'&'";
         case TokenType::ARROW:

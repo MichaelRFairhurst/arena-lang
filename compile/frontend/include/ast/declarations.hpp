@@ -57,9 +57,12 @@ namespace arena::ast {
 
     class ParamList : public Node {
     public:
-        ParamList(Token *openParen, std::vector<Parameter *> arguments, Token *closeParen)
+        ParamList(Token *openParen,
+                  std::vector<Parameter *> arguments,
+                  Token *elipse,
+                  Token *closeParen)
             : Node(openParen, closeParen), openParen(openParen), closeParen(closeParen),
-              arguments(arguments) {}
+              arguments(arguments), elipse(elipse) {}
 
         virtual ~ParamList() = default;
 
@@ -79,9 +82,12 @@ namespace arena::ast {
 
         const std::vector<Parameter *> &get_params() const { return arguments; }
 
+        bool is_variadic() const { return elipse != nullptr; }
+
     private:
         Token *openParen;
         Token *closeParen;
+        Token *elipse;
         std::vector<Parameter *> arguments;
     };
 
@@ -187,9 +193,7 @@ namespace arena::ast {
 
         std::string_view get_name() const { return name->text; }
 
-        std::string to_string() const override {
-            return "struct " + std::string(get_name()) + ";";
-        }
+        std::string to_string() const override { return "struct " + std::string(get_name()) + ";"; }
 
     private:
         Token *name;

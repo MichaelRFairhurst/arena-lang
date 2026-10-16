@@ -14,9 +14,10 @@ namespace arena::sema {
                          FunctionSymbol symbol,
                          std::vector<TypeId> param_types,
                          std::optional<TypeId> return_type,
+                         bool is_variadic,
                          LifetimeGroup lifetimes)
             : id(id), symbol(symbol), param_types(param_types), return_type(return_type),
-              lifetimes(std::move(lifetimes)) {}
+              is_variadic(is_variadic), lifetimes(std::move(lifetimes)) {}
 
         FunctionId get_id() const { return id; }
 
@@ -24,6 +25,7 @@ namespace arena::sema {
 
         const std::vector<TypeId> *get_param_types() const { return &param_types; }
         std::optional<TypeId> get_return_type() const { return return_type; }
+        bool get_is_variadic() const { return is_variadic; }
 
         const LifetimeGroup &get_lifetimes() const { return lifetimes; }
 
@@ -56,6 +58,7 @@ namespace arena::sema {
         FunctionSymbol symbol;
         std::vector<TypeId> param_types;
         std::optional<TypeId> return_type;
+        bool is_variadic = false;
         LifetimeGroup lifetimes;
     };
 

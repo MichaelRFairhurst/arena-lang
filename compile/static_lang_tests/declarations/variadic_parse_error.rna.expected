@@ -1,0 +1,53 @@
+
+Error[E-P_UNEXP]: Expected '...' for variadic parameter but found .
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:1:8:1:9
+  : fun v1(.); // E-P_UNEXP
+  :        ^ Unexpected token
+
+
+Error[E-P_UNEXP]: Expected '...' for variadic parameter but found ..
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:2:8:2:10
+  : fun v2(..); // E-P_UNEXP
+  :        ^^ Unexpected token
+
+
+Error[E-P_UNEXP]: Expected '...' for variadic parameter but found ....
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:4:8:4:12
+  : fun v4(....); // E-P_UNEXP
+  :        ^^^^ Unexpected token
+
+
+Error[E-P_UNEXP]: Expected '...' for variadic parameter but found .....
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:5:8:5:13
+  : fun v5(.....); // E-P_UNEXP
+  :        ^^^^^ Unexpected token
+
+
+Error[E-P_UNEXP]: Expected '...' for variadic parameter but found .
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:7:16:7:17
+  : fun v6(x: int, .); // E-P_UNEXP
+  :                ^ Unexpected token
+
+
+Error[E-P_UNEXP]: Expected '...' for variadic parameter but found ..
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:8:16:8:18
+  : fun v7(x: int, ..); // E-P_UNEXP
+  :                ^^ Unexpected token
+
+
+Error[E-P_UNEXP]: Expected '...' for variadic parameter but found ....
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:10:16:10:20
+  : fun v9(x: int, ....); // E-P_UNEXP
+  :                ^^^^ Unexpected token
+
+
+Error[E-P_UNEXP]: Expected ')' but found ,
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:12:20:12:21
+  : fun v10(x: int, ..., y: int); // E-P_UNEXP -- TODO, bad error text.
+  :                    ^ Unexpected token
+
+
+Error[E-P_UNEXP]: Expected  but found 
+at compile/static_lang_tests/declarations/variadic_parse_error.rna:12:20:12:29
+  : fun v10(x: int, ..., y: int); // E-P_UNEXP -- TODO, bad error text.
+  :                    ^^^^^^^^^ Unexpected token

@@ -37,6 +37,7 @@ namespace {
                                       symbol,
                                       param_types,
                                       return_type_id,
+                                      decl->get_params()->is_variadic(),
                                       std::move(lifetimes)};
             ftable->add_function(symbol, function, decl);
         }

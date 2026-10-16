@@ -1,0 +1,12 @@
+fun v1(.); // E-P_UNEXP
+fun v2(..); // E-P_UNEXP
+fun v3(...); // Ok
+fun v4(....); // E-P_UNEXP
+fun v5(.....); // E-P_UNEXP
+
+fun v6(x: int, .); // E-P_UNEXP
+fun v7(x: int, ..); // E-P_UNEXP
+fun v8(x: int, ...);
+fun v9(x: int, ....); // E-P_UNEXP
+
+fun v10(x: int, ..., y: int); // E-P_UNEXP -- TODO, bad error text.

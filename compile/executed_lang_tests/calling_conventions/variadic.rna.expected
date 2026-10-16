@@ -1,0 +1,11 @@
+Compiling...done, now running.
+No args
+Name is Jeremy
+Age is 123
+Weight is 66.300000
+Name: Jeremy, age: 123, weight: 66.300000
+
+Promoted type tests
+Short age is 123
+Float weight is 66.300003
+Program exited with code 0

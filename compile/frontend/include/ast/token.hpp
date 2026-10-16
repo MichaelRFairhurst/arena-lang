@@ -39,7 +39,7 @@ namespace arena::ast {
         AND,
         OR,
         NOT,
-        DOT,
+        DOTS,
         AMP,
         AMP_EQUAL,
         ARROW,

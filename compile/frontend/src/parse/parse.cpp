@@ -112,8 +112,11 @@ namespace arena::parse {
                         });
                     });
                 });
-            case '.':
-                return n_char_token(TokenType::DOT, 1);
+            case '.': {
+                auto end =
+                    std::find_if(state.begin(), state.end(), [](char c) { return c != '.'; });
+                return n_char_token(TokenType::DOTS, std::distance(state.begin(), end));
+            }
             case '!':
                 return lex_match("!=", TokenType::NOT_EQUAL, [this]() {
                     return n_char_token(TokenType::NOT, 1);
@@ -432,7 +435,7 @@ namespace arena::parse {
             case TokenType::STRING:
             case TokenType::OPEN_PAREN:
             case TokenType::NOT:
-            case TokenType::DOT:
+            case TokenType::DOTS:
             case TokenType::INC:
             case TokenType::DEC:
                 return 0;
@@ -594,7 +597,7 @@ namespace arena::parse {
 
         Expression *parse_dot_expression(Expression *prev_expr) {
             Token *dot =
-                require_take_token(TokenType::DOT, "to start member access or method call");
+                require_take_token(TokenType::DOTS, "to start member access or method call");
             if (tokens.peek()->type == TokenType::STAR || tokens.peek()->type == TokenType::AMP) {
                 Token *op = tokens.take();
                 return arena->alloc<DotOperatorExpression>(prev_expr, dot, op);
@@ -661,7 +664,7 @@ namespace arena::parse {
             Expression *expr = parse_primary_expression();
 
             while (true) {
-                if (tokens.peek()->type == TokenType::DOT) {
+                if (tokens.peek()->type == TokenType::DOTS) {
                     expr = parse_dot_expression(expr);
                 } else if (tokens.peek()->type == TokenType::OPEN_PAREN) {
                     expr = parse_call_expression(expr);
@@ -844,8 +847,9 @@ namespace arena::parse {
         ParamList *parse_param_list() {
             Token *openParen = require_take_token(TokenType::OPEN_PAREN, "to start parameter list");
             std::vector<Parameter *> params;
-            while (true) {
+            Token *elipse = nullptr;
 
+            while (true) {
                 require_consume_until({TokenType::IDENTIFIER,
                                        TokenType::CLOSE_PAREN,
                                        TokenType::CLOSE_BRACE,
@@ -853,7 +857,8 @@ namespace arena::parse {
                                        TokenType::COLON,
                                        TokenType::SEMICOLON,
                                        TokenType::COMMA,
-                                       TokenType::ARROW},
+                                       TokenType::ARROW,
+                                       TokenType::DOTS},
                                       "Expected parameter name or ')' in parameter list");
 
                 if (tokens.peek()->type == TokenType::CLOSE_PAREN ||
@@ -868,14 +873,26 @@ namespace arena::parse {
                     require_take_token(TokenType::COMMA, "between parameters in parameter list");
                 }
 
+                if (tokens.peek()->type == TokenType::DOTS) {
+                    elipse = tokens.take();
+                    if (elipse->text.size() != 3) {
+                        errors.E_P_UNEXP(elipse,
+                                         "Expected '...' for variadic parameter",
+                                         elipse->text);
+                    }
+
+                    break;
+                }
+
                 Token *paramName = require_take_token(TokenType::IDENTIFIER, "as parameter name");
                 Token *colon = require_take_token(TokenType::COLON, "after parameter name");
 
                 Type *paramType = parse_type();
                 params.push_back(arena->alloc<Parameter>(paramName, paramType));
             }
+
             Token *closeParen = require_take_token(TokenType::CLOSE_PAREN, "to end parameter list");
-            return arena->alloc<ParamList>(openParen, params, closeParen);
+            return arena->alloc<ParamList>(openParen, params, elipse, closeParen);
         }
 
         FunctionDeclaration *parse_function() {

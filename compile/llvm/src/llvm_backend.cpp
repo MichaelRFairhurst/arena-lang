@@ -78,7 +78,7 @@ namespace {
                 param_types.push_back(getLLVMType(param_type_id));
             }
 
-            return llvm::FunctionType::get(return_type, param_types, false);
+            return llvm::FunctionType::get(return_type, param_types, func.get_is_variadic());
         }
 
         std::pair<llvm::Function *, const arena::sema::ResolvedFunctionDeclaration *>
@@ -108,7 +108,9 @@ namespace {
                 param_names.push_back(param_var->name);
             }
 
-            auto func_type = llvm::FunctionType::get(return_type, param_types, false);
+            auto func_type = llvm::FunctionType::get(return_type,
+                                                     param_types,
+                                                     node->get_params()->is_variadic());
 
             llvm::Function *function = llvm::Function::Create(func_type,
                                                               llvm::Function::ExternalLinkage,

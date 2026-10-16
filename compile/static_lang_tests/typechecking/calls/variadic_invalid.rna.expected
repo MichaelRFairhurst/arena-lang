@@ -1,0 +1,56 @@
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'v1', expected 1 but got 0
+at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:5:5:5:9
+  :     v1(); // E_WRG_ARGC
+  :     ^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'v2', expected 2 but got 0
+at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:8:5:8:9
+  :     v2(); // E_WRG_ARGC
+  :     ^^^^ In function call expression here
+
+
+Error[E-T_CALL_WRG_ARGC]: Incorrect number of arguments in call to function 'v2', expected 2 but got 1
+at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:9:5:9:12
+  :     v2(123); // E_WRG_ARGC
+  :     ^^^^^^^ In function call expression here
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got bool in here
+at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:13:8:13:12
+  :     v1(true); // E_T_ASGN_NOREL
+  :        ^^^^ type mismatch
+  .
+ == note: expected type int based on argument 0
+  :     v1(true); // E_T_ASGN_NOREL
+  :     ^^^^^^^^  --- variadic_invalid.rna:13:5
+ == note: got conflicting type bool for here
+  :     v1(true); // E_T_ASGN_NOREL
+  :        ^^^^  --- variadic_invalid.rna:13:8
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got bool in here
+at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:14:8:14:12
+  :     v2(true, 123); // E_T_ASGN_NOREL
+  :        ^^^^ type mismatch
+  .
+ == note: expected type int based on argument 0
+  :     v2(true, 123); // E_T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^  --- variadic_invalid.rna:14:5
+ == note: got conflicting type bool for here
+  :     v2(true, 123); // E_T_ASGN_NOREL
+  :        ^^^^  --- variadic_invalid.rna:14:8
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got bool in here
+at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:15:13:15:17
+  :     v2(123, true); // E_T_ASGN_NOREL
+  :             ^^^^ type mismatch
+  .
+ == note: expected type int based on argument 1
+  :     v2(123, true); // E_T_ASGN_NOREL
+  :     ^^^^^^^^^^^^^  --- variadic_invalid.rna:15:5
+ == note: got conflicting type bool for here
+  :     v2(123, true); // E_T_ASGN_NOREL
+  :             ^^^^  --- variadic_invalid.rna:15:13

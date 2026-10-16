@@ -1,0 +1,21 @@
+fun printf(spec: char const*, ...);
+
+fun main(argc: int, argv: char const**) {
+    let name = "Jeremy";
+    let age = 123;
+    let weight = 66.3;
+
+    printf("No args\n");
+    printf("Name is %s\n", name);
+    printf("Age is %d\n", age);
+    printf("Weight is %f\n", weight);
+    printf("Name: %s, age: %d, weight: %f\n", name, age, weight);
+
+    // Test promotions, however, in the future these should require explicit casts (to int and
+    // double).
+    printf("\nPromoted type tests\n");
+    printf("Short age is %hd\n", age.as(short));
+    printf("Float weight is %f\n", weight.as(float32));
+
+    ret 0;
+}
