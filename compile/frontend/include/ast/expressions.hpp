@@ -19,6 +19,12 @@ namespace arena::ast {
         virtual std::string to_string() const = 0;
 
         void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        void set_annotation(Token *annotation) { this->annotation = annotation; }
+        Token *get_annotation() const { return annotation; }
+
+    private:
+        Token *annotation = nullptr;
     };
 
     class IdExpression : public Expression {
@@ -88,8 +94,11 @@ namespace arena::ast {
 
     class UnaryPrefixExpression : public Expression {
     public:
-        UnaryPrefixExpression(Token *op, Expression *operand)
-            : Expression(op, operand->end()), op(op), operand(operand) {}
+        UnaryPrefixExpression(Token *op, Token *annotation, Expression *operand)
+            : Expression(op, operand->end()), op(op), operand(operand) {
+            set_annotation(annotation);
+        }
+
         virtual ~UnaryPrefixExpression() = default;
 
 

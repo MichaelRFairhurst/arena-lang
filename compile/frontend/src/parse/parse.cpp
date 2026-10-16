@@ -147,6 +147,8 @@ namespace arena::parse {
                 return n_char_token(TokenType::SEMICOLON, 1);
             case ',':
                 return n_char_token(TokenType::COMMA, 1);
+            case '@':
+                return lex_annotation();
             case 'a':
                 return keyword_match("as", TokenType::AS, lex_ident());
             case 'c':
@@ -288,6 +290,27 @@ namespace arena::parse {
             }
 
             return iter_token(TokenType::IDENTIFIER, it);
+        }
+
+        Token *lex_annotation() {
+            auto it = state.begin();
+            auto end = state.end();
+
+            ++it; // skip the '@' character
+            if (it == end || std::isdigit(*it)) {
+                // Reject a digit immediately following the '@' character, e.g., '@1'.
+                return iter_token(TokenType::ANNOTATION, it);
+            }
+
+            for (; it != end; ++it) {
+                // Since we already rejected a digit immediately following the '@' character,
+                // we only need to check for alphanumeric characters and underscores here.
+                if (!std::isalnum(*it) && *it != '_') {
+                    break;
+                }
+            }
+
+            return iter_token(TokenType::ANNOTATION, it);
         }
 
         Token *lex_quoted_string() {
@@ -575,6 +598,24 @@ namespace arena::parse {
             return arena->alloc<Literal>(tok);
         }
 
+        Expression *parse_optional_postfix_annotation(Expression *prev_expr) {
+            if (tokens.peek()->type == TokenType::ANNOTATION) {
+                Token *annotation = tokens.take();
+                prev_expr->set_annotation(annotation);
+            }
+
+            return prev_expr;
+        }
+
+        std::pair<Token *, Token *> take_optionally_annotated_operator() {
+            Token *oper = tokens.take();
+            Token *annotation = nullptr;
+            if (tokens.peek()->type == TokenType::ANNOTATION) {
+                annotation = tokens.take();
+            }
+            return {oper, annotation};
+        }
+
         Expression *parse_primary_expression() {
             if (tokens.peek()->type == TokenType::OPEN_PAREN) {
                 Token *open_paren = tokens.take();
@@ -592,7 +633,7 @@ namespace arena::parse {
 
             auto idToken =
                 require_take_token(TokenType::IDENTIFIER, "to start identifier expression");
-            return arena->alloc<IdExpression>(idToken);
+            return parse_optional_postfix_annotation(arena->alloc<IdExpression>(idToken));
         }
 
         Expression *parse_dot_expression(Expression *prev_expr) {
@@ -600,7 +641,8 @@ namespace arena::parse {
                 require_take_token(TokenType::DOTS, "to start member access or method call");
             if (tokens.peek()->type == TokenType::STAR || tokens.peek()->type == TokenType::AMP) {
                 Token *op = tokens.take();
-                return arena->alloc<DotOperatorExpression>(prev_expr, dot, op);
+                return parse_optional_postfix_annotation(
+                    arena->alloc<DotOperatorExpression>(prev_expr, dot, op));
             } else if (tokens.peek()->type == TokenType::AS) {
                 Token *asToken = tokens.take();
                 Token *openParen =
@@ -608,17 +650,18 @@ namespace arena::parse {
                 Type *targetType = parse_type();
                 Token *closeParen =
                     require_take_token(TokenType::CLOSE_PAREN, "after type in cast expression");
-                return arena->alloc<CastExpression>(prev_expr,
-                                                    dot,
-                                                    asToken,
-                                                    openParen,
-                                                    targetType,
-                                                    closeParen);
+                return parse_optional_postfix_annotation(arena->alloc<CastExpression>(prev_expr,
+                                                                                      dot,
+                                                                                      asToken,
+                                                                                      openParen,
+                                                                                      targetType,
+                                                                                      closeParen));
             }
 
             Token *member =
                 require_take_token(TokenType::IDENTIFIER, "after '.' in member access expression");
-            return arena->alloc<MemberAccessExpression>(prev_expr, dot, member);
+            return parse_optional_postfix_annotation(
+                arena->alloc<MemberAccessExpression>(prev_expr, dot, member));
         }
 
         Expression *parse_call_expression(Expression *prev_expr) {
@@ -657,7 +700,8 @@ namespace arena::parse {
                 }
             }
 
-            return arena->alloc<CallExpression>(prev_expr, openParen, args, closeParen);
+            return parse_optional_postfix_annotation(
+                arena->alloc<CallExpression>(prev_expr, openParen, args, closeParen));
         }
 
         Expression *parse_postfix_expression() {
@@ -678,14 +722,14 @@ namespace arena::parse {
 
         Expression *parse_unary_expression() {
             if (tokens.peek()->type == TokenType::NOT) {
-                Token *op = tokens.take();
+                auto [op, annotation] = take_optionally_annotated_operator();
                 Expression *operand = parse_unary_expression();
-                return arena->alloc<UnaryPrefixExpression>(op, operand);
+                return arena->alloc<UnaryPrefixExpression>(op, annotation, operand);
             } else if (tokens.peek()->type == TokenType::MINUS) {
-                Token *op = tokens.take();
+                auto [op, annotation] = take_optionally_annotated_operator();
                 if (tokens.peek()->type == TokenType::INTEGER) {}
                 Expression *operand = parse_unary_expression();
-                return arena->alloc<UnaryPrefixExpression>(op, operand);
+                return arena->alloc<UnaryPrefixExpression>(op, annotation, operand);
             } else {
                 return parse_postfix_expression();
             }
@@ -700,16 +744,16 @@ namespace arena::parse {
             Expression *left = parse_bin_expression(precedence - 1);
 
             while (true) {
-                Token *op = tokens.peek();
-
-                if (get_binary_precedence(op->type) > precedence) {
+                if (get_binary_precedence(tokens.peek()->type) > precedence) {
                     break;
                 }
 
+                auto [op, annotation] = take_optionally_annotated_operator();
+
                 // valid binary operator
-                tokens.take();
                 Expression *right = parse_bin_expression(precedence - 1);
                 left = arena->alloc<BinaryExpression>(left, op, right);
+                left->set_annotation(annotation);
             }
 
             return left;

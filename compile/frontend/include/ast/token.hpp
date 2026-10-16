@@ -12,6 +12,7 @@ namespace arena::ast {
         FLOATING,
         TRUE,
         FALSE,
+        ANNOTATION,
         OPEN_BRACE,
         CLOSE_BRACE,
         OPEN_PAREN,

@@ -14,6 +14,8 @@
             return "'true'";
         case TokenType::FALSE:
             return "'false'";
+        case TokenType::ANNOTATION:
+            return "an annotation beginning with '@'";
         case TokenType::OPEN_BRACE:
             return "'{'";
         case TokenType::CLOSE_BRACE:
