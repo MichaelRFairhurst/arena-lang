@@ -774,24 +774,23 @@ namespace arena::parse {
 
         Expression *parse_assignment_expression() {
             Expression *left = parse_bin_expression();
-            switch(tokens.peek()->type) {
-                case TokenType::EQUAL:
-                case TokenType::AMP_EQUAL:
-                case TokenType::PIPE_EQUAL:
-                case TokenType::PLUS_EQUAL:
-                case TokenType::MINUS_EQUAL:
-                case TokenType::STAR_EQUAL:
-                case TokenType::SLASH_EQUAL:
-                case TokenType::PERC_EQUAL:
-                case TokenType::SHIFT_LEFT_EQUAL:
-                case TokenType::SHIFT_RIGHT_EQUAL:
-                {
-                    Token *op = tokens.take();
-                    Expression *right = parse_assignment_expression();
-                    return arena->alloc<BinaryExpression>(left, op, right);
-                }
-                default:
-                    return left;
+            switch (tokens.peek()->type) {
+            case TokenType::EQUAL:
+            case TokenType::AMP_EQUAL:
+            case TokenType::PIPE_EQUAL:
+            case TokenType::PLUS_EQUAL:
+            case TokenType::MINUS_EQUAL:
+            case TokenType::STAR_EQUAL:
+            case TokenType::SLASH_EQUAL:
+            case TokenType::PERC_EQUAL:
+            case TokenType::SHIFT_LEFT_EQUAL:
+            case TokenType::SHIFT_RIGHT_EQUAL: {
+                Token *op = tokens.take();
+                Expression *right = parse_assignment_expression();
+                return arena->alloc<BinaryExpression>(left, op, right);
+            }
+            default:
+                return left;
             }
         }
 
@@ -817,11 +816,16 @@ namespace arena::parse {
             Token *while_token = require_take_token(TokenType::WHILE, "to start while statement");
             Token *openParen = require_take_token(TokenType::OPEN_PAREN, "after 'while'");
             Expression *condition = parse_expression();
-            Token *closeParen = require_take_token(TokenType::CLOSE_PAREN, "after 'while' condition");
+            Token *closeParen =
+                require_take_token(TokenType::CLOSE_PAREN, "after 'while' condition");
 
             Statement *body = parse_statement();
 
-            return arena->alloc<WhileStatement>(while_token, openParen, condition, closeParen, body);
+            return arena->alloc<WhileStatement>(while_token,
+                                                openParen,
+                                                condition,
+                                                closeParen,
+                                                body);
         }
 
         Statement *parse_let_statement() {
@@ -933,9 +937,7 @@ namespace arena::parse {
                 if (tokens.peek()->type == TokenType::DOTS) {
                     elipse = tokens.take();
                     if (elipse->text.size() != 3) {
-                        errors.E_P_UNEXP(elipse,
-                                         "Expected '...' for variadic parameter",
-                                         elipse->text);
+                        errors.E_P_UNEXP(elipse, "'...' for variadic parameter", elipse->text);
                     }
 
                     break;
