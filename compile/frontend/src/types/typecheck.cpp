@@ -371,7 +371,7 @@ namespace {
                     // TODO: Check assignability rather than exact type equality.
                     arg_inference_ctx.constrain_context_type( // force line break
                         param_type,
-                        error::LocatedText(step.ast, "argument " + std::to_string(i)));
+                        error::LocatedText(step.ast, "argument " + std::to_string(i + 1)));
                 } else {
                     // TODO: Check the extra arguments for validity. In c, certain argument types
                     // will be promoted, but we will require an explicit cast in these cases.
