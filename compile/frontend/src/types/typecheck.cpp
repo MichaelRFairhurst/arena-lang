@@ -89,22 +89,12 @@ namespace {
                 return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
             } else if (auto value = std::get_if<__int128_t>(&token->literalValue)) {
                 auto int_type = ops.get_types().get_type_id(NamedTypeSymbol{"int"});
-                inference_ctx->constrain_integral_literal(int_type, step.ast);
+                inference_ctx->constrain_context_type(int_type,
+                                                      error::LocatedText{step.ast,
+                                                                         "integer literal"},
+                                                      InferenceContext::ConstraintKind::Suggestion);
                 auto result_id = set_type_info(step.type_out(), ResolvedRValue{});
-
-                auto actual_type = ops.get_type(result_id);
-                if (auto integral_type =
-                        std::get_if<IntegralType>(&actual_type.get_program_type())) {
-
-                    auto name = std::string{actual_type.get_name()};
-                    if (integral_type->literal_kind == IntegralLiteralKind::Int &&
-                        (*value > integral_type->max_value() ||
-                         *value < integral_type->min_value())) {
-                        ops.get_errors().E_T_LIT_OOR(step.ast,
-                                                     name,
-                                                     inference_ctx->get_why_constraint());
-                    }
-                }
+                check_valid_integer_literal(result_id, step.ast, *value);
 
                 return result_id;
             } else if (std::holds_alternative<std::string_view>(token->literalValue)) {
@@ -125,6 +115,26 @@ namespace {
             }
 
             throw std::runtime_error("Unknown literal type");
+        }
+
+        void check_valid_integer_literal(TypeId type_id, const ast::Node *ast, __int128_t value) {
+            auto actual_type = ops.get_type(type_id);
+            if (actual_type.is_error()) {
+                return;
+            }
+
+            auto type_name = std::string{actual_type.get_name()};
+
+            auto integral_type = std::get_if<IntegralType>(&actual_type.get_program_type());
+            if (integral_type == nullptr ||
+                integral_type->literal_kind != IntegralLiteralKind::Int) {
+                ops.get_errors().E_T_NOT_INTGL(ast, {ast, type_name});
+                return;
+            }
+
+            if ((value > integral_type->max_value() || value < integral_type->min_value())) {
+                ops.get_errors().E_T_LIT_OOR(ast, type_name, inference_ctx->get_why_constraint());
+            }
         }
 
         TypeId operator()(ExprTransformStep<ast::BinaryExpression> step) {

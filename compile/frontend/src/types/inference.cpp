@@ -27,7 +27,11 @@ void InferenceContext::constrain_context_type(VariableId id) {
 void InferenceContext::constrain_context_type(TypeId id,
                                               error::LocatedText why,
                                               ConstraintKind kind) {
-    if (!context_type.has_value() || context_kind == ConstraintKind::Suggestion) {
+    if (context_type.has_value() && kind == ConstraintKind::Suggestion) {
+        // If the current context type is already set and the new constraint is only a suggestion,
+        // we do not override the existing context type.
+        return;
+    } else if (!context_type.has_value() || context_kind == ConstraintKind::Suggestion) {
         context_type = id;
         context_kind = kind;
         why_constraint = why;
@@ -89,26 +93,6 @@ void InferenceContext::constrain_points_to(InferenceContext *other,
         ops->get_types().get_type_id(PointerTypeSymbol{*other_context_type, lifetime});
     auto link = error::LocatedText{origin, "here"};
     constrain_context_type(pointer_to_other, link, kind);
-}
-
-void InferenceContext::constrain_integral_literal(sema::TypeId default_type, const ast::Node *origin) {
-    if (!context_type.has_value()) {
-        context_type = default_type;
-        context_kind = ConstraintKind::Assignee;
-        why_constraint = error::LocatedText{origin, "integral literal without a size context"};
-        return;
-    }
-
-    auto type = ops->get_type(*context_type);
-    if (type.is_error()) {
-        context_type = type.get_id();
-        return;
-    }
-
-    auto integral_type = std::get_if<IntegralType>(&type.get_program_type());
-    if (integral_type == nullptr || integral_type->literal_kind != IntegralLiteralKind::Int) {
-        ops->get_errors().E_T_NOT_INTGL(origin, {context_node, ops->get_type_name(*context_type)});
-    }
 }
 
 TypeId InferenceContext::get_inferred_context_type() {
