@@ -62,6 +62,9 @@ namespace arena::sema {
             void visit(const ast::CallExpression *call_expr) {
                 handle<ast::CallExpression>(call_expr);
             }
+            void visit(const ast::IndexExpression *index_expr) {
+                handle<ast::IndexExpression>(index_expr);
+            }
             void visit(const ast::CastExpression *cast_expr) {
                 handle<ast::CastExpression>(cast_expr);
             }

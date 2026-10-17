@@ -232,6 +232,34 @@ namespace arena::ast {
         Token *closeParen;
     };
 
+    class IndexExpression : public Expression {
+    public:
+        IndexExpression(Expression *base,
+                       Token *openBracket,
+                       Expression *offset,
+                       Token *closeBracket)
+            : Expression(base->begin(), closeBracket), base(base), openBracket(openBracket),
+              offset(offset), closeBracket(closeBracket) {}
+
+        virtual ~IndexExpression() = default;
+
+        void accept(Visitor *visitor) const override { visitor->visit(this); }
+
+        std::string to_string() const override {
+            return base->to_string() + "[" + offset->to_string() + "]";
+        }
+
+        const Expression *get_base() const { return base; }
+
+        const Expression *get_offset() const { return offset; }
+
+    private:
+        Expression *base;
+        Token *openBracket;
+        Expression *offset;
+        Token *closeBracket;
+    };
+
 } // namespace arena::ast
 
 #endif // ARENA_INCLUDE_AST_EXPRESSIONS_HPP

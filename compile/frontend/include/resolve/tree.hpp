@@ -200,6 +200,10 @@ namespace arena::sema {
             }
         }
 
+        void visit(const ast::IndexExpression *index_expr) override {
+            recurse_exprs(index_expr->get_base(), index_expr->get_offset());
+        }
+
         void visit(const ast::MemberAccessExpression *member_access) override {
             recurse_exprs(member_access->get_object());
         }

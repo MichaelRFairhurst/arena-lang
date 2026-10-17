@@ -15,6 +15,7 @@ namespace arena::ast {
     class MemberAccessExpression;
     class CallExpression;
     class CastExpression;
+    class IndexExpression;
     
     // Statements
     class Statement;
@@ -66,6 +67,7 @@ namespace arena::ast {
         virtual void visit(const MemberAccessExpression *node) {}
         virtual void visit(const CallExpression *node) {}
         virtual void visit(const CastExpression *node) {}
+        virtual void visit(const IndexExpression *node) {}
 
         // Statement visitors
         virtual void visit(const Statement *node) {}

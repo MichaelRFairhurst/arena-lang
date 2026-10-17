@@ -457,6 +457,7 @@ namespace arena::parse {
             case TokenType::INTEGER:
             case TokenType::STRING:
             case TokenType::OPEN_PAREN:
+            case TokenType::OPEN_BRACKET:
             case TokenType::NOT:
             case TokenType::DOTS:
             case TokenType::INC:
@@ -704,6 +705,17 @@ namespace arena::parse {
                 arena->alloc<CallExpression>(prev_expr, openParen, args, closeParen));
         }
 
+        Expression *parse_index_expression(Expression *prev_expr) {
+            Token *open_bracket = require_take_token(TokenType::OPEN_BRACKET,
+                                                     "to start array/pointer index operation");
+            auto offset_expr = parse_expression();
+            auto close_bracket = require_take_token(TokenType::CLOSE_BRACKET,
+                                                    "to end array/pointer index operation");
+
+            return parse_optional_postfix_annotation(
+                arena->alloc<IndexExpression>(prev_expr, open_bracket, offset_expr, close_bracket));
+        }
+
         Expression *parse_postfix_expression() {
             Expression *expr = parse_primary_expression();
 
@@ -712,6 +724,8 @@ namespace arena::parse {
                     expr = parse_dot_expression(expr);
                 } else if (tokens.peek()->type == TokenType::OPEN_PAREN) {
                     expr = parse_call_expression(expr);
+                } else if (tokens.peek()->type == TokenType::OPEN_BRACKET) {
+                    expr = parse_index_expression(expr);
                 } else {
                     break;
                 }

@@ -397,6 +397,10 @@ namespace {
             return set_type_info(step.type_out(), ResolvedRValue{});
         }
 
+        TypeId operator()(ExprTransformStep<ast::IndexExpression> step) {
+            throw std::runtime_error("IndexExpression not implemented");
+        }
+
         TypeId operator()(ExprTransformStep<ast::DotOperatorExpression> step) {
             auto inference_ctx_parent = inference_ctx;
             auto operand_inference_ctx = make_child_context(step, 0);
