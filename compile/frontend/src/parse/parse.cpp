@@ -749,8 +749,7 @@ namespace arena::parse {
             }
         }
 
-        Expression *parse_bin_expression(
-            int precedence = get_binary_precedence(TokenType::EQUAL_EQUAL)) {
+        Expression *parse_bin_expression(int precedence = get_binary_precedence(TokenType::OR)) {
             if (precedence < 1) {
                 return parse_unary_expression();
             }
