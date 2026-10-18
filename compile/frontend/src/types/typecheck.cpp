@@ -24,10 +24,16 @@ namespace {
             }
 
             this->inference_ctx = inference_ctx;
+
+            // Assume an operation is safe unless typechecking determines otherwise
+            this->safety = Safety::Safe;
             auto expr = middleware.transform_root(*expr_in, *this);
+            verify_safety(expr);
+
             this->inference_ctx = nullptr;
             return expr;
         }
+
         TypeId set_type_info(std::optional<ResolvedTypeInfo> &info,
                              ResolvedValueCategory value_category) {
             auto type_id = inference_ctx->get_inferred_context_type();
@@ -63,9 +69,49 @@ namespace {
                              InferenceContext *ctx) {
             auto prev_ctx = inference_ctx;
             inference_ctx = ctx;
+
+            // Assume an operation is safe unless typechecking determines otherwise
+            safety = Safety::Safe;
             auto child_type_id = middleware.transform_child<TypeId>(step, child_index, *this);
+            verify_safety(&step.out->children[child_index]);
+            // Reset safety to safe for subsequent operations
+            safety = Safety::Safe;
+
             inference_ctx = prev_ctx;
             return child_type_id;
+        }
+
+        void verify_safety(ResolvedExpression *expr) {
+            auto annotation = expr->original->get_annotation();
+            bool marked_unsafe = annotation != nullptr && annotation->text == "@unsafe";
+            if (annotation != nullptr && !marked_unsafe) {
+                // TODO: Emit warning about unrecognized annotation
+            }
+
+            if (safety == Safety::Safe && marked_unsafe) {
+                ops.get_errors().W_T_UNNSRY_UNSAFE(expr->original,
+                                                   expr->original->get_annotation());
+            }
+
+            if (safety == Safety::Safe || marked_unsafe) {
+                return;
+            }
+
+            std::string_view operation;
+            std::string_view hint;
+
+            switch (safety) {
+            case Safety::UnsafePointerMath:
+                operation = "Performing pointer arithmetic";
+                hint = "Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to "
+                       "bypass this restriction";
+                break;
+            case Safety::Safe:
+                // Unreachable
+                return;
+            }
+
+            ops.get_errors().E_T_UNSAFE(expr->original, operation, hint);
         }
 
         TypeId operator()(ExprTransformStep<ast::IdExpression> step) {
@@ -89,13 +135,9 @@ namespace {
                 return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
             } else if (auto value = std::get_if<__int128_t>(&token->literalValue)) {
                 auto int_type = ops.get_types().get_type_id(NamedTypeSymbol{"int"});
-                inference_ctx->constrain_context_type(int_type,
-                                                      error::LocatedText{step.ast,
-                                                                         "integer literal"},
-                                                      InferenceContext::ConstraintKind::Suggestion);
+                inference_ctx->constrain_int_literal(step.ast);
                 auto result_id = set_type_info(step.type_out(), ResolvedRValue{});
                 check_valid_integer_literal(result_id, step.ast, *value);
-
                 return result_id;
             } else if (std::holds_alternative<std::string_view>(token->literalValue)) {
                 if (token->text[0] == '"') {
@@ -245,11 +287,9 @@ namespace {
         }
 
         TypeId handle_binary_operation(ExprTransformStep<ast::BinaryExpression> step) {
+            // Note: this does not require both operands to have matching types. It only ensures
+            // that the lhs type info is available to the rhs operand when inferring its type.
             auto [left_type_id, right_type_id] = infer_equal_binary_operands(step);
-
-            // We do not support many implicit conversions. For now, the types must match exactly,
-            // or we produce an error type.
-            require_operand_types_equal(left_type_id, right_type_id, step.ast);
 
             switch (step.ast->get_operator()) {
             case ast::TokenType::PLUS:
@@ -257,46 +297,134 @@ namespace {
             case ast::TokenType::STAR:
             case ast::TokenType::SLASH:
             case ast::TokenType::PERC:
-            case ast::TokenType::LESS:
-            case ast::TokenType::LESS_EQUAL:
-            case ast::TokenType::GREATER:
-            case ast::TokenType::GREATER_EQUAL:
-                if (!ops.is_numeric(left_type_id)) {
-                    ops.get_errors().E_T_MTHOPRND_NNUM(step.ast->get_left(),
-                                                       ops.get_type(left_type_id).get_name());
-                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
-                } else if (!ops.is_numeric(right_type_id)) {
-                    ops.get_errors().E_T_MTHOPRND_NNUM(step.ast->get_right(),
-                                                       ops.get_type(right_type_id).get_name());
-                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
-                }
+                return handle_bin_arithmetic_operation(step, left_type_id, right_type_id);
                 break;
 
             case ast::TokenType::AMP:
             case ast::TokenType::PIPE:
-                if (!ops.is_integral(left_type_id, IntegralLiteralKind::Int)) {
-                    ops.get_errors().E_T_BINOPRND_NINT(step.ast->get_left(),
-                                                       ops.get_type(left_type_id).get_name());
-                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
-                } else if (!ops.is_integral(right_type_id, IntegralLiteralKind::Int)) {
-                    ops.get_errors().E_T_BINOPRND_NINT(step.ast->get_right(),
-                                                       ops.get_type(right_type_id).get_name());
-                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
-                }
+                return handle_bin_bitwise_operation(step, left_type_id, right_type_id);
                 break;
-            }
 
-            switch (step.ast->get_operator()) {
-            case ast::TokenType::EQUAL_EQUAL:
-            case ast::TokenType::NOT_EQUAL:
             case ast::TokenType::LESS:
             case ast::TokenType::LESS_EQUAL:
             case ast::TokenType::GREATER:
             case ast::TokenType::GREATER_EQUAL:
-                return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
+                return handle_bin_numeric_comparison(step, left_type_id, right_type_id);
+                break;
+
+            case ast::TokenType::EQUAL_EQUAL:
+            case ast::TokenType::NOT_EQUAL:
+                require_operand_types_equal(left_type_id, right_type_id, step.ast);
+                return set_type(step.out, left_type_id, ResolvedRValue{});
+                break;
+
             default:
+                throw std::runtime_error("Unexpected binary operator");
+            }
+        }
+
+        TypeId handle_bin_numeric_comparison(ExprTransformStep<ast::BinaryExpression> step,
+                                             TypeId left_type_id,
+                                             TypeId right_type_id) {
+            auto left_type = ops.get_type(left_type_id);
+            auto right_type = ops.get_type(right_type_id);
+
+            if (!ops.is_numeric(left_type_id) && !ops.is_pointer(left_type_id, true)) {
+                ops.get_errors().E_T_MTHOPRND_NNUM(step.ast->get_left(),
+                                                   ops.get_type(left_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            } else if (!ops.is_numeric(right_type_id) && !ops.is_pointer(right_type_id, true)) {
+                ops.get_errors().E_T_MTHOPRND_NNUM(step.ast->get_right(),
+                                                   ops.get_type(right_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            require_operand_types_equal(left_type_id, right_type_id, step.ast);
+            return set_type(step.out, NamedTypeSymbol{"bool"}, ResolvedRValue{});
+        }
+
+        TypeId handle_bin_bitwise_operation(ExprTransformStep<ast::BinaryExpression> step,
+                                            TypeId left_type_id,
+                                            TypeId right_type_id) {
+            auto left_type = ops.get_type(left_type_id);
+            auto right_type = ops.get_type(right_type_id);
+
+            if (ops.is_pointer(left_type_id, false) || ops.is_pointer(right_type_id, false)) {
+                return handle_bin_pointermath_operation(step, left_type_id, right_type_id);
+            }
+
+            if (!ops.is_integral(left_type_id, IntegralLiteralKind::Int)) {
+                ops.get_errors().E_T_BINOPRND_NINT(step.ast->get_left(),
+                                                   ops.get_type(left_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            } else if (!ops.is_integral(right_type_id, IntegralLiteralKind::Int)) {
+                ops.get_errors().E_T_BINOPRND_NINT(step.ast->get_right(),
+                                                   ops.get_type(right_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            require_operand_types_equal(left_type_id, right_type_id, step.ast);
+            return set_type(step.out, left_type_id, ResolvedRValue{});
+        }
+
+        TypeId handle_bin_arithmetic_operation(ExprTransformStep<ast::BinaryExpression> step,
+                                               TypeId left_type_id,
+                                               TypeId right_type_id) {
+            auto left_type = ops.get_type(left_type_id);
+            auto right_type = ops.get_type(right_type_id);
+
+            if (ops.is_pointer(left_type_id, false) || ops.is_pointer(right_type_id, false)) {
+                return handle_bin_pointermath_operation(step, left_type_id, right_type_id);
+            }
+
+            if (!ops.is_numeric(left_type_id)) {
+                ops.get_errors().E_T_MTHOPRND_NNUM(step.ast->get_left(),
+                                                   ops.get_type(left_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            } else if (!ops.is_numeric(right_type_id)) {
+                ops.get_errors().E_T_MTHOPRND_NNUM(step.ast->get_right(),
+                                                   ops.get_type(right_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            require_operand_types_equal(left_type_id, right_type_id, step.ast);
+            return set_type(step.out, left_type_id, ResolvedRValue{});
+        }
+
+        TypeId handle_bin_pointermath_operation(ExprTransformStep<ast::BinaryExpression> step,
+                                                TypeId left_type_id,
+                                                TypeId right_type_id) {
+            safety = Safety::UnsafePointerMath;
+
+            auto left_type = ops.get_type(left_type_id);
+            auto right_type = ops.get_type(right_type_id);
+
+            if (ops.is_pointer(left_type_id, true) && ops.is_pointer(right_type_id, true)) {
+                require_operand_types_equal(left_type_id, right_type_id, step.ast);
                 return set_type(step.out, left_type_id, ResolvedRValue{});
             }
+
+            if (ops.is_pointer(left_type_id, false)) {
+                if (!ops.is_integral(right_type_id, IntegralLiteralKind::Int)) {
+                    ops.get_errors().E_T_BINOPRND_NINT(step.ast->get_right(),
+                                                       ops.get_type(right_type_id).get_name());
+                    return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+                }
+
+                return set_type(step.out, left_type_id, ResolvedRValue{});
+            }
+
+            if (!ops.is_pointer(right_type_id, true)) {
+                throw std::runtime_error("Right operand must be a pointer for pointer arithmetic.");
+            }
+
+            if (!ops.is_integral(left_type_id, IntegralLiteralKind::Int)) {
+                ops.get_errors().E_T_BINOPRND_NINT(step.ast->get_left(),
+                                                   ops.get_type(left_type_id).get_name());
+                return set_type(step.out, ErrorTypeSymbol{}, ResolvedRValue{});
+            }
+
+            return set_type(step.out, right_type_id, ResolvedRValue{});
         }
 
         TypeId handle_shift_operation(ExprTransformStep<ast::BinaryExpression> step) {
@@ -579,9 +707,15 @@ namespace {
         LifetimeId current_arena_lifetime;
 
     private:
+        enum class Safety {
+            Safe,
+            UnsafePointerMath,
+        };
+
         TypeOperations ops;
         ExprTransformMiddleware middleware;
         InferenceContext *inference_ctx = nullptr;
+        Safety safety;
     };
 
     class StatementTypeCheckTransform {

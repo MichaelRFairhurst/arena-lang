@@ -1,0 +1,102 @@
+struct MyStruct{}
+
+fun test() {
+    let double: double64 = 0.0;
+    let float: float32 = double.as(float32);
+    let mystruct: MyStruct;
+    let arr: char[10];
+
+    let pchar: char*;
+    let pint: int*;
+
+    pchar +@unsafe double;   // Err
+    pchar +@unsafe float;    // Err
+    pchar +@unsafe mystruct; // Err
+    pchar +@unsafe arr;      // Err
+    pchar + double;   // Err
+    pchar + float;    // Err
+    pchar + mystruct; // Err
+    pchar + arr;      // Err
+
+    pint +@unsafe double;   // Err
+    pint +@unsafe float;    // Err
+    pint +@unsafe mystruct; // Err
+    pint +@unsafe arr;      // Err
+    pint + double;   // Err
+    pint + float;    // Err
+    pint + mystruct; // Err
+    pint + arr;      // Err
+
+    let byte_: byte = 0;
+    let short_: short = 0;
+    let ushort_: ushort = 0;
+    let int_: int = 0;
+    let uint_: uint = 0;
+    let long_: long = 0;
+    let ulong_: ulong = 0;
+    let usize_: usize = 0;
+    let ssize_: ssize = 0;
+
+    pchar + byte_;   // Err
+    pchar + short_;  // Err
+    pchar + ushort_; // Err
+    pchar + int_;    // Err
+    pchar + uint_;   // Err
+    pchar + long_;   // Err
+    pchar + ulong_;  // Err
+    pchar + usize_;  // Err
+    pchar + ssize_;  // Err
+    pchar + 1;       // Err
+    pchar + pchar;   // Err
+
+    pint + byte_;   // Err
+    pint + short_;  // Err
+    pint + ushort_; // Err
+    pint + int_;    // Err
+    pint + uint_;   // Err
+    pint + long_;   // Err
+    pint + ulong_;  // Err
+    pint + usize_;  // Err
+    pint + ssize_;  // Err
+    pint + 1;       // Err
+    pint + pint;    // Err
+
+    byte_   + pchar; // Err
+    short_  + pchar; // Err
+    ushort_ + pchar; // Err
+    int_    + pchar; // Err
+    uint_   + pchar; // Err
+    long_   + pchar; // Err
+    ulong_  + pchar; // Err
+    usize_  + pchar; // Err
+    ssize_  + pchar; // Err
+
+    pchar + 10; // Err
+    pchar - 10; // Err
+    pchar * 10; // Err
+    pchar / 10; // Err
+    pchar % 10; // Err
+    pchar | 10; // Err
+    pchar & 10; // Err
+
+    pchar + int_; // Err
+    pchar - int_; // Err
+    pchar * int_; // Err
+    pchar / int_; // Err
+    pchar % int_; // Err
+    pchar | int_; // Err
+    pchar & int_; // Err
+
+    pchar + pchar; // Err
+    pchar - pchar; // Err
+    pchar * pchar; // Err
+    pchar / pchar; // Err
+    pchar % pchar; // Err
+    pchar | pchar; // Err
+    pchar & pchar; // Err
+
+    pchar = pint + 10; // Err
+    pint = pchar + 10; // Err
+    pint + pchar; // Err
+    pchar + pint; // Err
+}

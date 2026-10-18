@@ -1,0 +1,97 @@
+fun test() {
+    let byte_: byte = 0;
+    let short_: short = 0;
+    let ushort_: ushort = 0;
+    let int_: int = 0;
+    let uint_: uint = 0;
+    let long_: long = 0;
+    let ulong_: ulong = 0;
+    let usize_: usize = 0;
+    let ssize_: ssize = 0;
+
+    let pchar: char*;
+    let pint: int*;
+
+    pchar +@unsafe byte_;   // OK
+    pchar +@unsafe short_;  // OK
+    pchar +@unsafe ushort_; // OK
+    pchar +@unsafe int_;    // OK
+    pchar +@unsafe uint_;   // OK
+    pchar +@unsafe long_;   // OK
+    pchar +@unsafe ulong_;  // OK
+    pchar +@unsafe usize_;  // OK
+    pchar +@unsafe ssize_;  // OK
+    pchar +@unsafe 1;       // OK
+    pchar +@unsafe pchar;   // OK
+
+    pint +@unsafe byte_;   // OK
+    pint +@unsafe short_;  // OK
+    pint +@unsafe ushort_; // OK
+    pint +@unsafe int_;    // OK
+    pint +@unsafe uint_;   // OK
+    pint +@unsafe long_;   // OK
+    pint +@unsafe ulong_;  // OK
+    pint +@unsafe usize_;  // OK
+    pint +@unsafe ssize_;  // OK
+    pint +@unsafe 1;       // OK
+    pint +@unsafe pint;    // OK
+
+    byte_   +@unsafe pchar; // OK
+    short_  +@unsafe pchar; // OK
+    ushort_ +@unsafe pchar; // OK
+    int_    +@unsafe pchar; // OK
+    uint_   +@unsafe pchar; // OK
+    long_   +@unsafe pchar; // OK
+    ulong_  +@unsafe pchar; // OK
+    usize_  +@unsafe pchar; // OK
+    ssize_  +@unsafe pchar; // OK
+
+    byte_   +@unsafe pint; // OK
+    short_  +@unsafe pint; // OK
+    ushort_ +@unsafe pint; // OK
+    int_    +@unsafe pint; // OK
+    uint_   +@unsafe pint; // OK
+    long_   +@unsafe pint; // OK
+    ulong_  +@unsafe pint; // OK
+    usize_  +@unsafe pint; // OK
+    ssize_  +@unsafe pint; // OK
+
+    pchar +@unsafe 10; // OK
+    pchar -@unsafe 10; // OK
+    pchar *@unsafe 10; // OK
+    pchar /@unsafe 10; // OK
+    pchar %@unsafe 10; // OK
+    pchar |@unsafe 10; // OK
+    pchar &@unsafe 10; // OK
+
+    pchar +@unsafe int_; // OK
+    pchar -@unsafe int_; // OK
+    pchar *@unsafe int_; // OK
+    pchar /@unsafe int_; // OK
+    pchar %@unsafe int_; // OK
+    pchar |@unsafe int_; // OK
+    pchar &@unsafe int_; // OK
+
+    int_ +@unsafe pchar; // OK
+    int_ -@unsafe pchar; // OK
+    int_ *@unsafe pchar; // OK
+    int_ /@unsafe pchar; // OK
+    int_ %@unsafe pchar; // OK
+    int_ |@unsafe pchar; // OK
+    int_ &@unsafe pchar; // OK
+
+    pchar +@unsafe pchar; // OK
+    pchar -@unsafe pchar; // OK
+    pchar *@unsafe pchar; // OK
+    pchar /@unsafe pchar; // OK
+    pchar %@unsafe pchar; // OK
+    pchar |@unsafe pchar; // OK
+    pchar &@unsafe pchar; // OK
+    
+    pchar = pchar +@unsafe 10;
+    pchar = pchar +@unsafe int_;
+    pchar = pchar +@unsafe pchar;
+    pint = pint +@unsafe 10;
+    pint = pint +@unsafe int_;
+    pint = pint +@unsafe pint;
+}

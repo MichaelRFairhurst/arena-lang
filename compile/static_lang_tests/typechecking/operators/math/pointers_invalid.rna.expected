@@ -1,0 +1,729 @@
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type double64
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:12:20:12:26
+  :     pchar +@unsafe double;   // Err
+  :                    ^^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:12:20
+  :     pchar +@unsafe double;   // Err
+  :                    ^^^^^^ operand has type double64
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type float32
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:13:20:13:25
+  :     pchar +@unsafe float;    // Err
+  :                    ^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:13:20
+  :     pchar +@unsafe float;    // Err
+  :                    ^^^^^ operand has type float32
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type MyStruct
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:14:20:14:28
+  :     pchar +@unsafe mystruct; // Err
+  :                    ^^^^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:14:20
+  :     pchar +@unsafe mystruct; // Err
+  :                    ^^^^^^^^ operand has type MyStruct
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type char[10]
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:15:20:15:23
+  :     pchar +@unsafe arr;      // Err
+  :                    ^^^ In this operand of this bitwise operation
+pointers_invalid.rna:15:20
+  :     pchar +@unsafe arr;      // Err
+  :                    ^^^ operand has type char[10]
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type double64
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:16:13:16:19
+  :     pchar + double;   // Err
+  :             ^^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:16:13
+  :     pchar + double;   // Err
+  :             ^^^^^^ operand has type double64
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:16:5:16:19
+  :     pchar + double;   // Err
+  :     ^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type float32
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:17:13:17:18
+  :     pchar + float;    // Err
+  :             ^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:17:13
+  :     pchar + float;    // Err
+  :             ^^^^^ operand has type float32
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:17:5:17:18
+  :     pchar + float;    // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type MyStruct
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:18:13:18:21
+  :     pchar + mystruct; // Err
+  :             ^^^^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:18:13
+  :     pchar + mystruct; // Err
+  :             ^^^^^^^^ operand has type MyStruct
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:18:5:18:21
+  :     pchar + mystruct; // Err
+  :     ^^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type char[10]
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:19:13:19:16
+  :     pchar + arr;      // Err
+  :             ^^^ In this operand of this bitwise operation
+pointers_invalid.rna:19:13
+  :     pchar + arr;      // Err
+  :             ^^^ operand has type char[10]
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:19:5:19:16
+  :     pchar + arr;      // Err
+  :     ^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type double64
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:21:19:21:25
+  :     pint +@unsafe double;   // Err
+  :                   ^^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:21:19
+  :     pint +@unsafe double;   // Err
+  :                   ^^^^^^ operand has type double64
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type float32
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:22:19:22:24
+  :     pint +@unsafe float;    // Err
+  :                   ^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:22:19
+  :     pint +@unsafe float;    // Err
+  :                   ^^^^^ operand has type float32
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type MyStruct
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:23:19:23:27
+  :     pint +@unsafe mystruct; // Err
+  :                   ^^^^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:23:19
+  :     pint +@unsafe mystruct; // Err
+  :                   ^^^^^^^^ operand has type MyStruct
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type char[10]
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:24:19:24:22
+  :     pint +@unsafe arr;      // Err
+  :                   ^^^ In this operand of this bitwise operation
+pointers_invalid.rna:24:19
+  :     pint +@unsafe arr;      // Err
+  :                   ^^^ operand has type char[10]
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type double64
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:25:12:25:18
+  :     pint + double;   // Err
+  :            ^^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:25:12
+  :     pint + double;   // Err
+  :            ^^^^^^ operand has type double64
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:25:5:25:18
+  :     pint + double;   // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type float32
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:26:12:26:17
+  :     pint + float;    // Err
+  :            ^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:26:12
+  :     pint + float;    // Err
+  :            ^^^^^ operand has type float32
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:26:5:26:17
+  :     pint + float;    // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type MyStruct
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:27:12:27:20
+  :     pint + mystruct; // Err
+  :            ^^^^^^^^ In this operand of this bitwise operation
+pointers_invalid.rna:27:12
+  :     pint + mystruct; // Err
+  :            ^^^^^^^^ operand has type MyStruct
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:27:5:27:20
+  :     pint + mystruct; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_BINOPRND_NINT]: Operand requires integral type in this bitwise operation, but has non-integral type char[10]
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:28:12:28:15
+  :     pint + arr;      // Err
+  :            ^^^ In this operand of this bitwise operation
+pointers_invalid.rna:28:12
+  :     pint + arr;      // Err
+  :            ^^^ operand has type char[10]
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:28:5:28:15
+  :     pint + arr;      // Err
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:40:5:40:18
+  :     pchar + byte_;   // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:41:5:41:19
+  :     pchar + short_;  // Err
+  :     ^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:42:5:42:20
+  :     pchar + ushort_; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:43:5:43:17
+  :     pchar + int_;    // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:44:5:44:18
+  :     pchar + uint_;   // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:45:5:45:18
+  :     pchar + long_;   // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:46:5:46:19
+  :     pchar + ulong_;  // Err
+  :     ^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:47:5:47:19
+  :     pchar + usize_;  // Err
+  :     ^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:48:5:48:19
+  :     pchar + ssize_;  // Err
+  :     ^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:49:5:49:14
+  :     pchar + 1;       // Err
+  :     ^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:50:5:50:18
+  :     pchar + pchar;   // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:52:5:52:17
+  :     pint + byte_;   // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:53:5:53:18
+  :     pint + short_;  // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:54:5:54:19
+  :     pint + ushort_; // Err
+  :     ^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:55:5:55:16
+  :     pint + int_;    // Err
+  :     ^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:56:5:56:17
+  :     pint + uint_;   // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:57:5:57:17
+  :     pint + long_;   // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:58:5:58:18
+  :     pint + ulong_;  // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:59:5:59:18
+  :     pint + usize_;  // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:60:5:60:18
+  :     pint + ssize_;  // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:61:5:61:13
+  :     pint + 1;       // Err
+  :     ^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:62:5:62:16
+  :     pint + pint;    // Err
+  :     ^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:64:5:64:20
+  :     byte_   + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:65:5:65:20
+  :     short_  + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:66:5:66:20
+  :     ushort_ + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:67:5:67:20
+  :     int_    + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:68:5:68:20
+  :     uint_   + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:69:5:69:20
+  :     long_   + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:70:5:70:20
+  :     ulong_  + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:71:5:71:20
+  :     usize_  + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:72:5:72:20
+  :     ssize_  + pchar; // Err
+  :     ^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:74:5:74:15
+  :     pchar + 10; // Err
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:75:5:75:15
+  :     pchar - 10; // Err
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:76:5:76:15
+  :     pchar * 10; // Err
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:77:5:77:15
+  :     pchar / 10; // Err
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:78:5:78:15
+  :     pchar % 10; // Err
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:79:5:79:15
+  :     pchar | 10; // Err
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:80:5:80:15
+  :     pchar & 10; // Err
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:82:5:82:17
+  :     pchar + int_; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:83:5:83:17
+  :     pchar - int_; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:84:5:84:17
+  :     pchar * int_; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:85:5:85:17
+  :     pchar / int_; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:86:5:86:17
+  :     pchar % int_; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:87:5:87:17
+  :     pchar | int_; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:88:5:88:17
+  :     pchar & int_; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:90:5:90:18
+  :     pchar + pchar; // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:91:5:91:18
+  :     pchar - pchar; // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:92:5:92:18
+  :     pchar * pchar; // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:93:5:93:18
+  :     pchar / pchar; // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:94:5:94:18
+  :     pchar % pchar; // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:95:5:95:18
+  :     pchar | pchar; // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:96:5:96:18
+  :     pchar & pchar; // Err
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_ASGN_NOREL]: Expected char but got int in 'int*<free>' assigned to pointer with lifetime '*<free>'
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:98:13:98:22
+  :     pchar = pint + 10; // Err
+  :             ^^^^^^^^^ type mismatch
+  .
+ == note: expected type char*<free> based on lvalue in assignment here
+  :     pchar = pint + 10; // Err
+  :     ^^^^^^^^^^^^^^^^^  --- pointers_invalid.rna:98:5
+ == note: got conflicting type int*<free> for here
+  :     pchar = pint + 10; // Err
+  :             ^^^^^^^^^  --- pointers_invalid.rna:98:13
+  .
+ ... caused by:
+  -> Pointee type of char*<free> must be compatible with pointee type of int*<free>
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:98:13:98:22
+  :     pchar = pint + 10; // Err
+  :             ^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_ASGN_NOREL]: Expected char but got int in 'int*<free>' assigned to pointer with lifetime '*<free>'
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:98:5:98:22
+  :     pchar = pint + 10; // Err
+  :     ^^^^^^^^^^^^^^^^^ type mismatch
+  .
+ ... caused by:
+  -> Pointee type of char*<free> must be compatible with pointee type of int*<free>
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got char in 'char*<free>' assigned to pointer with lifetime '*<free>'
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:99:12:99:22
+  :     pint = pchar + 10; // Err
+  :            ^^^^^^^^^^ type mismatch
+  .
+ == note: expected type int*<free> based on lvalue in assignment here
+  :     pint = pchar + 10; // Err
+  :     ^^^^^^^^^^^^^^^^^  --- pointers_invalid.rna:99:5
+ == note: got conflicting type char*<free> for here
+  :     pint = pchar + 10; // Err
+  :            ^^^^^^^^^^  --- pointers_invalid.rna:99:12
+  .
+ ... caused by:
+  -> Pointee type of int*<free> must be compatible with pointee type of char*<free>
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:99:12:99:22
+  :     pint = pchar + 10; // Err
+  :            ^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_ASGN_NOREL]: Expected int but got char in 'char*<free>' assigned to pointer with lifetime '*<free>'
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:99:5:99:22
+  :     pint = pchar + 10; // Err
+  :     ^^^^^^^^^^^^^^^^^ type mismatch
+  .
+ ... caused by:
+  -> Pointee type of int*<free> must be compatible with pointee type of char*<free>
+
+
+Error[E-T_BIN_MIS]: Expected both binary operands to have matching types, but got int*<free> and char*<free>
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:100:5:100:17
+  :     pint + pchar; // Err
+  :     ^^^^^^^^^^^^ In this binary expression
+pointers_invalid.rna:100:5
+  :     pint + pchar; // Err
+  :     ^^^^ left operand type is int*<free>
+pointers_invalid.rna:100:12
+  :     pint + pchar; // Err
+  :            ^^^^^ right operand type is char*<free>
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:100:5:100:17
+  :     pint + pchar; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction
+
+
+Error[E-T_BIN_MIS]: Expected both binary operands to have matching types, but got char*<free> and int*<free>
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:101:5:101:17
+  :     pchar + pint; // Err
+  :     ^^^^^^^^^^^^ In this binary expression
+pointers_invalid.rna:101:5
+  :     pchar + pint; // Err
+  :     ^^^^^ left operand type is char*<free>
+pointers_invalid.rna:101:13
+  :     pchar + pint; // Err
+  :             ^^^^ right operand type is int*<free>
+
+
+Error[E-T_UNSAFE]: Performing pointer arithmetic is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/math/pointers_invalid.rna:101:5:101:17
+  :     pchar + pint; // Err
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to bypass this restriction

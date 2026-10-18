@@ -173,6 +173,15 @@ bool TypeOperations::is_numeric(TypeId id) const {
            is_integral(id, IntegralLiteralKind::Int);
 }
 
+bool TypeOperations::is_pointer(TypeId id, bool value_on_error) const {
+    auto type = get_type(id);
+    if (type.is_error()) {
+        return value_on_error;
+    }
+
+    return std::holds_alternative<PointerType>(type.get_program_type());
+}
+
 TypeId TypeOperations::substitute_lifetimes(
     TypeId type_id,
     const LifetimeGroup &type_lifetimes,

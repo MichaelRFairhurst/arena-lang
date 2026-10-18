@@ -561,6 +561,37 @@ namespace arena::error {
             });
         }
 
+        Error &E_T_UNSAFE(Location l, std::string_view operation, std::string_view hint) {
+            auto &err = report({
+                "E-T_UNSAFE",
+                l,
+                "Unsafe operation",
+                std::vector<Chunk>{
+                    operation, " is an unsafe operation, and must be explicitly marked @unsafe to be permitted",
+                },
+            });
+
+            err.add_supplement(SupplementKind::Help, std::string{hint});
+            return err;
+        }
+
+        Error &W_T_UNNSRY_UNSAFE(Location l, ast::Token *annotation) {
+            // TODO: Distinguish warnings from errors.
+            return report({
+                "W-T_UNNSRY_UNSAFE",
+                l,
+                "Unnecessary @unsafe annotation attached to a safe operation",
+                std::vector<Chunk>{
+                    Link{
+                        .link_text = "This @unsafe annotation",
+                        .label_text = "Unnecessary @unsafe annotation",
+                        .location = annotation,
+                    },
+                    " is not needed here",
+                },
+            });
+        }
+
         Error &E_L_ESC_STACK(Location l, std::vector<Cause> causes) {
             auto &err = report({
                 "E-L_ESC_STACK",

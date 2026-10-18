@@ -1,5 +1,6 @@
 #include "types/inference.hpp"
 #include "types/operations.hpp"
+#include <cassert>
 
 using namespace arena;
 using namespace arena::sema;
@@ -93,6 +94,28 @@ void InferenceContext::constrain_points_to(InferenceContext *other,
         ops->get_types().get_type_id(PointerTypeSymbol{*other_context_type, lifetime});
     auto link = error::LocatedText{origin, "here"};
     constrain_context_type(pointer_to_other, link, kind);
+}
+
+void InferenceContext::constrain_int_literal(const ast::Node *literal) {
+    if (!context_type.has_value()) {
+        // If the context type is not yet constrained, suggest it to be an int.
+        constrain_context_type(ops->get_types().get_type_id(NamedTypeSymbol{"int"}),
+                               error::LocatedText{literal, "integer literal"},
+                               ConstraintKind::Suggestion);
+        return;
+    }
+
+    if (context_kind == ConstraintKind::Assignee) {
+        // If the context has a hard constraint, defer to that hard constraint.
+        return;
+    }
+
+    assert(context_type.has_value());
+    assert(context_kind == ConstraintKind::Suggestion);
+    if (!ops->is_integral(context_type.value(), IntegralLiteralKind::Int)) {
+        // If the context is suggesting a non-int type, override it with a suggestion of type int.
+        context_type = ops->get_types().get_type_id(NamedTypeSymbol{"int"});
+    }
 }
 
 TypeId InferenceContext::get_inferred_context_type() {
