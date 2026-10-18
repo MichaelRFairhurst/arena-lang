@@ -22,7 +22,7 @@ at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:13:8:13:12
   :     v1(true); // E_T_ASGN_NOREL
   :        ^^^^ type mismatch
   .
- == note: expected type int based on argument 0
+ == note: expected type int based on argument 1
   :     v1(true); // E_T_ASGN_NOREL
   :     ^^^^^^^^  --- variadic_invalid.rna:13:5
  == note: got conflicting type bool for here
@@ -35,7 +35,7 @@ at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:14:8:14:12
   :     v2(true, 123); // E_T_ASGN_NOREL
   :        ^^^^ type mismatch
   .
- == note: expected type int based on argument 0
+ == note: expected type int based on argument 1
   :     v2(true, 123); // E_T_ASGN_NOREL
   :     ^^^^^^^^^^^^^  --- variadic_invalid.rna:14:5
  == note: got conflicting type bool for here
@@ -48,7 +48,7 @@ at compile/static_lang_tests/typechecking/calls/variadic_invalid.rna:15:13:15:17
   :     v2(123, true); // E_T_ASGN_NOREL
   :             ^^^^ type mismatch
   .
- == note: expected type int based on argument 1
+ == note: expected type int based on argument 2
   :     v2(123, true); // E_T_ASGN_NOREL
   :     ^^^^^^^^^^^^^  --- variadic_invalid.rna:15:5
  == note: got conflicting type bool for here
