@@ -536,7 +536,43 @@ namespace {
         }
 
         TypeId operator()(ExprTransformStep<ast::IndexExpression> step) {
-            throw std::runtime_error("IndexExpression not implemented");
+            auto base_inference_ctx = make_child_context(step, 0);
+            auto offset_inference_ctx = make_child_context(step, 1);
+
+            auto value_category = ResolvedLValue{ops.get_lifetimes().get_unsafe_lifetime()};
+
+            base_inference_ctx.constrain_indexable_as(inference_ctx, step.ast);
+            resolve_child(step, 0, &base_inference_ctx);
+            inference_ctx->constrain_indexes_into(&base_inference_ctx, step.ast);
+            auto child_info = step.out->children[0].type.value();
+            auto ptr_type = ops.get_type(child_info.type_id);
+            auto lifetime = ops.pointed_lifetime(child_info.type_id);
+            if (lifetime.has_value()) {
+                // Note: `constrain_dereferences` already reports errors for non-pointer types.
+                value_category = ResolvedLValue{lifetime.value()};
+            }
+
+            auto size_type = ops.get_types().get_type_id(NamedTypeSymbol{"usize"});
+            offset_inference_ctx
+                .constrain_context_type(size_type,
+                                        error::LocatedText(step.ast, "index"),
+                                        InferenceContext::ConstraintKind::Suggestion);
+
+            resolve_child(step, 0, &base_inference_ctx);
+
+            auto offset_type_id = resolve_child(step, 1, &offset_inference_ctx);
+            auto offset_type = ops.get_type(offset_type_id);
+            auto offset_integral = std::get_if<IntegralType>(&offset_type.get_program_type());
+
+            if (offset_integral == nullptr ||
+                offset_integral->literal_kind != IntegralLiteralKind::Int) {
+
+                ops.get_errors().E_T_IDX_OFF_NINT(step.out->children[1].original,
+                                                  step.out->children[0].original,
+                                                  offset_type.get_name());
+            }
+
+            return set_type_info(step.type_out(), value_category);
         }
 
         TypeId operator()(ExprTransformStep<ast::DotOperatorExpression> step) {

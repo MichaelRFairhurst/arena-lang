@@ -1,0 +1,164 @@
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got bool
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:19:5:19:13
+  :     bool_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:19:5
+  :     bool_[0]; // E-T_CANT_INDEX
+  :     ^^^^^ expression has type bool
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got char
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:20:5:20:13
+  :     char_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:20:5
+  :     char_[0]; // E-T_CANT_INDEX
+  :     ^^^^^ expression has type char
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got byte
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:21:5:21:13
+  :     byte_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:21:5
+  :     byte_[0]; // E-T_CANT_INDEX
+  :     ^^^^^ expression has type byte
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got short
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:22:5:22:14
+  :     short_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:22:5
+  :     short_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^ expression has type short
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got ushort
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:23:5:23:15
+  :     ushort_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:23:5
+  :     ushort_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^ expression has type ushort
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got int
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:24:5:24:12
+  :     int_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^ Indexing with '[]'
+invalid_bases.rna:24:5
+  :     int_[0]; // E-T_CANT_INDEX
+  :     ^^^^ expression has type int
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got uint
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:25:5:25:13
+  :     uint_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:25:5
+  :     uint_[0]; // E-T_CANT_INDEX
+  :     ^^^^^ expression has type uint
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got long
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:26:5:26:13
+  :     long_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:26:5
+  :     long_[0]; // E-T_CANT_INDEX
+  :     ^^^^^ expression has type long
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got ulong
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:27:5:27:14
+  :     ulong_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:27:5
+  :     ulong_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^ expression has type ulong
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got usize
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:28:5:28:14
+  :     usize_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:28:5
+  :     usize_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^ expression has type usize
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got ssize
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:29:5:29:14
+  :     ssize_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:29:5
+  :     ssize_[0]; // E-T_CANT_INDEX
+  :     ^^^^^^ expression has type ssize
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got double64
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:30:5:30:14
+  :     double[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:30:5
+  :     double[0]; // E-T_CANT_INDEX
+  :     ^^^^^^ expression has type double64
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got float32
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:31:5:31:13
+  :     float[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:31:5
+  :     float[0]; // E-T_CANT_INDEX
+  :     ^^^^^ expression has type float32
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got MyStruct
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:32:5:32:16
+  :     mystruct[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:32:5
+  :     mystruct[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^ expression has type MyStruct
+  .
+ == help: Array types and pointer types support indexing
+
+
+Error[E-T_CANT_INDEX]: Expected an indexable type, but got int const
+at compile/static_lang_tests/typechecking/operators/index/invalid_bases.rna:35:5:35:16
+  :     constint[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^^^^ Indexing with '[]'
+invalid_bases.rna:35:5
+  :     constint[0]; // E-T_CANT_INDEX
+  :     ^^^^^^^^ expression has type int const
+  .
+ == help: Array types and pointer types support indexing

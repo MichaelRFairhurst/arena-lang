@@ -41,6 +41,47 @@ namespace {
     private:
         const TypeOperations *ops;
     };
+
+    class IndexIntoVisitor {
+    public:
+        IndexIntoVisitor(const TypeOperations *ops) : ops(ops) {}
+
+        std::optional<ResolvedType> operator()(PointerType ptr_type) const {
+            return ops->get_type(ptr_type.pointee_type);
+        }
+
+        std::optional<ResolvedType> operator()(ArrayType array_type) const {
+            return ops->get_type(array_type.element_type);
+        }
+
+        std::optional<ResolvedType> operator()(ConstType const_type) const {
+            auto consted = ops->get_type(const_type.const_type);
+            auto inner = std::visit(*this, consted.get_program_type());
+            if (inner == std::nullopt) {
+                return std::nullopt;
+            }
+
+            if (std::holds_alternative<ConstType>(inner->get_program_type()) ||
+                std::holds_alternative<ErrorType>(inner->get_program_type())) {
+                return inner;
+            }
+
+            auto inner_type_id = inner->get_id();
+            return ops->get_type(ops->get_types().get_type_id(ConstTypeSymbol{inner_type_id}));
+        }
+
+        std::optional<ResolvedType> operator()(ErrorType error_type) const {
+            return ops->get_error_type();
+        }
+
+        template <typename CannotDeref>
+        std::optional<ResolvedType> operator()(CannotDeref type) const {
+            return std::nullopt;
+        }
+
+    private:
+        const TypeOperations *ops;
+    };
 } // namespace
 
 ResolvedType TypeOperations::get_type(TypeId id) const { return ttable->get_type(id, lifetimes); }
@@ -96,6 +137,10 @@ std::optional<LifetimeId> TypeOperations::pointed_lifetime(TypeId id) const {
     }
 
     return std::nullopt;
+}
+
+std::optional<ResolvedType> TypeOperations::index_into(TypeId id) const {
+    return std::visit(IndexIntoVisitor(this), get_type(id).get_program_type());
 }
 
 bool TypeOperations::is_const_strict(TypeId id) const {

@@ -1,0 +1,28 @@
+fun test() {
+    let iarr: int[10];
+    let iconstarr: int const[10];
+    let iarrconst: int[10]const;
+
+    let ip: int*;
+    let iconstp: int const*;
+    let ipconst: int*const;
+
+    iarr[0];
+    iconstarr[0];
+    iarrconst[0];
+    ip[0];
+    iconstp[0];
+    ipconst[0];
+
+    let iarrarr: int[10][20];
+    iarrarr[1][2];
+    
+    let ipp: int**;
+    ipp[1][2];
+
+    let iparr: int*[10];
+    let iarrp: int[10]*;
+
+    iparr[1][2];
+    iarrp[1][2];
+}

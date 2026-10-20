@@ -33,6 +33,7 @@ namespace arena::sema {
 
         std::optional<ResolvedType> dereference(TypeId id) const;
         std::optional<LifetimeId> pointed_lifetime(TypeId id) const;
+        std::optional<ResolvedType> index_into(TypeId id) const;
 
         bool is_const_strict(TypeId id) const;
         bool is_lifetime_strict(TypeId id) const;

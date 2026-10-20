@@ -353,6 +353,24 @@ namespace arena::error {
             });
         }
 
+        Error &E_T_CANT_INDEX(Location l, LocatedText operand) {
+            auto &err = report({
+                "E-T_CANT_INDEX",
+                l,
+                "Indexing with '[]'",
+                std::vector<Chunk>{
+                    "Expected an indexable type, but got ",
+                    Link{.link_text = operand.second,
+                         .label_text = "expression has type " + operand.second,
+                         .location = operand.first},
+                },
+            });
+
+            err.add_supplement(SupplementKind::Help,
+                               "Array types and pointer types support indexing");
+            return err;
+        }
+
         Error &E_T_CALL_WRG_ARGC(Location l,
                                  std::string_view function_name,
                                  size_t expected,
@@ -590,6 +608,36 @@ namespace arena::error {
                     " is not needed here",
                 },
             });
+        }
+
+        Error &E_T_IDX_OFF_NINT(Location offset, Location base, std::string_view offset_type) {
+            auto &err = report({
+                "E_T_IDX_OFF_NINT",
+                offset,
+                "Provided offset in indexing expression has non-integral type",
+                std::vector<Chunk>{
+                    Link{
+                        .link_text = "Offset expression",
+                        .label_text =
+                            "Offset expression has non-integral type " + std::string{offset_type},
+                        .location = offset,
+                    },
+                    " applied to base expression ",
+                    Link{
+                        .link_text = "here",
+                        .label_text = "Access of this base expression here",
+                        .location = base,
+                    },
+                    " has type " + std::string{offset_type} +
+                        ", which is not an allowed integral type",
+                },
+            });
+
+            err.add_supplement(SupplementKind::Help,
+                               "Index offset must have an integral type such as 'usize', or 'int', "
+                               "etc.");
+
+            return err;
         }
 
         Error &E_L_ESC_STACK(Location l, std::vector<Cause> causes) {

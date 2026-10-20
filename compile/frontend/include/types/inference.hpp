@@ -30,6 +30,11 @@ namespace arena::sema {
                                  LifetimeId lifetime,
                                  const ast::Node *origin,
                                  ConstraintKind kind = ConstraintKind::Assignee);
+        void constrain_indexes_into(InferenceContext *other,
+                                    const ast::Node *origin,
+                                    ConstraintKind kind = ConstraintKind::Assignee);
+        void constrain_indexable_as(InferenceContext *other,
+                                    const ast::Node *origin);
         void constrain_int_literal(const ast::Node *literal);
         sema::TypeId get_inferred_context_type();
         error::LocatedText get_why_constraint() const { return why_constraint; }

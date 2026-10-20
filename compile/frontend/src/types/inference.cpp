@@ -96,6 +96,46 @@ void InferenceContext::constrain_points_to(InferenceContext *other,
     constrain_context_type(pointer_to_other, link, kind);
 }
 
+void InferenceContext::constrain_indexes_into(InferenceContext *other,
+                                              const ast::Node *origin,
+                                              ConstraintKind kind) {
+    if (other == nullptr) {
+        return;
+    }
+
+    auto other_context_type = other->context_type;
+    if (!other_context_type.has_value()) {
+        return;
+    }
+
+    auto element_type = ops->index_into(*other_context_type);
+    if (!element_type.has_value()) {
+        ops->get_errors().E_T_CANT_INDEX(origin,
+                                         {other->context_node,
+                                          ops->get_type_name(*other_context_type)});
+        element_type = ops->get_error_type();
+    }
+
+    constrain_context_type(element_type->get_id(),
+                           error::LocatedText{origin, "element type"},
+                           kind);
+}
+
+void InferenceContext::constrain_indexable_as(InferenceContext *other, const ast::Node *origin) {
+    if (other == nullptr) {
+        return;
+    }
+
+    auto other_context_type = other->context_type;
+    if (!other_context_type.has_value()) {
+        return;
+    }
+
+    auto array_of_other = ops->get_types().get_type_id(ArrayTypeSymbol{*other_context_type});
+    auto link = error::LocatedText{origin, "here"};
+    constrain_context_type(array_of_other, link, ConstraintKind::Suggestion);
+}
+
 void InferenceContext::constrain_int_literal(const ast::Node *literal) {
     if (!context_type.has_value()) {
         // If the context type is not yet constrained, suggest it to be an int.

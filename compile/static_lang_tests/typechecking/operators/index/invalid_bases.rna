@@ -1,0 +1,36 @@
+struct MyStruct {}
+ 
+fun test() {
+    let bool_: bool = true;
+    let char_: char;
+    let byte_: byte = 0;
+    let short_: short = 0;
+    let ushort_: ushort = 0;
+    let int_: int = 0;
+    let uint_: uint = 0;
+    let long_: long = 0;
+    let ulong_: ulong = 0;
+    let usize_: usize = 0;
+    let ssize_: ssize = 0;
+    let double: double64 = 0.0;
+    let float: float32;
+    let mystruct: MyStruct;
+
+    bool_[0]; // E-T_CANT_INDEX
+    char_[0]; // E-T_CANT_INDEX
+    byte_[0]; // E-T_CANT_INDEX
+    short_[0]; // E-T_CANT_INDEX
+    ushort_[0]; // E-T_CANT_INDEX
+    int_[0]; // E-T_CANT_INDEX
+    uint_[0]; // E-T_CANT_INDEX
+    long_[0]; // E-T_CANT_INDEX
+    ulong_[0]; // E-T_CANT_INDEX
+    usize_[0]; // E-T_CANT_INDEX
+    ssize_[0]; // E-T_CANT_INDEX
+    double[0]; // E-T_CANT_INDEX
+    float[0]; // E-T_CANT_INDEX
+    mystruct[0]; // E-T_CANT_INDEX
+
+    let constint: int const;
+    constint[0]; // E-T_CANT_INDEX
+}

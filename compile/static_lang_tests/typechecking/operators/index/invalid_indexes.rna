@@ -1,0 +1,21 @@
+struct MyStruct{}
+
+fun test(ptr: char*, arr: char[4]) {
+    let bool_ = true;
+    let char_: char;
+    let double_: double64 = 1.0;
+    let float_: float32;
+    let mystruct_: MyStruct;
+    
+    ptr[bool_];
+    ptr[char_];
+    ptr[double_];
+    ptr[float_];
+    ptr[mystruct_];
+    
+    arr[bool_];
+    arr[char_];
+    arr[double_];
+    arr[float_];
+    arr[mystruct_];
+}

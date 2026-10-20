@@ -1,0 +1,34 @@
+fun test(ptr: char*, arr: char[20]) {
+    ptr[0];
+    arr[0];
+
+    let byte_: byte = 0;
+    let short_: short = 0;
+    let ushort_: ushort = 0;
+    let int_: int = 0;
+    let uint_: uint = 0;
+    let long_: long = 0;
+    let ulong_: ulong = 0;
+    let usize_: usize = 0;
+    let ssize_: ssize = 0;
+
+    ptr[byte_];
+    ptr[short_];
+    ptr[ushort_];
+    ptr[int_];
+    ptr[uint_];
+    ptr[long_];
+    ptr[ulong_];
+    ptr[usize_];
+    ptr[ssize_];
+
+    arr[byte_];
+    arr[short_];
+    arr[ushort_];
+    arr[int_];
+    arr[uint_];
+    arr[long_];
+    arr[ulong_];
+    arr[usize_];
+    arr[ssize_];
+}
