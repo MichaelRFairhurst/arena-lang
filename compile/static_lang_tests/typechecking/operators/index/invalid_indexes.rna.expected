@@ -1,13 +1,13 @@
 
 Error[E_T_IDX_OFF_NINT]: Offset expression applied to base expression here has type bool, which is not an allowed integral type
 at compile/static_lang_tests/typechecking/operators/index/invalid_indexes.rna:10:9:10:14
-  :     ptr[bool_];
+  :     ptr[bool_]@unsafe;
   :         ^^^^^ Provided offset in indexing expression has non-integral type
 invalid_indexes.rna:10:9
-  :     ptr[bool_];
+  :     ptr[bool_]@unsafe;
   :         ^^^^^ Offset expression has non-integral type bool
 invalid_indexes.rna:10:5
-  :     ptr[bool_];
+  :     ptr[bool_]@unsafe;
   :     ^^^ Access of this base expression here
   .
  == help: Index offset must have an integral type such as 'usize', or 'int', etc.
@@ -15,13 +15,13 @@ invalid_indexes.rna:10:5
 
 Error[E_T_IDX_OFF_NINT]: Offset expression applied to base expression here has type char, which is not an allowed integral type
 at compile/static_lang_tests/typechecking/operators/index/invalid_indexes.rna:11:9:11:14
-  :     ptr[char_];
+  :     ptr[char_]@unsafe;
   :         ^^^^^ Provided offset in indexing expression has non-integral type
 invalid_indexes.rna:11:9
-  :     ptr[char_];
+  :     ptr[char_]@unsafe;
   :         ^^^^^ Offset expression has non-integral type char
 invalid_indexes.rna:11:5
-  :     ptr[char_];
+  :     ptr[char_]@unsafe;
   :     ^^^ Access of this base expression here
   .
  == help: Index offset must have an integral type such as 'usize', or 'int', etc.
@@ -29,13 +29,13 @@ invalid_indexes.rna:11:5
 
 Error[E_T_IDX_OFF_NINT]: Offset expression applied to base expression here has type double64, which is not an allowed integral type
 at compile/static_lang_tests/typechecking/operators/index/invalid_indexes.rna:12:9:12:16
-  :     ptr[double_];
+  :     ptr[double_]@unsafe;
   :         ^^^^^^^ Provided offset in indexing expression has non-integral type
 invalid_indexes.rna:12:9
-  :     ptr[double_];
+  :     ptr[double_]@unsafe;
   :         ^^^^^^^ Offset expression has non-integral type double64
 invalid_indexes.rna:12:5
-  :     ptr[double_];
+  :     ptr[double_]@unsafe;
   :     ^^^ Access of this base expression here
   .
  == help: Index offset must have an integral type such as 'usize', or 'int', etc.
@@ -43,13 +43,13 @@ invalid_indexes.rna:12:5
 
 Error[E_T_IDX_OFF_NINT]: Offset expression applied to base expression here has type float32, which is not an allowed integral type
 at compile/static_lang_tests/typechecking/operators/index/invalid_indexes.rna:13:9:13:15
-  :     ptr[float_];
+  :     ptr[float_]@unsafe;
   :         ^^^^^^ Provided offset in indexing expression has non-integral type
 invalid_indexes.rna:13:9
-  :     ptr[float_];
+  :     ptr[float_]@unsafe;
   :         ^^^^^^ Offset expression has non-integral type float32
 invalid_indexes.rna:13:5
-  :     ptr[float_];
+  :     ptr[float_]@unsafe;
   :     ^^^ Access of this base expression here
   .
  == help: Index offset must have an integral type such as 'usize', or 'int', etc.
@@ -57,13 +57,13 @@ invalid_indexes.rna:13:5
 
 Error[E_T_IDX_OFF_NINT]: Offset expression applied to base expression here has type MyStruct, which is not an allowed integral type
 at compile/static_lang_tests/typechecking/operators/index/invalid_indexes.rna:14:9:14:18
-  :     ptr[mystruct_];
+  :     ptr[mystruct_]@unsafe;
   :         ^^^^^^^^^ Provided offset in indexing expression has non-integral type
 invalid_indexes.rna:14:9
-  :     ptr[mystruct_];
+  :     ptr[mystruct_]@unsafe;
   :         ^^^^^^^^^ Offset expression has non-integral type MyStruct
 invalid_indexes.rna:14:5
-  :     ptr[mystruct_];
+  :     ptr[mystruct_]@unsafe;
   :     ^^^ Access of this base expression here
   .
  == help: Index offset must have an integral type such as 'usize', or 'int', etc.

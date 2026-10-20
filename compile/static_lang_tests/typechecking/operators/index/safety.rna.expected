@@ -1,0 +1,92 @@
+
+Error[W-T_UNNSRY_UNSAFE]: This @unsafe annotation is not needed here
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:7:5:7:14
+  :     intarr[1]@unsafe; // E-T_UNNSRY_UNSAFE
+  :     ^^^^^^^^^ Unnecessary @unsafe annotation attached to a safe operation
+safety.rna:7:14
+  :     intarr[1]@unsafe; // E-T_UNNSRY_UNSAFE
+  :              ^^^^^^^ Unnecessary @unsafe annotation
+
+
+Error[E-T_UNSAFE]: Dereferencing a pointer with the indexing operator is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:9:5:9:12
+  :     intp[1]; // E-T_UNSAFE
+  :     ^^^^^^^ Unsafe operation
+  .
+ == help: To bypass this restriction, use the unsafe version of the operator with `a[b]@unsafe`
+
+
+Error[E-T_UNSAFE]: Dereferencing a pointer with the indexing operator is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:11:5:11:17
+  :     intpconst[1]; // E-T_UNSAFE
+  :     ^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: To bypass this restriction, use the unsafe version of the operator with `a[b]@unsafe`
+
+
+Error[E-T_UNSAFE]: Dereferencing a pointer with the indexing operator is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:18:5:18:18
+  :     intparr[0][1]; // E-T_UNSAFE
+  :     ^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: To bypass this restriction, use the unsafe version of the operator with `a[b]@unsafe`
+
+
+Error[W-T_UNNSRY_UNSAFE]: This @unsafe annotation is not needed here
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:19:5:19:15
+  :     intparr[0]@unsafe[1]; // E-T_UNSAFE, E-T_UNNSRY_UNSAFE
+  :     ^^^^^^^^^^ Unnecessary @unsafe annotation attached to a safe operation
+safety.rna:19:15
+  :     intparr[0]@unsafe[1]; // E-T_UNSAFE, E-T_UNNSRY_UNSAFE
+  :               ^^^^^^^ Unnecessary @unsafe annotation
+
+
+Error[E-T_UNSAFE]: Dereferencing a pointer with the indexing operator is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:19:5:19:25
+  :     intparr[0]@unsafe[1]; // E-T_UNSAFE, E-T_UNNSRY_UNSAFE
+  :     ^^^^^^^^^^^^^^^^^^^^ Unsafe operation
+  .
+ == help: To bypass this restriction, use the unsafe version of the operator with `a[b]@unsafe`
+
+
+Error[W-T_UNNSRY_UNSAFE]: This @unsafe annotation is not needed here
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:20:5:20:15
+  :     intparr[0]@unsafe[1]@unsafe; // E-T_UNNSRY_UNSAFE
+  :     ^^^^^^^^^^ Unnecessary @unsafe annotation attached to a safe operation
+safety.rna:20:15
+  :     intparr[0]@unsafe[1]@unsafe; // E-T_UNNSRY_UNSAFE
+  :               ^^^^^^^ Unnecessary @unsafe annotation
+
+
+Error[E-T_UNSAFE]: Dereferencing a pointer with the indexing operator is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:23:5:23:15
+  :     intarrp[0][1]; // E-T_UNSAFE
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: To bypass this restriction, use the unsafe version of the operator with `a[b]@unsafe`
+
+
+Error[E-T_UNSAFE]: Dereferencing a pointer with the indexing operator is an unsafe operation, and must be explicitly marked @unsafe to be permitted
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:24:5:24:15
+  :     intarrp[0][1]@unsafe; // E-T_UNSAFE, E-T_UNNSRY_UNSAFE
+  :     ^^^^^^^^^^ Unsafe operation
+  .
+ == help: To bypass this restriction, use the unsafe version of the operator with `a[b]@unsafe`
+
+
+Error[W-T_UNNSRY_UNSAFE]: This @unsafe annotation is not needed here
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:24:5:24:18
+  :     intarrp[0][1]@unsafe; // E-T_UNSAFE, E-T_UNNSRY_UNSAFE
+  :     ^^^^^^^^^^^^^ Unnecessary @unsafe annotation attached to a safe operation
+safety.rna:24:18
+  :     intarrp[0][1]@unsafe; // E-T_UNSAFE, E-T_UNNSRY_UNSAFE
+  :                  ^^^^^^^ Unnecessary @unsafe annotation
+
+
+Error[W-T_UNNSRY_UNSAFE]: This @unsafe annotation is not needed here
+at compile/static_lang_tests/typechecking/operators/index/safety.rna:25:5:25:25
+  :     intarrp[0]@unsafe[1]@unsafe; // E-T_UNNSRY_UNSAFE
+  :     ^^^^^^^^^^^^^^^^^^^^ Unnecessary @unsafe annotation attached to a safe operation
+safety.rna:25:25
+  :     intarrp[0]@unsafe[1]@unsafe; // E-T_UNNSRY_UNSAFE
+  :                         ^^^^^^^ Unnecessary @unsafe annotation

@@ -1,5 +1,5 @@
 fun test(ptr: char*, arr: char[20]) {
-    ptr[0];
+    ptr[0]@unsafe;
     arr[0];
 
     let byte_: byte = 0;
@@ -12,15 +12,15 @@ fun test(ptr: char*, arr: char[20]) {
     let usize_: usize = 0;
     let ssize_: ssize = 0;
 
-    ptr[byte_];
-    ptr[short_];
-    ptr[ushort_];
-    ptr[int_];
-    ptr[uint_];
-    ptr[long_];
-    ptr[ulong_];
-    ptr[usize_];
-    ptr[ssize_];
+    ptr[byte_]@unsafe;
+    ptr[short_]@unsafe;
+    ptr[ushort_]@unsafe;
+    ptr[int_]@unsafe;
+    ptr[uint_]@unsafe;
+    ptr[long_]@unsafe;
+    ptr[ulong_]@unsafe;
+    ptr[usize_]@unsafe;
+    ptr[ssize_]@unsafe;
 
     arr[byte_];
     arr[short_];

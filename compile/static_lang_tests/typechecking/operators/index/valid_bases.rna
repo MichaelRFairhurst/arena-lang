@@ -10,19 +10,19 @@ fun test() {
     iarr[0];
     iconstarr[0];
     iarrconst[0];
-    ip[0];
-    iconstp[0];
-    ipconst[0];
+    ip[0]@unsafe;
+    iconstp[0]@unsafe;
+    ipconst[0]@unsafe;
 
     let iarrarr: int[10][20];
     iarrarr[1][2];
     
     let ipp: int**;
-    ipp[1][2];
+    ipp[1]@unsafe[2]@unsafe;
 
     let iparr: int*[10];
     let iarrp: int[10]*;
 
-    iparr[1][2];
-    iarrp[1][2];
+    iparr[1][2]@unsafe;
+    iarrp[1]@unsafe[2];
 }

@@ -74,8 +74,6 @@ namespace {
             safety = Safety::Safe;
             auto child_type_id = middleware.transform_child<TypeId>(step, child_index, *this);
             verify_safety(&step.out->children[child_index]);
-            // Reset safety to safe for subsequent operations
-            safety = Safety::Safe;
 
             inference_ctx = prev_ctx;
             return child_type_id;
@@ -94,6 +92,8 @@ namespace {
             }
 
             if (safety == Safety::Safe || marked_unsafe) {
+                // Reset safety to safe for subsequent operations
+                safety = Safety::Safe;
                 return;
             }
 
@@ -106,12 +106,19 @@ namespace {
                 hint = "Use unsafe arithmetic operators (such as '+@unsafe', '-@unsafe', etc.) to "
                        "bypass this restriction";
                 break;
+            case Safety::UnsafePointerIndex:
+                operation = "Dereferencing a pointer with the indexing operator";
+                hint = "To bypass this restriction, use the unsafe version of the operator with "
+                       "`a[b]@unsafe`";
+                break;
             case Safety::Safe:
                 // Unreachable
                 return;
             }
 
             ops.get_errors().E_T_UNSAFE(expr->original, operation, hint);
+            // Reset safety to safe for subsequent operations
+            safety = Safety::Safe;
         }
 
         TypeId operator()(ExprTransformStep<ast::IdExpression> step) {
@@ -542,11 +549,10 @@ namespace {
             auto value_category = ResolvedLValue{ops.get_lifetimes().get_unsafe_lifetime()};
 
             base_inference_ctx.constrain_indexable_as(inference_ctx, step.ast);
-            resolve_child(step, 0, &base_inference_ctx);
+            auto base_type_id = resolve_child(step, 0, &base_inference_ctx);
             inference_ctx->constrain_indexes_into(&base_inference_ctx, step.ast);
-            auto child_info = step.out->children[0].type.value();
-            auto ptr_type = ops.get_type(child_info.type_id);
-            auto lifetime = ops.pointed_lifetime(child_info.type_id);
+            auto ptr_type = ops.get_type(base_type_id);
+            auto lifetime = ops.pointed_lifetime(base_type_id);
             if (lifetime.has_value()) {
                 // Note: `constrain_dereferences` already reports errors for non-pointer types.
                 value_category = ResolvedLValue{lifetime.value()};
@@ -558,8 +564,6 @@ namespace {
                                         error::LocatedText(step.ast, "index"),
                                         InferenceContext::ConstraintKind::Suggestion);
 
-            resolve_child(step, 0, &base_inference_ctx);
-
             auto offset_type_id = resolve_child(step, 1, &offset_inference_ctx);
             auto offset_type = ops.get_type(offset_type_id);
             auto offset_integral = std::get_if<IntegralType>(&offset_type.get_program_type());
@@ -570,6 +574,10 @@ namespace {
                 ops.get_errors().E_T_IDX_OFF_NINT(step.out->children[1].original,
                                                   step.out->children[0].original,
                                                   offset_type.get_name());
+            }
+
+            if (ops.is_pointer(base_type_id, false)) {
+                safety = Safety::UnsafePointerIndex;
             }
 
             return set_type_info(step.type_out(), value_category);
@@ -746,6 +754,7 @@ namespace {
         enum class Safety {
             Safe,
             UnsafePointerMath,
+            UnsafePointerIndex,
         };
 
         TypeOperations ops;

@@ -1,0 +1,26 @@
+fun test() {
+    let intarr: int[10];
+    let intp: int*;
+    let intpconst: int* const;
+
+    intarr[1]; // Ok
+    intarr[1]@unsafe; // E-T_UNNSRY_UNSAFE
+
+    intp[1]; // E-T_UNSAFE
+    intp[1]@unsafe; // Ok
+    intpconst[1]; // E-T_UNSAFE
+    intpconst[1]@unsafe; // Ok
+
+    let intparr: int*[1];
+    let intarrp: int[1]*;
+
+    intparr[0][1]@unsafe; // Ok
+    intparr[0][1]; // E-T_UNSAFE
+    intparr[0]@unsafe[1]; // E-T_UNSAFE, E-T_UNNSRY_UNSAFE
+    intparr[0]@unsafe[1]@unsafe; // E-T_UNNSRY_UNSAFE
+
+    intarrp[0]@unsafe[1]; // Ok
+    intarrp[0][1]; // E-T_UNSAFE
+    intarrp[0][1]@unsafe; // E-T_UNSAFE, E-T_UNNSRY_UNSAFE
+    intarrp[0]@unsafe[1]@unsafe; // E-T_UNNSRY_UNSAFE
+}
