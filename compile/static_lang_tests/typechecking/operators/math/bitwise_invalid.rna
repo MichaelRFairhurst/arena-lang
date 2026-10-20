@@ -16,329 +16,329 @@ fun test() {
     let arr: int[2];
     let mystruct: MyStruct;
 
-    byte_ | bool_; // E-T_BIN_MIS
-    byte_ | char_; // E-T_BIN_MIS
+    byte_ | bool_; // E-T_BINOPRND_NINT
+    byte_ | char_; // E-T_BINOPRND_NINT
     byte_ | short_; // E-T_BIN_MIS
     byte_ | ushort_; // E-T_BIN_MIS
     byte_ | int_; // E-T_BIN_MIS
     byte_ | uint_; // E-T_BIN_MIS
     byte_ | long_; // E-T_BIN_MIS
     byte_ | ulong_; // E-T_BIN_MIS
-    byte_ | ptr; // E-T_BIN_MIS
-    byte_ | arr; // E-T_BIN_MIS
-    byte_ | mystruct; // E-T_BIN_MIS
-    byte_ & bool_; // E-T_BIN_MIS
-    byte_ & char_; // E-T_BIN_MIS
+    byte_ | ptr; // E-T_UNSAFE
+    byte_ | arr; // E-T_BINOPRND_NINT
+    byte_ | mystruct; // E-T_BINOPRND_NINT
+    byte_ & bool_; // E-T_BINOPRND_NINT
+    byte_ & char_; // E-T_BINOPRND_NINT
     byte_ & short_; // E-T_BIN_MIS
     byte_ & ushort_; // E-T_BIN_MIS
     byte_ & int_; // E-T_BIN_MIS
     byte_ & uint_; // E-T_BIN_MIS
     byte_ & long_; // E-T_BIN_MIS
     byte_ & ulong_; // E-T_BIN_MIS
-    byte_ & ptr; // E-T_BIN_MIS
-    byte_ & arr; // E-T_BIN_MIS
-    byte_ & mystruct; // E-T_BIN_MIS
+    byte_ & ptr; // E-T_UNSAFE
+    byte_ & arr; // E-T_BINOPRND_NINT
+    byte_ & mystruct; // E-T_BINOPRND_NINT
 
-    short_ | bool_; // E-T_BIN_MIS
-    short_ | char_; // E-T_BIN_MIS
+    short_ | bool_; // E-T_BINOPRND_NINT
+    short_ | char_; // E-T_BINOPRND_NINT
     short_ | byte_; // E-T_BIN_MIS
     short_ | ushort_; // E-T_BIN_MIS
     short_ | int_; // E-T_BIN_MIS
     short_ | uint_; // E-T_BIN_MIS
     short_ | long_; // E-T_BIN_MIS
     short_ | ulong_; // E-T_BIN_MIS
-    short_ | ptr; // E-T_BIN_MIS
-    short_ | arr; // E-T_BIN_MIS
-    short_ | mystruct; // E-T_BIN_MIS
-    short_ & bool_; // E-T_BIN_MIS
-    short_ & char_; // E-T_BIN_MIS
+    short_ | ptr; // E-T_UNSAFE
+    short_ | arr; // E-T_BINOPRND_NINT
+    short_ | mystruct; // E-T_BINOPRND_NINT
+    short_ & bool_; // E-T_BINOPRND_NINT
+    short_ & char_; // E-T_BINOPRND_NINT
     short_ & short_; // E-T_BIN_MIS
     short_ & ushort_; // E-T_BIN_MIS
     short_ & int_; // E-T_BIN_MIS
     short_ & uint_; // E-T_BIN_MIS
     short_ & long_; // E-T_BIN_MIS
     short_ & ulong_; // E-T_BIN_MIS
-    short_ & ptr; // E-T_BIN_MIS
-    short_ & arr; // E-T_BIN_MIS
-    short_ & mystruct; // E-T_BIN_MIS
+    short_ & ptr; // E-T_UNSAFE
+    short_ & arr; // E-T_BINOPRND_NINT
+    short_ & mystruct; // E-T_BINOPRND_NINT
 
-    ushort_ | bool_; // E-T_BIN_MIS
-    ushort_ | char_; // E-T_BIN_MIS
+    ushort_ | bool_; // E-T_BINOPRND_NINT
+    ushort_ | char_; // E-T_BINOPRND_NINT
     ushort_ | byte_; // E-T_BIN_MIS
     ushort_ | short_; // E-T_BIN_MIS
     ushort_ | int_; // E-T_BIN_MIS
     ushort_ | uint_; // E-T_BIN_MIS
     ushort_ | long_; // E-T_BIN_MIS
     ushort_ | ulong_; // E-T_BIN_MIS
-    ushort_ | ptr; // E-T_BIN_MIS
-    ushort_ | arr; // E-T_BIN_MIS
-    ushort_ | mystruct; // E-T_BIN_MIS
-    ushort_ & bool_; // E-T_BIN_MIS
-    ushort_ & char_; // E-T_BIN_MIS
+    ushort_ | ptr; // E-T_UNSAFE
+    ushort_ | arr; // E-T_BINOPRND_NINT
+    ushort_ | mystruct; // E-T_BINOPRND_NINT
+    ushort_ & bool_; // E-T_BINOPRND_NINT
+    ushort_ & char_; // E-T_BINOPRND_NINT
     ushort_ & short_; // E-T_BIN_MIS
     ushort_ & int_; // E-T_BIN_MIS
     ushort_ & uint_; // E-T_BIN_MIS
     ushort_ & long_; // E-T_BIN_MIS
     ushort_ & ulong_; // E-T_BIN_MIS
-    ushort_ & ptr; // E-T_BIN_MIS
-    ushort_ & arr; // E-T_BIN_MIS
-    ushort_ & mystruct; // E-T_BIN_MIS
+    ushort_ & ptr; // E-T_UNSAFE
+    ushort_ & arr; // E-T_BINOPRND_NINT
+    ushort_ & mystruct; // E-T_BINOPRND_NINT
 
-    int_ | bool_; // E-T_BIN_MIS
-    int_ | char_; // E-T_BIN_MIS
+    int_ | bool_; // E-T_BINOPRND_NINT
+    int_ | char_; // E-T_BINOPRND_NINT
     int_ | byte_; // E-T_BIN_MIS
     int_ | short_; // E-T_BIN_MIS
     int_ | uint_; // E-T_BIN_MIS
     int_ | long_; // E-T_BIN_MIS
     int_ | ulong_; // E-T_BIN_MIS
-    int_ | ptr; // E-T_BIN_MIS
-    int_ | arr; // E-T_BIN_MIS
-    int_ | mystruct; // E-T_BIN_MIS
-    int_ & bool_; // E-T_BIN_MIS
-    int_ & char_; // E-T_BIN_MIS
+    int_ | ptr; // E-T_UNSAFE
+    int_ | arr; // E-T_BINOPRND_NINT
+    int_ | mystruct; // E-T_BINOPRND_NINT
+    int_ & bool_; // E-T_BINOPRND_NINT
+    int_ & char_; // E-T_BINOPRND_NINT
     int_ & short_; // E-T_BIN_MIS
     int_ & ushort_; // E-T_BIN_MIS
     int_ & uint_; // E-T_BIN_MIS
     int_ & long_; // E-T_BIN_MIS
     int_ & ulong_; // E-T_BIN_MIS
-    int_ & ptr; // E-T_BIN_MIS
-    int_ & arr; // E-T_BIN_MIS
-    int_ & mystruct; // E-T_BIN_MIS
+    int_ & ptr; // E-T_UNSAFE
+    int_ & arr; // E-T_BINOPRND_NINT
+    int_ & mystruct; // E-T_BINOPRND_NINT
 
-    uint_ | bool_; // E-T_BIN_MIS
-    uint_ | char_; // E-T_BIN_MIS
+    uint_ | bool_; // E-T_BINOPRND_NINT
+    uint_ | char_; // E-T_BINOPRND_NINT
     uint_ | byte_; // E-T_BIN_MIS
     uint_ | short_; // E-T_BIN_MIS
     uint_ | ushort_; // E-T_BIN_MIS
     uint_ | int_; // E-T_BIN_MIS
     uint_ | long_; // E-T_BIN_MIS
     uint_ | ulong_; // E-T_BIN_MIS
-    uint_ | ptr; // E-T_BIN_MIS
-    uint_ | arr; // E-T_BIN_MIS
-    uint_ | mystruct; // E-T_BIN_MIS
-    uint_ & bool_; // E-T_BIN_MIS
-    uint_ & char_; // E-T_BIN_MIS
+    uint_ | ptr; // E-T_UNSAFE
+    uint_ | arr; // E-T_BINOPRND_NINT
+    uint_ | mystruct; // E-T_BINOPRND_NINT
+    uint_ & bool_; // E-T_BINOPRND_NINT
+    uint_ & char_; // E-T_BINOPRND_NINT
     uint_ & short_; // E-T_BIN_MIS
     uint_ & ushort_; // E-T_BIN_MIS
     uint_ & int_; // E-T_BIN_MIS
     uint_ & long_; // E-T_BIN_MIS
     uint_ & ulong_; // E-T_BIN_MIS
-    uint_ & ptr; // E-T_BIN_MIS
-    uint_ & arr; // E-T_BIN_MIS
-    uint_ & mystruct; // E-T_BIN_MIS
+    uint_ & ptr; // E-T_UNSAFE
+    uint_ & arr; // E-T_BINOPRND_NINT
+    uint_ & mystruct; // E-T_BINOPRND_NINT
 
-    long_ | bool_; // E-T_BIN_MIS
-    long_ | char_; // E-T_BIN_MIS
+    long_ | bool_; // E-T_BINOPRND_NINT
+    long_ | char_; // E-T_BINOPRND_NINT
     long_ | byte_; // E-T_BIN_MIS
     long_ | short_; // E-T_BIN_MIS
     long_ | ushort_; // E-T_BIN_MIS
     long_ | int_; // E-T_BIN_MIS
     long_ | ulong_; // E-T_BIN_MIS
-    long_ | ptr; // E-T_BIN_MIS
-    long_ | arr; // E-T_BIN_MIS
-    long_ | mystruct; // E-T_BIN_MIS
-    long_ & bool_; // E-T_BIN_MIS
-    long_ & char_; // E-T_BIN_MIS
+    long_ | ptr; // E-T_UNSAFE
+    long_ | arr; // E-T_BINOPRND_NINT
+    long_ | mystruct; // E-T_BINOPRND_NINT
+    long_ & bool_; // E-T_BINOPRND_NINT
+    long_ & char_; // E-T_BINOPRND_NINT
     long_ & short_; // E-T_BIN_MIS
     long_ & ushort_; // E-T_BIN_MIS
     long_ & int_; // E-T_BIN_MIS
     long_ & uint_; // E-T_BIN_MIS
     long_ & ulong_; // E-T_BIN_MIS
-    long_ & ptr; // E-T_BIN_MIS
-    long_ & arr; // E-T_BIN_MIS
-    long_ & mystruct; // E-T_BIN_MIS
+    long_ & ptr; // E-T_UNSAFE
+    long_ & arr; // E-T_BINOPRND_NINT
+    long_ & mystruct; // E-T_BINOPRND_NINT
 
-    ulong_ | bool_; // E-T_BIN_MIS
-    ulong_ | char_; // E-T_BIN_MIS
+    ulong_ | bool_; // E-T_BINOPRND_NINT
+    ulong_ | char_; // E-T_BINOPRND_NINT
     ulong_ | byte_; // E-T_BIN_MIS
     ulong_ | short_; // E-T_BIN_MIS
     ulong_ | ushort_; // E-T_BIN_MIS
     ulong_ | int_; // E-T_BIN_MIS
     ulong_ | long_; // E-T_BIN_MIS
-    ulong_ | ptr; // E-T_BIN_MIS
-    ulong_ | arr; // E-T_BIN_MIS
-    ulong_ | mystruct; // E-T_BIN_MIS
-    ulong_ & bool_; // E-T_BIN_MIS
-    ulong_ & char_; // E-T_BIN_MIS
+    ulong_ | ptr; // E-T_UNSAFE
+    ulong_ | arr; // E-T_BINOPRND_NINT
+    ulong_ | mystruct; // E-T_BINOPRND_NINT
+    ulong_ & bool_; // E-T_BINOPRND_NINT
+    ulong_ & char_; // E-T_BINOPRND_NINT
     ulong_ & short_; // E-T_BIN_MIS
     ulong_ & ushort_; // E-T_BIN_MIS
     ulong_ & int_; // E-T_BIN_MIS
     ulong_ & uint_; // E-T_BIN_MIS
     ulong_ & long_; // E-T_BIN_MIS
-    ulong_ & ptr; // E-T_BIN_MIS
-    ulong_ & arr; // E-T_BIN_MIS
-    ulong_ & mystruct; // E-T_BIN_MIS
+    ulong_ & ptr; // E-T_UNSAFE
+    ulong_ & arr; // E-T_BINOPRND_NINT
+    ulong_ & mystruct; // E-T_BINOPRND_NINT
 
-    usize_ | bool_; // E-T_BIN_MIS
-    usize_ | char_; // E-T_BIN_MIS
+    usize_ | bool_; // E-T_BINOPRND_NINT
+    usize_ | char_; // E-T_BINOPRND_NINT
     usize_ | byte_; // E-T_BIN_MIS
     usize_ | short_; // E-T_BIN_MIS
     usize_ | ushort_; // E-T_BIN_MIS
     usize_ | int_; // E-T_BIN_MIS
     usize_ | long_; // E-T_BIN_MIS
     usize_ | ulong_; // E-T_BIN_MIS
-    usize_ | ptr; // E-T_BIN_MIS
-    usize_ | arr; // E-T_BIN_MIS
-    usize_ | mystruct; // E-T_BIN_MIS
-    usize_ & bool_; // E-T_BIN_MIS
-    usize_ & char_; // E-T_BIN_MIS
+    usize_ | ptr; // E-T_UNSAFE
+    usize_ | arr; // E-T_BINOPRND_NINT
+    usize_ | mystruct; // E-T_BINOPRND_NINT
+    usize_ & bool_; // E-T_BINOPRND_NINT
+    usize_ & char_; // E-T_BINOPRND_NINT
     usize_ & short_; // E-T_BIN_MIS
     usize_ & ushort_; // E-T_BIN_MIS
     usize_ & int_; // E-T_BIN_MIS
     usize_ & uint_; // E-T_BIN_MIS
     usize_ & long_; // E-T_BIN_MIS
     usize_ & ulong_; // E-T_BIN_MIS
-    usize_ & ptr; // E-T_BIN_MIS
-    usize_ & arr; // E-T_BIN_MIS
-    usize_ & mystruct; // E-T_BIN_MIS
+    usize_ & ptr; // E-T_UNSAFE
+    usize_ & arr; // E-T_BINOPRND_NINT
+    usize_ & mystruct; // E-T_BINOPRND_NINT
 
-    ssize_ | bool_; // E-T_BIN_MIS
-    ssize_ | char_; // E-T_BIN_MIS
+    ssize_ | bool_; // E-T_BINOPRND_NINT
+    ssize_ | char_; // E-T_BINOPRND_NINT
     ssize_ | byte_; // E-T_BIN_MIS
     ssize_ | short_; // E-T_BIN_MIS
     ssize_ | ushort_; // E-T_BIN_MIS
     ssize_ | int_; // E-T_BIN_MIS
     ssize_ | long_; // E-T_BIN_MIS
     ssize_ | ulong_; // E-T_BIN_MIS
-    ssize_ | ptr; // E-T_BIN_MIS
-    ssize_ | arr; // E-T_BIN_MIS
-    ssize_ | mystruct; // E-T_BIN_MIS
-    ssize_ & bool_; // E-T_BIN_MIS
-    ssize_ & char_; // E-T_BIN_MIS
+    ssize_ | ptr; // E-T_UNSAFE
+    ssize_ | arr; // E-T_BINOPRND_NINT
+    ssize_ | mystruct; // E-T_BINOPRND_NINT
+    ssize_ & bool_; // E-T_BINOPRND_NINT
+    ssize_ & char_; // E-T_BINOPRND_NINT
     ssize_ & short_; // E-T_BIN_MIS
     ssize_ & ushort_; // E-T_BIN_MIS
     ssize_ & int_; // E-T_BIN_MIS
     ssize_ & uint_; // E-T_BIN_MIS
     ssize_ & long_; // E-T_BIN_MIS
     ssize_ & ulong_; // E-T_BIN_MIS
-    ssize_ & ptr; // E-T_BIN_MIS
-    ssize_ & arr; // E-T_BIN_MIS
-    ssize_ & mystruct; // E-T_BIN_MIS
+    ssize_ & ptr; // E-T_UNSAFE
+    ssize_ & arr; // E-T_BINOPRND_NINT
+    ssize_ & mystruct; // E-T_BINOPRND_NINT
 
-    bool_ | bool_;
-    bool_ | char_;
-    bool_ | byte_;
-    bool_ | short_;
-    bool_ | ushort_;
-    bool_ | int_;
-    bool_ | uint_;
-    bool_ | long_;
-    bool_ | ulong_;
-    bool_ | ptr;
-    bool_ | arr;
-    bool_ | mystruct;
-    bool_ & bool_;
-    bool_ & char_;
-    bool_ & byte_;
-    bool_ & short_;
-    bool_ & ushort_;
-    bool_ & int_;
-    bool_ & uint_;
-    bool_ & long_;
-    bool_ & ulong_;
-    bool_ & ptr;
-    bool_ & arr;
-    bool_ & mystruct;
+    bool_ | bool_; // E-T_BINOPRND_NINT
+    bool_ | char_; // E-T_BINOPRND_NINT
+    bool_ | byte_; // E-T_BINOPRND_NINT
+    bool_ | short_; // E-T_BINOPRND_NINT
+    bool_ | ushort_; // E-T_BINOPRND_NINT
+    bool_ | int_; // E-T_BINOPRND_NINT
+    bool_ | uint_; // E-T_BINOPRND_NINT
+    bool_ | long_; // E-T_BINOPRND_NINT
+    bool_ | ulong_; // E-T_BINOPRND_NINT
+    bool_ | ptr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    bool_ | arr; // E-T_BINOPRND_NINT
+    bool_ | mystruct; // E-T_BINOPRND_NINT
+    bool_ & bool_; // E-T_BINOPRND_NINT
+    bool_ & char_; // E-T_BINOPRND_NINT
+    bool_ & byte_; // E-T_BINOPRND_NINT
+    bool_ & short_; // E-T_BINOPRND_NINT
+    bool_ & ushort_; // E-T_BINOPRND_NINT
+    bool_ & int_; // E-T_BINOPRND_NINT
+    bool_ & uint_; // E-T_BINOPRND_NINT
+    bool_ & long_; // E-T_BINOPRND_NINT
+    bool_ & ulong_; // E-T_BINOPRND_NINT
+    bool_ & ptr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    bool_ & arr; // E-T_BINOPRND_NINT
+    bool_ & mystruct; // E-T_BINOPRND_NINT
 
-    char_ | bool_;
-    char_ | char_;
-    char_ | byte_;
-    char_ | short_;
-    char_ | ushort_;
-    char_ | int_;
-    char_ | uint_;
-    char_ | long_;
-    char_ | ulong_;
-    char_ | ptr;
-    char_ | arr;
-    char_ | mystruct;
-    char_ & bool_;
-    char_ & char_;
-    char_ & byte_;
-    char_ & short_;
-    char_ & ushort_;
-    char_ & int_;
-    char_ & uint_;
-    char_ & long_;
-    char_ & ulong_;
-    char_ & ptr;
-    char_ & arr;
-    char_ & mystruct;
+    char_ | bool_; // E-T_BINOPRND_NINT
+    char_ | char_; // E-T_BINOPRND_NINT
+    char_ | byte_; // E-T_BINOPRND_NINT
+    char_ | short_; // E-T_BINOPRND_NINT
+    char_ | ushort_; // E-T_BINOPRND_NINT
+    char_ | int_; // E-T_BINOPRND_NINT
+    char_ | uint_; // E-T_BINOPRND_NINT
+    char_ | long_; // E-T_BINOPRND_NINT
+    char_ | ulong_; // E-T_BINOPRND_NINT
+    char_ | ptr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    char_ | arr; // E-T_BINOPRND_NINT
+    char_ | mystruct; // E-T_BINOPRND_NINT
+    char_ & bool_; // E-T_BINOPRND_NINT
+    char_ & char_; // E-T_BINOPRND_NINT
+    char_ & byte_; // E-T_BINOPRND_NINT
+    char_ & short_; // E-T_BINOPRND_NINT
+    char_ & ushort_; // E-T_BINOPRND_NINT
+    char_ & int_; // E-T_BINOPRND_NINT
+    char_ & uint_; // E-T_BINOPRND_NINT
+    char_ & long_; // E-T_BINOPRND_NINT
+    char_ & ulong_; // E-T_BINOPRND_NINT
+    char_ & ptr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    char_ & arr; // E-T_BINOPRND_NINT
+    char_ & mystruct; // E-T_BINOPRND_NINT
 
-    ptr | bool_;
-    ptr | char_;
-    ptr | byte_;
-    ptr | short_;
-    ptr | ushort_;
-    ptr | int_;
-    ptr | uint_;
-    ptr | long_;
-    ptr | ulong_;
-    ptr | ptr;
-    ptr | arr;
-    ptr | mystruct;
-    ptr & bool_;
-    ptr & char_;
-    ptr & byte_;
-    ptr & short_;
-    ptr & ushort_;
-    ptr & int_;
-    ptr & uint_;
-    ptr & long_;
-    ptr & ulong_;
-    ptr & ptr;
-    ptr & arr;
-    ptr & mystruct;
+    ptr | bool_; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    ptr | char_; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    ptr | byte_; // E-T_UNSAFE
+    ptr | short_; // E-T_UNSAFE
+    ptr | ushort_; // E-T_UNSAFE
+    ptr | int_; // E-T_UNSAFE
+    ptr | uint_; // E-T_UNSAFE
+    ptr | long_; // E-T_UNSAFE
+    ptr | ulong_; // E-T_UNSAFE
+    ptr | ptr; // E-T_UNSAFE
+    ptr | arr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    ptr | mystruct; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    ptr & bool_; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    ptr & char_; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    ptr & byte_; // E-T_UNSAFE
+    ptr & short_; // E-T_UNSAFE
+    ptr & ushort_; // E-T_UNSAFE
+    ptr & int_; // E-T_UNSAFE
+    ptr & uint_; // E-T_UNSAFE
+    ptr & long_; // E-T_UNSAFE
+    ptr & ulong_; // E-T_UNSAFE
+    ptr & ptr; // E-T_UNSAFE
+    ptr & arr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    ptr & mystruct; // E-T_BINOPRND_NINT, E-T_UNSAFE
 
-    arr | bool_;
-    arr | char_;
-    arr | byte_;
-    arr | short_;
-    arr | ushort_;
-    arr | int_;
-    arr | uint_;
-    arr | long_;
-    arr | ulong_;
-    arr | ptr;
-    arr | arr;
-    arr | mystruct;
-    arr & bool_;
-    arr & char_;
-    arr & byte_;
-    arr & short_;
-    arr & ushort_;
-    arr & int_;
-    arr & uint_;
-    arr & long_;
-    arr & ulong_;
-    arr & ptr;
-    arr & arr;
-    arr & mystruct;
+    arr | bool_; // E-T_BINOPRND_NINT
+    arr | char_; // E-T_BINOPRND_NINT
+    arr | byte_; // E-T_BINOPRND_NINT
+    arr | short_; // E-T_BINOPRND_NINT
+    arr | ushort_; // E-T_BINOPRND_NINT
+    arr | int_; // E-T_BINOPRND_NINT
+    arr | uint_; // E-T_BINOPRND_NINT
+    arr | long_; // E-T_BINOPRND_NINT
+    arr | ulong_; // E-T_BINOPRND_NINT
+    arr | ptr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    arr | arr; // E-T_BINOPRND_NINT
+    arr | mystruct; // E-T_BINOPRND_NINT
+    arr & bool_; // E-T_BINOPRND_NINT
+    arr & char_; // E-T_BINOPRND_NINT
+    arr & byte_; // E-T_BINOPRND_NINT
+    arr & short_; // E-T_BINOPRND_NINT
+    arr & ushort_; // E-T_BINOPRND_NINT
+    arr & int_; // E-T_BINOPRND_NINT
+    arr & uint_; // E-T_BINOPRND_NINT
+    arr & long_; // E-T_BINOPRND_NINT
+    arr & ulong_; // E-T_BINOPRND_NINT
+    arr & ptr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    arr & arr; // E-T_BINOPRND_NINT
+    arr & mystruct; // E-T_BINOPRND_NINT
 
-    mystruct | bool_;
-    mystruct | char_;
-    mystruct | byte_;
-    mystruct | short_;
-    mystruct | ushort_;
-    mystruct | int_;
-    mystruct | uint_;
-    mystruct | long_;
-    mystruct | ulong_;
-    mystruct | ptr;
-    mystruct | arr;
-    mystruct | mystruct;
-    mystruct & bool_;
-    mystruct & char_;
-    mystruct & byte_;
-    mystruct & short_;
-    mystruct & ushort_;
-    mystruct & int_;
-    mystruct & uint_;
-    mystruct & long_;
-    mystruct & ulong_;
-    mystruct & ptr;
-    mystruct & arr;
-    mystruct & mystruct;
+    mystruct | bool_; // E-T_BINOPRND_NINT
+    mystruct | char_; // E-T_BINOPRND_NINT
+    mystruct | byte_; // E-T_BINOPRND_NINT
+    mystruct | short_; // E-T_BINOPRND_NINT
+    mystruct | ushort_; // E-T_BINOPRND_NINT
+    mystruct | int_; // E-T_BINOPRND_NINT
+    mystruct | uint_; // E-T_BINOPRND_NINT
+    mystruct | long_; // E-T_BINOPRND_NINT
+    mystruct | ulong_; // E-T_BINOPRND_NINT
+    mystruct | ptr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    mystruct | arr; // E-T_BINOPRND_NINT
+    mystruct | mystruct; // E-T_BINOPRND_NINT
+    mystruct & bool_; // E-T_BINOPRND_NINT
+    mystruct & char_; // E-T_BINOPRND_NINT
+    mystruct & byte_; // E-T_BINOPRND_NINT
+    mystruct & short_; // E-T_BINOPRND_NINT
+    mystruct & ushort_; // E-T_BINOPRND_NINT
+    mystruct & int_; // E-T_BINOPRND_NINT
+    mystruct & uint_; // E-T_BINOPRND_NINT
+    mystruct & long_; // E-T_BINOPRND_NINT
+    mystruct & ulong_; // E-T_BINOPRND_NINT
+    mystruct & ptr; // E-T_BINOPRND_NINT, E-T_UNSAFE
+    mystruct & arr; // E-T_BINOPRND_NINT
+    mystruct & mystruct; // E-T_BINOPRND_NINT
 
     byte_ << bool_; // E-T_SHFT_NINT
     byte_ << char_; // E-T_SHFT_NINT
